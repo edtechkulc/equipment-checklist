@@ -137,6 +137,156 @@ label.form-label{font-size:12px;font-weight:800;color:var(--muted)}
 @keyframes spin{to{transform:rotate(360deg)}}
 .print-area{display:none}
 @media print{body>*:not(.print-area){display:none!important}.print-area{display:block!important;padding:24px;background:#fff}}
+
+/* ── GOOGLE CALENDAR STYLE ENHANCEMENT ── */
+.calendar-grid.google-style {
+  gap: 0;
+  border: 1px solid var(--gray-2);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--gray-2);
+}
+.calendar-grid.google-style .day-name {
+  background: #fff;
+  border-right: 1px solid var(--gray-2);
+  border-bottom: 1px solid var(--gray-2);
+  border-radius: 0;
+  padding: 9px 6px;
+}
+.calendar-grid.google-style .day-name:nth-child(7) {
+  border-right: none;
+}
+.calendar-grid.google-style .day {
+  min-height: 128px;
+  border: 0;
+  border-right: 1px solid var(--gray-2);
+  border-bottom: 1px solid var(--gray-2);
+  border-radius: 0;
+  padding: 7px 5px 6px;
+  background: #fff;
+}
+.calendar-grid.google-style .day:nth-child(7n) {
+  border-right: none;
+}
+.calendar-grid.google-style .day:hover {
+  z-index: 2;
+  box-shadow: inset 0 0 0 2px rgba(0,107,63,.25);
+}
+.calendar-grid.google-style .day.today {
+  background: #f8fffb;
+}
+.calendar-grid.google-style .day.today .day-num {
+  background: var(--ku-green);
+  color: #fff;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.calendar-grid.google-style .day.selected {
+  outline: none;
+  box-shadow: inset 0 0 0 3px rgba(0,107,63,.22);
+}
+.day-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  min-height: 25px;
+}
+.day-count {
+  font-size: 10px;
+  font-weight: 800;
+  color: #64748b;
+  background: #f1f5f9;
+  border-radius: 999px;
+  padding: 2px 6px;
+}
+.day-events {
+  margin-top: 3px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.gcal-event {
+  min-height: 19px;
+  border-radius: 5px;
+  padding: 2px 6px;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1.45;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  border-left: 4px solid transparent;
+}
+.gcal-event:hover {
+  filter: brightness(.96);
+  transform: translateX(1px);
+}
+.gcal-event.pending {
+  background: #fff3cd;
+  color: #8a5a00;
+  border-left-color: #f59e0b;
+}
+.gcal-event.approved,
+.gcal-event.borrowed {
+  background: #dbeafe;
+  color: #1d4ed8;
+  border-left-color: #3b82f6;
+}
+.gcal-event.borrowed {
+  background: #fdecea;
+  color: #c0392b;
+  border-left-color: #c0392b;
+}
+.gcal-more {
+  font-size: 10px;
+  color: #475569;
+  font-weight: 800;
+  padding: 2px 5px;
+  cursor: pointer;
+}
+.gcal-more:hover {
+  text-decoration: underline;
+}
+.calendar-legend {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  display: inline-block;
+}
+.legend-pending { background: #f59e0b; }
+.legend-approved { background: #3b82f6; }
+.legend-borrowed { background: #c0392b; }
+@media(max-width:700px) {
+  .calendar-grid.google-style .day {
+    min-height: 96px;
+    padding: 5px 3px;
+  }
+  .gcal-event {
+    font-size: 9px;
+    padding: 2px 4px;
+  }
+  .day-count {
+    display: none;
+  }
+}
+
+
+.day.pending-day {
+  background: #fffdf3;
+}
+
 </style>
 </head>
 <body>
@@ -251,13 +401,13 @@ label.form-label{font-size:12px;font-weight:800;color:var(--muted)}
       <div class="card-body calendar-card">
         <div class="calendar-head">
           <div class="month-title" id="month-title">—</div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <span class="badge pending">รออนุมัติ</span>
-            <span class="badge approved">อนุมัติแล้ว</span>
-            <span class="badge busy">ถูกยืม/ชนคิว</span>
+          <div class="calendar-legend">
+            <span><i class="legend-dot legend-pending"></i> รออนุมัติ</span>
+            <span><i class="legend-dot legend-approved"></i> อนุมัติแล้ว</span>
+            <span><i class="legend-dot legend-borrowed"></i> ถูกยืม/ชนคิว</span>
           </div>
         </div>
-        <div class="calendar-grid" id="calendar-grid"></div>
+        <div class="calendar-grid google-style" id="calendar-grid"></div>
       </div>
     </div>
 
@@ -278,6 +428,15 @@ label.form-label{font-size:12px;font-weight:800;color:var(--muted)}
         <div style="font-size:12px;color:var(--muted)">ใช้อนุมัติ แก้ไขสถานะ หรือไม่อนุมัติคำขอยืมก่อนตัดสถานะเป็น “ถูกยืม”</div>
       </div>
       <button class="btn warn" onclick="syncFromGoogle()">🔄 โหลด/ซิงก์ข้อมูล</button>
+    </div>
+    <div class="card">
+      <div class="card-header">🔐 สิทธิ์เจ้าหน้าที่</div>
+      <div class="card-body">
+        <div id="admin-status"></div>
+        <div class="alert warn" style="margin-top:12px">
+          การอนุมัติ / ไม่อนุมัติ / ยืนยันคืน ต้องกรอก Admin key ก่อน เหมาะสำหรับการใช้งานภายในหน่วยงาน
+        </div>
+      </div>
     </div>
     <div id="approval-list"></div>
   </div>
@@ -321,6 +480,19 @@ label.form-label{font-size:12px;font-weight:800;color:var(--muted)}
         <div id="url-status" style="font-size:12px;color:var(--muted);margin-top:8px">ยังไม่ได้ตั้งค่า</div>
         <div class="alert info" style="margin-top:12px">
           ไฟล์นี้ออกแบบให้ทำงานได้ทันทีด้วย localStorage และยังคงรองรับการส่งข้อมูลไปยัง Google Sheets ผ่าน Apps Script URL เดิม โดย workflow ใหม่เพิ่มสถานะ pending / approved / rejected / returned
+        </div>
+
+        <hr style="border:0;border-top:1px solid var(--gray-2);margin:16px 0">
+
+        <div class="form-group">
+          <label class="form-label">Admin key สำหรับเจ้าหน้าที่</label>
+          <input class="form-control" id="adminKeySetting" placeholder="เช่น KU-ADMIN-2569">
+        </div>
+        <div class="btn-row">
+          <button class="btn primary" onclick="saveAdminKey()">💾 บันทึก Admin key</button>
+        </div>
+        <div class="alert warn" style="margin-top:12px">
+          ค่าเริ่มต้นคือ <strong>KU-ADMIN-2569</strong> ควรเปลี่ยนก่อนใช้งานจริงภายในหน่วยงาน
         </div>
       </div>
     </div>
@@ -444,6 +616,55 @@ const STATUS_LABEL = {
   rejected: ['⚫ ไม่อนุมัติ','idle'],
   returned: ['🟢 คืนแล้ว','returned']
 };
+
+// ══════════════════════════════════════════════
+// INTERNAL ADMIN CONFIG
+// เปลี่ยนรหัสนี้ให้เหมาะกับหน่วยงานของคุณ
+// หมายเหตุ: วิธีนี้เหมาะกับการใช้งานภายในแบบง่าย ไม่ใช่ระบบความปลอดภัยระดับสูง
+// ══════════════════════════════════════════════
+const ADMIN_KEY_STORAGE = 'equipment_admin_verified';
+const DEFAULT_ADMIN_KEY = localStorage.getItem('equipment_admin_key') || 'KU-ADMIN-2569';
+
+function requireAdmin(actionText='ดำเนินการสำหรับเจ้าหน้าที่') {
+  if (sessionStorage.getItem(ADMIN_KEY_STORAGE) === '1') return true;
+  const key = prompt(`กรอกรหัสเจ้าหน้าที่เพื่อ${actionText}`);
+  const adminKey = localStorage.getItem('equipment_admin_key') || DEFAULT_ADMIN_KEY;
+  if (key === adminKey) {
+    sessionStorage.setItem(ADMIN_KEY_STORAGE, '1');
+    showToast('✅ ยืนยันสิทธิ์เจ้าหน้าที่แล้ว');
+    renderAdminStatus();
+    return true;
+  }
+  showToast('❌ รหัสเจ้าหน้าที่ไม่ถูกต้อง');
+  return false;
+}
+
+function logoutAdmin() {
+  sessionStorage.removeItem(ADMIN_KEY_STORAGE);
+  renderAdminStatus();
+  showToast('ออกจากโหมดเจ้าหน้าที่แล้ว');
+}
+
+function renderAdminStatus() {
+  const el = document.getElementById('admin-status');
+  if (!el) return;
+  const ok = sessionStorage.getItem(ADMIN_KEY_STORAGE) === '1';
+  el.innerHTML = ok
+    ? '<span class="badge ok">🔐 โหมดเจ้าหน้าที่</span> <button class="btn danger" onclick="logoutAdmin()">ออกจากโหมดเจ้าหน้าที่</button>'
+    : '<span class="badge idle">🔒 ยังไม่ได้ยืนยันสิทธิ์เจ้าหน้าที่</span> <button class="btn primary" onclick="requireAdmin(\'เข้าสู่โหมดเจ้าหน้าที่\')">เข้าสู่โหมดเจ้าหน้าที่</button>';
+}
+
+function saveAdminKey() {
+  const val = document.getElementById('adminKeySetting')?.value.trim();
+  if (!val) {
+    showToast('⚠️ กรุณากรอกรหัส Admin key');
+    return;
+  }
+  localStorage.setItem('equipment_admin_key', val);
+  sessionStorage.removeItem(ADMIN_KEY_STORAGE);
+  renderAdminStatus();
+  showToast('✅ บันทึก Admin key แล้ว');
+}
 
 let state = {};
 let openSecs = {};
@@ -702,26 +923,130 @@ function renderCalendar(){
   const title = document.getElementById('month-title');
   const y = currentMonth.getFullYear(), m = currentMonth.getMonth();
   title.textContent = currentMonth.toLocaleDateString('th-TH', {month:'long', year:'numeric'});
+
   const first = new Date(y,m,1);
-  const start = new Date(first); start.setDate(1 - first.getDay());
+  const start = new Date(first);
+  start.setDate(1 - first.getDay());
+
   const names = ['อา','จ','อ','พ','พฤ','ศ','ส'];
   let html = names.map(n=>`<div class="day-name">${n}</div>`).join('');
-  const records = getRecords().filter(r=>['pending','approved','borrowed'].includes(r.status));
+
+  const records = getCalendarRecords_();
+  const todayIso = new Date().toISOString().slice(0,10);
+
   for(let i=0;i<42;i++){
-    const d = new Date(start); d.setDate(start.getDate()+i);
+    const d = new Date(start);
+    d.setDate(start.getDate()+i);
     const iso = d.toISOString().slice(0,10);
     const dayRecords = records.filter(r=>rangesOverlap(iso, iso, r.date, r.returnDate || r.date));
+
     const cls = ['day'];
     if(d.getMonth()!==m) cls.push('muted');
     if(selectedCalendarDate===iso) cls.push('selected');
+    if(todayIso===iso) cls.push('today');
     if(dayRecords.some(r=>['approved','borrowed'].includes(r.status))) cls.push('conflict-day');
-    html += `<div class="${cls.join(' ')}" onclick="selectCalendarDate('${iso}')">
-      <div class="day-num">${d.getDate()}</div>
-      ${dayRecords.slice(0,3).map(r=>`<div class="event-chip ${r.status==='pending'?'pending':(r.status==='approved'?'approved':'borrowed')}">${escapeHtml(r.event)}</div>`).join('')}
-      ${dayRecords.length>3?`<div class="event-chip">+${dayRecords.length-3} รายการ</div>`:''}
+    else if(dayRecords.some(r=>r.status==='pending')) cls.push('pending-day');
+
+    html += `<div class="${cls.join(' ')}" onclick="selectCalendarDate('${iso}')" title="${escapeHtml(dayRecords.map(r=>r.event).join(' | '))}">
+      <div class="day-top">
+        <div class="day-num">${d.getDate()}</div>
+        ${dayRecords.length ? `<div class="day-count">📦 ${dayRecords.length}</div>` : ''}
+      </div>
+      <div class="day-events" id="day-events-${iso}"></div>
     </div>`;
   }
+
   grid.innerHTML = html;
+  renderGoogleCalendarEventBars_(records, start);
+}
+function getCalendarRecords_(){
+  return getRecords().filter(r=>['pending','approved','borrowed'].includes(r.status));
+}
+function renderGoogleCalendarEventBars_(records, calendarStartDate){
+  const maxPerDay = 4;
+  const visibleCountByDay = {};
+  const hiddenCountByDay = {};
+
+  records
+    .slice()
+    .sort((a,b)=>{
+      const aDays = daysBetween_(a.date, a.returnDate || a.date);
+      const bDays = daysBetween_(b.date, b.returnDate || b.date);
+      return bDays - aDays || String(a.event).localeCompare(String(b.event),'th');
+    })
+    .forEach(r=>{
+      const dates = getDatesBetween_(r.date, r.returnDate || r.date);
+      dates.forEach((iso, idx)=>{
+        const container = document.getElementById('day-events-' + iso);
+        if(!container) return;
+
+        visibleCountByDay[iso] = visibleCountByDay[iso] || 0;
+        hiddenCountByDay[iso] = hiddenCountByDay[iso] || 0;
+
+        if(visibleCountByDay[iso] >= maxPerDay) {
+          hiddenCountByDay[iso]++;
+          return;
+        }
+
+        const bar = document.createElement('div');
+        bar.className = 'gcal-event ' + (r.status === 'pending' ? 'pending' : (r.status === 'borrowed' ? 'borrowed' : 'approved'));
+
+        const isFirst = idx === 0;
+        const isMulti = dates.length > 1;
+        const prefix = r.status === 'pending' ? '🟡' : (r.status === 'borrowed' ? '🔴' : '🔵');
+        bar.textContent = isFirst
+          ? `${prefix} ${r.event || 'ไม่ระบุงาน'}${isMulti ? ` (${dates.length} วัน)` : ''}`
+          : `↳ ${r.event || 'ไม่ระบุงาน'}`;
+
+        bar.title = `${r.event || '-'}
+ผู้ขอยืม: ${r.user || '-'}
+วันที่: ${r.date} - ${r.returnDate || r.date}
+สถานะ: ${(STATUS_LABEL[r.status] || [''])[0]}`;
+        bar.onclick = (ev) => {
+          ev.stopPropagation();
+          selectCalendarDate(iso);
+          focusRequestInDayDetail_(r.id);
+        };
+        container.appendChild(bar);
+        visibleCountByDay[iso]++;
+      });
+    });
+
+  Object.keys(hiddenCountByDay).forEach(iso=>{
+    const container = document.getElementById('day-events-' + iso);
+    if(!container || !hiddenCountByDay[iso]) return;
+    const more = document.createElement('div');
+    more.className = 'gcal-more';
+    more.textContent = `+${hiddenCountByDay[iso]} more`;
+    more.onclick = (ev) => {
+      ev.stopPropagation();
+      selectCalendarDate(iso);
+    };
+    container.appendChild(more);
+  });
+}
+function getDatesBetween_(startIso, endIso){
+  const dates = [];
+  const d = new Date(startIso);
+  const end = new Date(endIso || startIso);
+  while(d <= end){
+    dates.push(d.toISOString().slice(0,10));
+    d.setDate(d.getDate()+1);
+  }
+  return dates;
+}
+function daysBetween_(startIso, endIso){
+  return getDatesBetween_(startIso, endIso).length;
+}
+function focusRequestInDayDetail_(id){
+  setTimeout(()=>{
+    const el = document.getElementById('req-' + id);
+    if(el) {
+      el.scrollIntoView({behavior:'smooth', block:'center'});
+      el.style.boxShadow = '0 0 0 3px rgba(0,107,63,.25), var(--shadow-soft)';
+      setTimeout(()=>{ el.style.boxShadow = 'var(--shadow-soft)'; }, 1600);
+    }
+  }, 80);
 }
 function selectCalendarDate(iso){
   selectedCalendarDate = iso; renderCalendar(); renderDayDetail(iso);
@@ -746,7 +1071,7 @@ function requestCard(r, mode='view'){
     </div>` : mode==='return' ? `
     <div class="btn-row"><button class="btn success" onclick="markReturned('${r.id}')">↩️ ยืนยันคืนอุปกรณ์</button><button class="btn" onclick="printRequest('${r.id}')">🖨️ พิมพ์</button></div>` : `
     <div class="btn-row"><button class="btn" onclick="printRequest('${r.id}')">🖨️ พิมพ์</button></div>`;
-  return `<div class="request-card">
+  return `<div class="request-card" id="req-${r.id}">
     <div class="request-top">
       <div>
         <div class="request-title">${escapeHtml(r.event)}</div>
@@ -763,6 +1088,7 @@ function renderApproval(){
   document.getElementById('approval-list').innerHTML = records.length ? records.map(r=>requestCard(r,'approval')).join('') : '<div class="alert info">ไม่มีคำขอที่รออนุมัติ</div>';
 }
 function approveRequest(id){
+  if(!requireAdmin('อนุมัติคำขอ')) return;
   const records = getRecords();
   const r = records.find(x=>x.id===id); if(!r) return;
   // Final conflict check: approved/borrowed records only, excluding this record
@@ -777,6 +1103,7 @@ function approveRequest(id){
   renderAll(); showToast('✅ อนุมัติคำขอแล้ว');
 }
 function rejectRequest(id){
+  if(!requireAdmin('ไม่อนุมัติคำขอ')) return;
   const reason = prompt('ระบุเหตุผลที่ไม่อนุมัติ (ถ้ามี)','อุปกรณ์ไม่พร้อมใช้งาน / ชนคิว');
   const records = getRecords(); const r = records.find(x=>x.id===id); if(!r) return;
   r.status='rejected'; r.rejectedAt=new Date().toISOString(); r.rejectReason=reason||'';
@@ -788,6 +1115,7 @@ function renderReturnList(){
   document.getElementById('return-list').innerHTML = records.length ? records.map(r=>requestCard(r,'return')).join('') : '<div class="alert info">ไม่มีรายการที่รอคืนอุปกรณ์</div>';
 }
 function markReturned(id){
+  if(!requireAdmin('ยืนยันคืนอุปกรณ์')) return;
   const returnedBy = prompt('ชื่อผู้คืน / ผู้รับคืน','เจ้าหน้าที่');
   if(returnedBy===null) return;
   const records = getRecords(); const r = records.find(x=>x.id===id); if(!r) return;
@@ -866,7 +1194,7 @@ function saveScriptUrl(){
   else{st.textContent='ยังไม่ได้ตั้งค่า';st.style.color='var(--muted)';}
 }
 function renderAll(){
-  renderCalendar(); renderApproval(); renderReturnList(); renderHistory(); updateHeaderStats();
+  renderCalendar(); renderApproval(); renderReturnList(); renderHistory(); updateHeaderStats(); renderAdminStatus();
 }
 function updateHeaderStats(){
   const r=getRecords();
@@ -895,6 +1223,9 @@ const DEFAULT_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzjqableak_H
 if(!localStorage.getItem('script_url')) localStorage.setItem('script_url', DEFAULT_SCRIPT_URL);
 document.getElementById('scriptUrl').value = localStorage.getItem('script_url') || '';
 saveScriptUrl();
+renderAdminStatus();
+const adminInput = document.getElementById('adminKeySetting');
+if(adminInput) adminInput.value = localStorage.getItem('equipment_admin_key') || DEFAULT_ADMIN_KEY;
 </script>
 </body>
 </html>
