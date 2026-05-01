@@ -268,82 +268,106 @@
   .saved-item-line:last-child { border-bottom: none; }
 
   /* ── RETURN TAB ── */
-  .return-group {
-    border: 1px solid var(--gray-mid);
-    border-radius: var(--radius);
+  /* Step indicator */
+  .return-steps {
+    display: flex; align-items: center; gap: 0;
+    margin-bottom: 14px; background: #fff;
+    border-radius: var(--radius); box-shadow: var(--shadow);
     overflow: hidden;
-    margin-bottom: 10px;
+  }
+  .return-step {
+    flex: 1; padding: 10px 12px; text-align: center;
+    font-size: 12px; font-weight: 600; color: var(--text-muted);
+    background: var(--gray); border-right: 1px solid var(--gray-mid);
+    transition: all 0.2s;
+  }
+  .return-step:last-child { border-right: none; }
+  .return-step.active { background: var(--blue); color: #fff; }
+  .return-step.done { background: var(--green-light); color: var(--green); }
+  .return-step-num {
+    display: inline-block; width: 18px; height: 18px;
+    border-radius: 50%; background: rgba(0,0,0,0.15);
+    line-height: 18px; font-size: 10px; margin-right: 5px;
+  }
+  .return-step.active .return-step-num { background: rgba(255,255,255,0.3); }
+  .return-step.done .return-step-num { background: var(--green); color: #fff; }
+
+  /* Borrower picker cards */
+  .borrower-card {
+    background: #fff; border: 2px solid var(--gray-mid);
+    border-radius: var(--radius); padding: 12px 14px;
+    margin-bottom: 8px; cursor: pointer;
+    transition: all 0.15s; display: flex; align-items: center; gap: 12px;
     box-shadow: var(--shadow);
   }
-  .return-group-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 14px;
-    background: var(--blue-light);
-    border-bottom: 1px solid var(--gray-mid);
-    gap: 10px;
+  .borrower-card:hover { border-color: var(--blue); background: var(--blue-light); }
+  .borrower-card.selected { border-color: var(--blue); background: var(--blue-light); }
+  .borrower-avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: var(--blue); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 700; flex-shrink: 0;
   }
-  .return-group-header.all-selected { background: var(--green-light); }
-  .return-group-info { flex: 1; min-width: 0; }
-  .return-group-title {
-    font-size: 13px; font-weight: 700;
-    color: var(--blue-dark); white-space: nowrap;
-    overflow: hidden; text-overflow: ellipsis;
+  .borrower-card.selected .borrower-avatar { background: var(--blue-dark); }
+  .borrower-info { flex: 1; min-width: 0; }
+  .borrower-name { font-size: 14px; font-weight: 700; color: var(--text); }
+  .borrower-event { font-size: 12px; color: var(--text-muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .borrower-meta { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+  .borrower-count {
+    font-size: 12px; padding: 3px 10px; border-radius: 100px;
+    background: var(--blue); color: #fff; font-weight: 700;
+    flex-shrink: 0;
   }
-  .return-group-meta { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
-  .return-group-count {
-    font-size: 11px; padding: 2px 9px;
-    border-radius: 100px; background: var(--blue);
-    color: #fff; font-weight: 600; white-space: nowrap; flex-shrink: 0;
+  .borrower-card.selected .borrower-count { background: var(--blue-dark); }
+
+  /* Confirm panel */
+  .confirm-panel { display: none; }
+  .confirm-panel.visible { display: block; }
+
+  .confirm-back-btn {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 12px; color: var(--blue); cursor: pointer;
+    background: none; border: none; font-family: inherit;
+    padding: 0; margin-bottom: 10px; font-weight: 600;
   }
-  .return-group-count.selected-count { background: var(--green); }
-  .btn-select-group {
-    padding: 4px 10px; font-size: 11px; font-weight: 600;
-    border-radius: 6px; cursor: pointer; border: 1px solid var(--blue);
-    background: #fff; color: var(--blue); white-space: nowrap; flex-shrink: 0;
-    transition: all 0.15s; font-family: inherit;
+  .confirm-back-btn:hover { text-decoration: underline; }
+
+  .confirm-header {
+    background: var(--blue-dark); color: #fff;
+    border-radius: var(--radius) var(--radius) 0 0;
+    padding: 12px 14px;
   }
-  .btn-select-group:hover { background: var(--blue); color: #fff; }
-  .btn-select-group.deselect { border-color: var(--green); color: var(--green); }
-  .btn-select-group.deselect:hover { background: var(--green); color: #fff; }
+  .confirm-header-name { font-size: 15px; font-weight: 700; }
+  .confirm-header-meta { font-size: 11px; opacity: 0.8; margin-top: 3px; }
 
   .return-item-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 9px 14px;
-    border-bottom: 1px solid var(--gray);
-    transition: background 0.1s;
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 14px; border-bottom: 1px solid var(--gray);
+    transition: background 0.1s; background: #fff;
   }
   .return-item-row:last-child { border-bottom: none; }
   .return-item-row:hover { background: #fafafa; }
   .return-item-row.selected { background: #f0faf4; }
-  .return-check { width: 15px; height: 15px; accent-color: var(--green); cursor: pointer; flex-shrink: 0; }
-  .return-item-info { flex: 1; min-width: 0; }
-  .return-item-name { font-size: 13px; font-weight: 500; }
+  .return-check { width: 16px; height: 16px; accent-color: var(--green); cursor: pointer; flex-shrink: 0; }
+  .return-item-name { flex: 1; font-size: 13px; font-weight: 500; }
   .return-item-meta { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+
   .return-empty {
     text-align: center; padding: 32px 16px;
     color: var(--text-muted); font-size: 14px;
   }
   .return-empty .icon { font-size: 36px; margin-bottom: 8px; }
 
-  /* Summary bar */
-  .return-summary-bar {
-    display: none;
-    background: var(--green-light);
-    border: 1px solid #b8dfc9;
-    border-radius: var(--radius);
-    padding: 10px 14px;
-    font-size: 12px;
-    color: var(--green);
-    margin-bottom: 10px;
-    align-items: center;
-    gap: 8px;
-    font-weight: 600;
+  .select-all-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 14px; background: var(--gray);
+    border-bottom: 1px solid var(--gray-mid); font-size: 12px; color: var(--text-muted);
   }
-  .return-summary-bar.visible { display: flex; }
+  .select-all-btn {
+    font-size: 11px; font-weight: 600; color: var(--blue);
+    background: none; border: none; cursor: pointer; font-family: inherit; padding: 0;
+  }
+  .select-all-btn:hover { text-decoration: underline; }
 
   /* ── GUIDE ── */
   .guide-step {
@@ -520,48 +544,73 @@
 <div class="tab-panel" id="panel-return">
 <div class="container">
 
-  <div class="card">
-    <div class="card-header green">↩️ บันทึกการคืนอุปกรณ์</div>
-    <div class="card-body">
-      <div class="form-grid">
-        <div class="form-group span2">
-          <div class="form-label">ชื่อผู้คืน *</div>
-          <input class="form-control" type="text" id="returnedBy" placeholder="กรอกชื่อ-นามสกุล">
-        </div>
-        <div class="form-group span2">
-          <div class="form-label">หมายเหตุ (เช่น สภาพอุปกรณ์)</div>
-          <input class="form-control" type="text" id="returnNote" placeholder="(ถ้ามี)">
-        </div>
+  <!-- Step indicator -->
+  <div class="return-steps">
+    <div class="return-step active" id="step-1">
+      <span class="return-step-num">1</span>เลือกผู้ยืม / งาน
+    </div>
+    <div class="return-step" id="step-2">
+      <span class="return-step-num">2</span>ยืนยันอุปกรณ์
+    </div>
+  </div>
+
+  <!-- STEP 1: Borrower picker -->
+  <div id="return-step1-panel">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <div style="font-size:13px;font-weight:600;color:var(--text-muted)">เลือกรายการที่ต้องการคืนอุปกรณ์</div>
+      <button class="btn avail" style="padding:6px 12px;font-size:12px" id="refreshReturnBtn" onclick="loadBorrowedList()">
+        🔄 โหลดรายการ
+      </button>
+    </div>
+    <div id="borrower-list">
+      <div class="return-empty">
+        <div class="icon">📦</div>
+        <div>กด <strong>โหลดรายการ</strong> เพื่อดูรายชื่อผู้ยืมและงานที่ยืมอุปกรณ์อยู่</div>
       </div>
     </div>
   </div>
 
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-    <div style="font-size:13px;font-weight:600;color:var(--text-muted)">รายการที่ถูกยืมอยู่ในขณะนี้</div>
-    <button class="btn avail" style="padding:6px 12px;font-size:12px" id="refreshReturnBtn" onclick="loadBorrowedList()">
-      🔄 โหลดรายการ
-    </button>
-  </div>
+  <!-- STEP 2: Confirm items for selected group -->
+  <div class="confirm-panel" id="return-step2-panel">
+    <button class="confirm-back-btn" onclick="goBackToStep1()">← กลับไปเลือกรายการ</button>
 
-  <!-- Summary bar -->
-  <div class="return-summary-bar" id="return-summary-bar">
-    <span>✅</span>
-    <span id="return-summary-text">เลือก 0 รายการ</span>
-    <button class="btn" style="margin-left:auto;padding:4px 10px;font-size:11px" onclick="selectAllItems()">เลือกทั้งหมด</button>
-  </div>
+    <!-- Selected group header -->
+    <div style="border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);margin-bottom:12px">
+      <div class="confirm-header">
+        <div class="confirm-header-name" id="confirm-name">👤 —</div>
+        <div class="confirm-header-meta" id="confirm-meta">📌 —</div>
+      </div>
 
-  <div id="return-list">
-    <div class="return-empty">
-      <div class="icon">📦</div>
-      <div>กด <strong>โหลดรายการ</strong> เพื่อดูอุปกรณ์ที่ถูกยืมอยู่</div>
+      <!-- Item checklist -->
+      <div class="select-all-bar">
+        <span id="confirm-selected-count">เลือกทั้งหมด 0 รายการ</span>
+        <button class="select-all-btn" onclick="toggleSelectAll()">เลือก / ยกเลิกทั้งหมด</button>
+      </div>
+      <div id="confirm-item-list"></div>
     </div>
-  </div>
 
-  <div class="btn-row">
-    <button class="btn success" id="confirmReturnBtn" onclick="confirmReturn()" disabled>
-      ✅ ยืนยันการคืน (<span id="return-count">0</span> รายการ)
-    </button>
-    <button class="btn" onclick="clearReturnSelection()">🔄 ยกเลิกการเลือก</button>
+    <!-- Return form -->
+    <div class="card">
+      <div class="card-header green">📝 ข้อมูลการคืน</div>
+      <div class="card-body">
+        <div class="form-grid">
+          <div class="form-group span2">
+            <div class="form-label">ชื่อผู้คืน *</div>
+            <input class="form-control" type="text" id="returnedBy" placeholder="กรอกชื่อ-นามสกุล">
+          </div>
+          <div class="form-group span2">
+            <div class="form-label">หมายเหตุ (เช่น สภาพอุปกรณ์)</div>
+            <input class="form-control" type="text" id="returnNote" placeholder="(ถ้ามี)">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn success" id="confirmReturnBtn" onclick="confirmReturn()" disabled>
+        ✅ ยืนยันการคืน (<span id="return-count">0</span> รายการ)
+      </button>
+    </div>
   </div>
 
 </div>
@@ -769,7 +818,6 @@ let availData = null;
 
 // Return tab state
 let borrowedItems = [];     // รายการที่ถูกยืมอยู่จาก server
-let selectedReturn = new Set(); // รายการที่เลือกจะคืน
 
 function initState() {
   EQUIPMENT.forEach(cat => cat.items.forEach(item => {
@@ -937,8 +985,13 @@ function renderAvailability() {
 }
 
 // ══════════════════════════════════════════════
-// RETURN TAB — โหลดรายการที่ถูกยืม
 // ══════════════════════════════════════════════
+// RETURN TAB — 2-Step Flow
+// ══════════════════════════════════════════════
+let borrowedGroups = {};   // { groupKey: { borrowedBy, event, returnDate, updatedAt, items[] } }
+let activeGroupKey = null; // key ของกลุ่มที่เลือกอยู่
+let selectedReturn = new Set();
+
 async function loadBorrowedList() {
   const scriptUrl = localStorage.getItem('script_url');
   if (!scriptUrl) { showToast('⚠️ ยังไม่ได้ตั้งค่า Google Sheets URL'); return; }
@@ -946,8 +999,6 @@ async function loadBorrowedList() {
   const btn = document.getElementById('refreshReturnBtn');
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner" style="border-top-color:var(--orange)"></span>กำลังโหลด...';
-  selectedReturn.clear();
-  updateReturnCount();
 
   try {
     const res = await fetch(scriptUrl + '?action=borrowed_list');
@@ -955,11 +1006,12 @@ async function loadBorrowedList() {
     if (!json.success) throw new Error(json.error || 'ไม่สามารถดึงข้อมูลได้');
 
     borrowedItems = json.items || [];
-    renderBorrowedList();
-    showToast(`✅ พบอุปกรณ์ที่ถูกยืมอยู่ ${borrowedItems.length} รายการ`);
+    buildGroups();
+    renderBorrowerCards();
+    showToast(`✅ พบอุปกรณ์ที่ถูกยืม ${borrowedItems.length} รายการ จาก ${Object.keys(borrowedGroups).length} รายการ/กิจกรรม`);
   } catch (err) {
     showToast('❌ โหลดไม่สำเร็จ: ' + err.message);
-    document.getElementById('return-list').innerHTML = `
+    document.getElementById('borrower-list').innerHTML = `
       <div class="return-empty">
         <div class="icon">⚠️</div>
         <div>ไม่สามารถโหลดข้อมูลได้<br><small style="color:#999">${err.message}</small></div>
@@ -970,24 +1022,12 @@ async function loadBorrowedList() {
   }
 }
 
-function renderBorrowedList() {
-  const container = document.getElementById('return-list');
-  if (borrowedItems.length === 0) {
-    container.innerHTML = `
-      <div class="return-empty">
-        <div class="icon">✅</div>
-        <div>ไม่มีอุปกรณ์ที่ถูกยืมอยู่ในขณะนี้</div>
-      </div>`;
-    document.getElementById('return-summary-bar').classList.remove('visible');
-    return;
-  }
-
-  // จัดกลุ่มตาม borrowedBy + event
-  const groups = {};
+function buildGroups() {
+  borrowedGroups = {};
   borrowedItems.forEach((item, idx) => {
     const key = (item.borrowedBy || 'ไม่ระบุ') + '|||' + (item.event || 'ไม่ระบุงาน');
-    if (!groups[key]) {
-      groups[key] = {
+    if (!borrowedGroups[key]) {
+      borrowedGroups[key] = {
         borrowedBy: item.borrowedBy || 'ไม่ระบุ',
         event: item.event || 'ไม่ระบุงาน',
         returnDate: item.returnDate || '',
@@ -995,120 +1035,113 @@ function renderBorrowedList() {
         items: []
       };
     }
-    groups[key].items.push({ ...item, _idx: idx });
+    borrowedGroups[key].items.push({ ...item, _idx: idx });
   });
+}
 
-  const groupKeys = Object.keys(groups);
-  container.innerHTML = groupKeys.map((key, gIdx) => {
-    const g = groups[key];
-    const itemsHtml = g.items.map((item) => `
-      <div class="return-item-row" id="ret-row-${item._idx}">
-        <input type="checkbox" class="return-check" id="ret-chk-${item._idx}"
-          onchange="toggleReturnItem(${item._idx}, '${escapeAttr(item.name)}')">
-        <div class="return-item-info">
-          <div class="return-item-name">${item.name}</div>
-          ${item.updatedAt ? `<div class="return-item-meta">🕒 ยืมเมื่อ: ${item.updatedAt}</div>` : ''}
-        </div>
-      </div>`).join('');
+function renderBorrowerCards() {
+  const container = document.getElementById('borrower-list');
+  const keys = Object.keys(borrowedGroups);
 
-    const returnDateStr = g.returnDate ? ` · 📅 กำหนดคืน: <strong>${g.returnDate}</strong>` : '';
-    const borrowedAtStr = g.updatedAt ? ` · 🕒 ${g.updatedAt}` : '';
+  if (keys.length === 0) {
+    container.innerHTML = `
+      <div class="return-empty">
+        <div class="icon">✅</div>
+        <div>ไม่มีอุปกรณ์ที่ถูกยืมอยู่ในขณะนี้</div>
+      </div>`;
+    return;
+  }
 
+  container.innerHTML = keys.map(key => {
+    const g = borrowedGroups[key];
+    const initial = (g.borrowedBy || '?').charAt(0).toUpperCase();
+    const returnStr = g.returnDate ? `📅 กำหนดคืน: ${g.returnDate}` : '';
+    const borrowedAtStr = g.updatedAt ? `🕒 ยืมเมื่อ: ${g.updatedAt}` : '';
+    const metaParts = [returnStr, borrowedAtStr].filter(Boolean).join('  ·  ');
     return `
-      <div class="return-group" id="grp-${gIdx}">
-        <div class="return-group-header" id="grp-hdr-${gIdx}">
-          <div class="return-item-info" style="flex:1;min-width:0">
-            <div class="return-group-title">👤 ${g.borrowedBy}</div>
-            <div class="return-group-meta">📌 ${g.event}${returnDateStr}</div>
-          </div>
-          <span class="return-group-count" id="grp-count-${gIdx}">${g.items.length} รายการ</span>
-          <button class="btn-select-group" id="grp-btn-${gIdx}"
-            onclick="toggleGroup('${escapeAttr(key)}', ${gIdx})">เลือกทั้งกลุ่ม</button>
+      <div class="borrower-card" onclick="selectBorrowerGroup('${escapeAttr(key)}')">
+        <div class="borrower-avatar">${initial}</div>
+        <div class="borrower-info">
+          <div class="borrower-name">${g.borrowedBy}</div>
+          <div class="borrower-event">📌 ${g.event}</div>
+          ${metaParts ? `<div class="borrower-meta">${metaParts}</div>` : ''}
         </div>
-        <div>${itemsHtml}</div>
+        <span class="borrower-count">${g.items.length} ชิ้น</span>
       </div>`;
   }).join('');
-
-  document.getElementById('return-summary-bar').classList.add('visible');
-  updateReturnSummary();
 }
 
-function escapeAttr(str) {
-  return (str || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+function selectBorrowerGroup(key) {
+  activeGroupKey = key;
+  selectedReturn.clear();
+  const g = borrowedGroups[key];
+  if (!g) return;
+
+  // Pre-select all items in the group
+  g.items.forEach(item => selectedReturn.add(item.name));
+
+  // Update step UI
+  document.getElementById('step-1').classList.remove('active');
+  document.getElementById('step-1').classList.add('done');
+  document.getElementById('step-1').querySelector('.return-step-num').textContent = '✓';
+  document.getElementById('step-2').classList.add('active');
+
+  // Fill confirm panel header
+  document.getElementById('confirm-name').textContent = '👤 ' + g.borrowedBy;
+  const meta = ['📌 ' + g.event, g.returnDate ? '📅 กำหนดคืน: ' + g.returnDate : ''].filter(Boolean).join('  ·  ');
+  document.getElementById('confirm-meta').textContent = meta;
+
+  // Fill item checklist (all pre-checked)
+  document.getElementById('confirm-item-list').innerHTML = g.items.map((item, i) => `
+    <div class="return-item-row selected" id="ci-row-${i}">
+      <input type="checkbox" class="return-check" id="ci-chk-${i}" checked
+        onchange="toggleConfirmItem(${i}, '${escapeAttr(item.name)}')">
+      <div style="flex:1">
+        <div class="return-item-name">${item.name}</div>
+        ${item.updatedAt ? `<div class="return-item-meta">🕒 ยืมเมื่อ: ${item.updatedAt}</div>` : ''}
+      </div>
+    </div>`).join('');
+
+  // Auto-fill returnedBy with borrower name as hint
+  const returnedByEl = document.getElementById('returnedBy');
+  if (!returnedByEl.value) returnedByEl.value = g.borrowedBy;
+
+  updateConfirmCount();
+
+  // Show/hide panels
+  document.getElementById('return-step1-panel').style.display = 'none';
+  document.getElementById('return-step2-panel').classList.add('visible');
 }
 
-function toggleReturnItem(idx, name) {
-  const chk = document.getElementById('ret-chk-'+idx);
-  const row = document.getElementById('ret-row-'+idx);
-  if (chk.checked) {
-    selectedReturn.add(name);
-    row.classList.add('selected');
-  } else {
-    selectedReturn.delete(name);
-    row.classList.remove('selected');
-  }
-  // sync group headers
-  const groups = {};
-  borrowedItems.forEach((item, i) => {
-    const k = (item.borrowedBy || 'ไม่ระบุ') + '|||' + (item.event || 'ไม่ระบุงาน');
-    if (!groups[k]) groups[k] = { items: [], gIdx: Object.keys(groups).length };
-    groups[k].items.push(item);
-  });
-  let gIdx = 0;
-  Object.values(groups).forEach(g => {
-    const selectedInGroup = g.items.filter(i => selectedReturn.has(i.name)).length;
-    const hdr = document.getElementById('grp-hdr-' + gIdx);
-    const btn = document.getElementById('grp-btn-' + gIdx);
-    const countEl = document.getElementById('grp-count-' + gIdx);
-    if (selectedInGroup === g.items.length && g.items.length > 0) {
-      hdr?.classList.add('all-selected');
-      if (btn) { btn.textContent = 'ยกเลิกกลุ่ม'; btn.classList.add('deselect'); }
-      if (countEl) { countEl.textContent = `✓ ${g.items.length} รายการ`; countEl.classList.add('selected-count'); }
-    } else {
-      hdr?.classList.remove('all-selected');
-      if (btn) { btn.textContent = 'เลือกทั้งกลุ่ม'; btn.classList.remove('deselect'); }
-      if (countEl) { countEl.textContent = `${g.items.length} รายการ`; countEl.classList.remove('selected-count'); }
-    }
-    gIdx++;
-  });
-  updateReturnCount();
+function goBackToStep1() {
+  activeGroupKey = null;
+  selectedReturn.clear();
+
+  document.getElementById('step-1').classList.add('active');
+  document.getElementById('step-1').classList.remove('done');
+  document.getElementById('step-1').querySelector('.return-step-num').textContent = '1';
+  document.getElementById('step-2').classList.remove('active');
+
+  document.getElementById('return-step1-panel').style.display = 'block';
+  document.getElementById('return-step2-panel').classList.remove('visible');
 }
 
-function updateReturnCount() {
-  const count = selectedReturn.size;
-  document.getElementById('return-count').textContent = count;
-  document.getElementById('confirmReturnBtn').disabled = count === 0;
-  updateReturnSummary();
+function toggleConfirmItem(i, name) {
+  const chk = document.getElementById('ci-chk-' + i);
+  const row = document.getElementById('ci-row-' + i);
+  if (chk.checked) { selectedReturn.add(name); row.classList.add('selected'); }
+  else { selectedReturn.delete(name); row.classList.remove('selected'); }
+  updateConfirmCount();
 }
 
-function updateReturnSummary() {
-  const count = selectedReturn.size;
-  const total = borrowedItems.length;
-  const summaryBar = document.getElementById('return-summary-bar');
-  if (!summaryBar) return;
-  if (total === 0) { summaryBar.classList.remove('visible'); return; }
-  summaryBar.classList.add('visible');
-  document.getElementById('return-summary-text').textContent =
-    count === 0 ? `มีอุปกรณ์ถูกยืม ${total} รายการ — เลือกรายการที่ต้องการคืน`
-                : `เลือกแล้ว ${count} จาก ${total} รายการ`;
-}
-
-// จัดกลุ่มเพื่อเลือกทั้งกลุ่ม
-function toggleGroup(key, gIdx) {
-  const groups = {};
-  borrowedItems.forEach((item, idx) => {
-    const k = (item.borrowedBy || 'ไม่ระบุ') + '|||' + (item.event || 'ไม่ระบุงาน');
-    if (!groups[k]) groups[k] = [];
-    groups[k].push({ ...item, _idx: idx });
-  });
-
-  const groupItems = groups[key] || [];
-  const allSelected = groupItems.every(item => selectedReturn.has(item.name));
-
-  groupItems.forEach(item => {
-    const chk = document.getElementById('ret-chk-' + item._idx);
-    const row = document.getElementById('ret-row-' + item._idx);
-    if (allSelected) {
+function toggleSelectAll() {
+  const g = borrowedGroups[activeGroupKey];
+  if (!g) return;
+  const allChecked = g.items.every(item => selectedReturn.has(item.name));
+  g.items.forEach((item, i) => {
+    const chk = document.getElementById('ci-chk-' + i);
+    const row = document.getElementById('ci-row-' + i);
+    if (allChecked) {
       selectedReturn.delete(item.name);
       if (chk) chk.checked = false;
       if (row) row.classList.remove('selected');
@@ -1118,80 +1151,29 @@ function toggleGroup(key, gIdx) {
       if (row) row.classList.add('selected');
     }
   });
-
-  // อัปเดต UI ของ group header
-  const hdr = document.getElementById('grp-hdr-' + gIdx);
-  const btn = document.getElementById('grp-btn-' + gIdx);
-  const countEl = document.getElementById('grp-count-' + gIdx);
-  const selectedInGroup = groupItems.filter(i => selectedReturn.has(i.name)).length;
-
-  if (selectedInGroup === groupItems.length) {
-    hdr?.classList.add('all-selected');
-    if (btn) { btn.textContent = 'ยกเลิกกลุ่ม'; btn.classList.add('deselect'); }
-    if (countEl) { countEl.textContent = `✓ ${groupItems.length} รายการ`; countEl.classList.add('selected-count'); }
-  } else {
-    hdr?.classList.remove('all-selected');
-    if (btn) { btn.textContent = 'เลือกทั้งกลุ่ม'; btn.classList.remove('deselect'); }
-    if (countEl) { countEl.textContent = `${groupItems.length} รายการ`; countEl.classList.remove('selected-count'); }
-  }
-
-  updateReturnCount();
+  updateConfirmCount();
 }
 
-function selectAllItems() {
-  borrowedItems.forEach((item, idx) => {
-    selectedReturn.add(item.name);
-    const chk = document.getElementById('ret-chk-' + idx);
-    const row = document.getElementById('ret-row-' + idx);
-    if (chk) chk.checked = true;
-    if (row) row.classList.add('selected');
-  });
-  // อัปเดต group headers
-  const groups = {};
-  borrowedItems.forEach((item, idx) => {
-    const k = (item.borrowedBy || 'ไม่ระบุ') + '|||' + (item.event || 'ไม่ระบุงาน');
-    if (!groups[k]) groups[k] = { items: [], gIdx: Object.keys(groups).length };
-    groups[k].items.push(idx);
-  });
-  let gIdx = 0;
-  Object.values(groups).forEach(g => {
-    const hdr = document.getElementById('grp-hdr-' + gIdx);
-    const btn = document.getElementById('grp-btn-' + gIdx);
-    const countEl = document.getElementById('grp-count-' + gIdx);
-    hdr?.classList.add('all-selected');
-    if (btn) { btn.textContent = 'ยกเลิกกลุ่ม'; btn.classList.add('deselect'); }
-    if (countEl) { countEl.textContent = `✓ ${g.items.length} รายการ`; countEl.classList.add('selected-count'); }
-    gIdx++;
-  });
-  updateReturnCount();
+function updateConfirmCount() {
+  const count = selectedReturn.size;
+  document.getElementById('return-count').textContent = count;
+  document.getElementById('confirmReturnBtn').disabled = count === 0;
+  const g = borrowedGroups[activeGroupKey];
+  const total = g ? g.items.length : 0;
+  document.getElementById('confirm-selected-count').textContent = `เลือกแล้ว ${count} จาก ${total} รายการ`;
 }
 
-function clearReturnSelection() {
-  selectedReturn.clear();
-  borrowedItems.forEach((_, idx) => {
-    const chk = document.getElementById('ret-chk-'+idx);
-    if (chk) chk.checked = false;
-    const row = document.getElementById('ret-row-'+idx);
-    if (row) row.classList.remove('selected');
-  });
-  // reset all group headers
-  document.querySelectorAll('.return-group-header').forEach(hdr => hdr.classList.remove('all-selected'));
-  document.querySelectorAll('.btn-select-group').forEach(btn => { btn.textContent = 'เลือกทั้งกลุ่ม'; btn.classList.remove('deselect'); });
-  document.querySelectorAll('.return-group-count').forEach(el => { el.classList.remove('selected-count'); });
-  // restore original counts
-  const groups = {};
-  borrowedItems.forEach(item => {
-    const k = (item.borrowedBy || 'ไม่ระบุ') + '|||' + (item.event || 'ไม่ระบุงาน');
-    if (!groups[k]) groups[k] = 0;
-    groups[k]++;
-  });
-  let gIdx = 0;
-  Object.values(groups).forEach(count => {
-    const el = document.getElementById('grp-count-' + gIdx);
-    if (el) el.textContent = count + ' รายการ';
-    gIdx++;
-  });
-  updateReturnCount();
+// compat shims (ไม่ถูกใช้อีกแล้ว แต่ป้องกัน error)
+function updateReturnCount() { updateConfirmCount(); }
+function clearReturnSelection() { goBackToStep1(); }
+function renderBorrowedList() { renderBorrowerCards(); }
+function selectAllItems() {}
+function toggleGroup() {}
+function toggleReturnItem() {}
+function updateReturnSummary() {}
+
+function escapeAttr(str) {
+  return (str || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
 }
 
 // ══════════════════════════════════════════════
@@ -1217,7 +1199,7 @@ async function confirmReturn() {
   };
 
   try {
-    const res = await fetch(scriptUrl, {
+    await fetch(scriptUrl, {
       method: 'POST',
       mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
@@ -1226,7 +1208,7 @@ async function confirmReturn() {
     showToast(`✅ คืนอุปกรณ์ ${selectedReturn.size} รายการสำเร็จ`);
     document.getElementById('returnedBy').value = '';
     document.getElementById('returnNote').value = '';
-    // โหลดรายการใหม่หลังคืนสำเร็จ
+    goBackToStep1();
     setTimeout(() => loadBorrowedList(), 1000);
   } catch (err) {
     showToast('❌ ไม่สามารถบันทึกได้: ' + err.message);
@@ -1234,7 +1216,6 @@ async function confirmReturn() {
     btn.innerHTML = `✅ ยืนยันการคืน (<span id="return-count">${selectedReturn.size}</span> รายการ)`;
   }
 }
-
 // ══════════════════════════════════════════════
 // SAVE / GOOGLE SHEETS
 // ══════════════════════════════════════════════
