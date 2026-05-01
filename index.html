@@ -796,24 +796,53 @@ function computeAvailability(){
   });
   return map;
 }
-function checkAvailabilitySmart(){
+async function checkAvailabilitySmart(){
   if(!dateRangeOK()) {
     setAlert('กรุณาเลือกวันที่ใช้งานและวันที่คืนให้ถูกต้องก่อนตรวจสอบ', 'danger');
     showToast('⚠️ กรุณาเลือกวันที่ให้ถูกต้อง');
     return;
   }
+  // 1. คำนวณจาก localStorage ก่อน
   availability = computeAvailability();
+
+  // 2. ดึงข้อมูลจาก Google Sheet (real-time) แล้ว merge — สำคัญสำหรับ multi-device
+  const scriptUrl = localStorage.getItem('script_url');
+  if(scriptUrl) {
+    try {
+      const res  = await fetch(scriptUrl + '?action=availability');
+      const json = await res.json();
+      if(json.success && json.borrowed) {
+        // merge: Sheet เป็น source of truth สำหรับ status 'borrowed'
+        Object.entries(json.borrowed).forEach(([name, info]) => {
+          const sheetType = (info.status === 'borrowed') ? 'busy' : 'pending';
+          if(!availability[name] || availability[name].type !== 'busy') {
+            availability[name] = {
+              type: sheetType,
+              records: [{
+                user:       info.borrowedBy || 'ไม่ระบุ',
+                event:      info.event      || 'ไม่ระบุงาน',
+                date:       '—',
+                returnDate: info.returnDate || 'ไม่ระบุ',
+                status:     info.status     || 'borrowed'
+              }]
+            };
+          }
+        });
+      }
+    } catch(e) { /* ไม่มีเน็ตหรือ Script ยัง deploy ไม่เสร็จ → ใช้ localStorage อย่างเดียว */ }
+  }
+
   renderAvailability();
-  const busy = Object.values(availability).filter(x=>x.type==='busy').length;
+  const busy    = Object.values(availability).filter(x=>x.type==='busy').length;
   const pending = Object.values(availability).filter(x=>x.type==='pending').length;
-  if(busy>0) setAlert(`พบอุปกรณ์ชนคิว/ถูกยืมอยู่ ${busy} รายการ ระบบปิดการเลือกให้อัตโนมัติ`, 'danger');
+  if(busy>0)       setAlert(`พบอุปกรณ์ชนคิว/ถูกยืมอยู่ ${busy} รายการ ระบบปิดการเลือกให้อัตโนมัติ`, 'danger');
   else if(pending>0) setAlert(`มีอุปกรณ์ ${pending} รายการที่อยู่ระหว่างรออนุมัติ เจ้าหน้าที่ควรตรวจสอบก่อนอนุมัติ`, 'warn');
-  else setAlert('ไม่พบรายการชนคิวในช่วงวันที่เลือก สามารถส่งคำขอยืมได้', 'info');
+  else               setAlert('ไม่พบรายการชนคิวในช่วงวันที่เลือก สามารถส่งคำขอยืมได้', 'info');
   updateStats();
   showToast('✅ ตรวจสอบความพร้อมใช้แล้ว');
 }
-function autoCheckByDate(){
-  if(document.getElementById('useDate').value) checkAvailabilitySmart();
+async function autoCheckByDate(){
+  if(document.getElementById('useDate').value) await checkAvailabilitySmart();
 }
 function renderAvailability(){
   EQUIPMENT.forEach(cat=>cat.items.forEach(item=>{
@@ -870,7 +899,7 @@ async function submitRequest(){
   const returnDate = document.getElementById('returnDate').value || date;
   const note = document.getElementById('note').value.trim();
   if(!user || !event || !date || !returnDate) {showToast('⚠️ กรุณากรอกข้อมูลคำขอให้ครบ');return;}
-  checkAvailabilitySmart();
+  await checkAvailabilitySmart();
   const items = selectedItems();
   if(items.length===0) {showToast('⚠️ กรุณาเลือกอุปกรณ์อย่างน้อย 1 รายการ');return;}
   const conflictNames = items.filter(it => availability[it.name]?.type === 'busy').map(it=>it.name);
@@ -894,9 +923,9 @@ async function postToGoogle(payload){
     await fetch(scriptUrl, {method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
   } catch(e) {}
 }
-function selectAvailableOnly(){
+async function selectAvailableOnly(){
   if(!dateRangeOK()) {showToast('⚠️ กรุณาเลือกวันที่ก่อน');return;}
-  checkAvailabilitySmart();
+  await checkAvailabilitySmart();
   EQUIPMENT.forEach(cat=>cat.items.forEach(item=>{
     const chk = document.getElementById('chk-'+item.id);
     if(!availability[item.name] && chk && !chk.disabled && !chk.checked) {
