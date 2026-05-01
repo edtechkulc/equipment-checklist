@@ -268,26 +268,82 @@
   .saved-item-line:last-child { border-bottom: none; }
 
   /* ── RETURN TAB ── */
+  .return-group {
+    border: 1px solid var(--gray-mid);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 10px;
+    box-shadow: var(--shadow);
+  }
+  .return-group-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: var(--blue-light);
+    border-bottom: 1px solid var(--gray-mid);
+    gap: 10px;
+  }
+  .return-group-header.all-selected { background: var(--green-light); }
+  .return-group-info { flex: 1; min-width: 0; }
+  .return-group-title {
+    font-size: 13px; font-weight: 700;
+    color: var(--blue-dark); white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis;
+  }
+  .return-group-meta { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .return-group-count {
+    font-size: 11px; padding: 2px 9px;
+    border-radius: 100px; background: var(--blue);
+    color: #fff; font-weight: 600; white-space: nowrap; flex-shrink: 0;
+  }
+  .return-group-count.selected-count { background: var(--green); }
+  .btn-select-group {
+    padding: 4px 10px; font-size: 11px; font-weight: 600;
+    border-radius: 6px; cursor: pointer; border: 1px solid var(--blue);
+    background: #fff; color: var(--blue); white-space: nowrap; flex-shrink: 0;
+    transition: all 0.15s; font-family: inherit;
+  }
+  .btn-select-group:hover { background: var(--blue); color: #fff; }
+  .btn-select-group.deselect { border-color: var(--green); color: var(--green); }
+  .btn-select-group.deselect:hover { background: var(--green); color: #fff; }
+
   .return-item-row {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 10px 14px;
+    padding: 9px 14px;
     border-bottom: 1px solid var(--gray);
     transition: background 0.1s;
   }
   .return-item-row:last-child { border-bottom: none; }
-  .return-item-row:hover { background: var(--gray); }
+  .return-item-row:hover { background: #fafafa; }
   .return-item-row.selected { background: #f0faf4; }
-  .return-check { width: 16px; height: 16px; accent-color: var(--green); cursor: pointer; flex-shrink: 0; }
-  .return-item-info { flex: 1; }
+  .return-check { width: 15px; height: 15px; accent-color: var(--green); cursor: pointer; flex-shrink: 0; }
+  .return-item-info { flex: 1; min-width: 0; }
   .return-item-name { font-size: 13px; font-weight: 500; }
-  .return-item-meta { font-size: 11px; color: var(--text-muted); margin-top: 2px; line-height: 1.5; }
+  .return-item-meta { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
   .return-empty {
     text-align: center; padding: 32px 16px;
     color: var(--text-muted); font-size: 14px;
   }
   .return-empty .icon { font-size: 36px; margin-bottom: 8px; }
+
+  /* Summary bar */
+  .return-summary-bar {
+    display: none;
+    background: var(--green-light);
+    border: 1px solid #b8dfc9;
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    font-size: 12px;
+    color: var(--green);
+    margin-bottom: 10px;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+  }
+  .return-summary-bar.visible { display: flex; }
 
   /* ── GUIDE ── */
   .guide-step {
@@ -487,12 +543,17 @@
     </button>
   </div>
 
-  <div class="card" id="return-list-card">
-    <div id="return-list">
-      <div class="return-empty">
-        <div class="icon">📦</div>
-        <div>กด <strong>โหลดรายการ</strong> เพื่อดูอุปกรณ์ที่ถูกยืมอยู่</div>
-      </div>
+  <!-- Summary bar -->
+  <div class="return-summary-bar" id="return-summary-bar">
+    <span>✅</span>
+    <span id="return-summary-text">เลือก 0 รายการ</span>
+    <button class="btn" style="margin-left:auto;padding:4px 10px;font-size:11px" onclick="selectAllItems()">เลือกทั้งหมด</button>
+  </div>
+
+  <div id="return-list">
+    <div class="return-empty">
+      <div class="icon">📦</div>
+      <div>กด <strong>โหลดรายการ</strong> เพื่อดูอุปกรณ์ที่ถูกยืมอยู่</div>
     </div>
   </div>
 
@@ -917,22 +978,59 @@ function renderBorrowedList() {
         <div class="icon">✅</div>
         <div>ไม่มีอุปกรณ์ที่ถูกยืมอยู่ในขณะนี้</div>
       </div>`;
+    document.getElementById('return-summary-bar').classList.remove('visible');
     return;
   }
 
-  container.innerHTML = borrowedItems.map((item, idx) => `
-    <div class="return-item-row" id="ret-row-${idx}">
-      <input type="checkbox" class="return-check" id="ret-chk-${idx}"
-        onchange="toggleReturnItem(${idx}, '${escapeAttr(item.name)}')">
-      <div class="return-item-info">
-        <div class="return-item-name">${item.name}</div>
-        <div class="return-item-meta">
-          👤 ${item.borrowedBy || 'ไม่ระบุ'} &nbsp;·&nbsp; 📌 ${item.event || 'ไม่ระบุงาน'}
-          ${item.returnDate ? `&nbsp;·&nbsp; 📅 กำหนดคืน: <strong>${item.returnDate}</strong>` : ''}
-          ${item.updatedAt ? `<br>🕒 ยืมเมื่อ: ${item.updatedAt}` : ''}
+  // จัดกลุ่มตาม borrowedBy + event
+  const groups = {};
+  borrowedItems.forEach((item, idx) => {
+    const key = (item.borrowedBy || 'ไม่ระบุ') + '|||' + (item.event || 'ไม่ระบุงาน');
+    if (!groups[key]) {
+      groups[key] = {
+        borrowedBy: item.borrowedBy || 'ไม่ระบุ',
+        event: item.event || 'ไม่ระบุงาน',
+        returnDate: item.returnDate || '',
+        updatedAt: item.updatedAt || '',
+        items: []
+      };
+    }
+    groups[key].items.push({ ...item, _idx: idx });
+  });
+
+  const groupKeys = Object.keys(groups);
+  container.innerHTML = groupKeys.map((key, gIdx) => {
+    const g = groups[key];
+    const itemsHtml = g.items.map((item) => `
+      <div class="return-item-row" id="ret-row-${item._idx}">
+        <input type="checkbox" class="return-check" id="ret-chk-${item._idx}"
+          onchange="toggleReturnItem(${item._idx}, '${escapeAttr(item.name)}')">
+        <div class="return-item-info">
+          <div class="return-item-name">${item.name}</div>
+          ${item.updatedAt ? `<div class="return-item-meta">🕒 ยืมเมื่อ: ${item.updatedAt}</div>` : ''}
         </div>
-      </div>
-    </div>`).join('');
+      </div>`).join('');
+
+    const returnDateStr = g.returnDate ? ` · 📅 กำหนดคืน: <strong>${g.returnDate}</strong>` : '';
+    const borrowedAtStr = g.updatedAt ? ` · 🕒 ${g.updatedAt}` : '';
+
+    return `
+      <div class="return-group" id="grp-${gIdx}">
+        <div class="return-group-header" id="grp-hdr-${gIdx}">
+          <div class="return-item-info" style="flex:1;min-width:0">
+            <div class="return-group-title">👤 ${g.borrowedBy}</div>
+            <div class="return-group-meta">📌 ${g.event}${returnDateStr}</div>
+          </div>
+          <span class="return-group-count" id="grp-count-${gIdx}">${g.items.length} รายการ</span>
+          <button class="btn-select-group" id="grp-btn-${gIdx}"
+            onclick="toggleGroup('${escapeAttr(key)}', ${gIdx})">เลือกทั้งกลุ่ม</button>
+        </div>
+        <div>${itemsHtml}</div>
+      </div>`;
+  }).join('');
+
+  document.getElementById('return-summary-bar').classList.add('visible');
+  updateReturnSummary();
 }
 
 function escapeAttr(str) {
@@ -949,6 +1047,30 @@ function toggleReturnItem(idx, name) {
     selectedReturn.delete(name);
     row.classList.remove('selected');
   }
+  // sync group headers
+  const groups = {};
+  borrowedItems.forEach((item, i) => {
+    const k = (item.borrowedBy || 'ไม่ระบุ') + '|||' + (item.event || 'ไม่ระบุงาน');
+    if (!groups[k]) groups[k] = { items: [], gIdx: Object.keys(groups).length };
+    groups[k].items.push(item);
+  });
+  let gIdx = 0;
+  Object.values(groups).forEach(g => {
+    const selectedInGroup = g.items.filter(i => selectedReturn.has(i.name)).length;
+    const hdr = document.getElementById('grp-hdr-' + gIdx);
+    const btn = document.getElementById('grp-btn-' + gIdx);
+    const countEl = document.getElementById('grp-count-' + gIdx);
+    if (selectedInGroup === g.items.length && g.items.length > 0) {
+      hdr?.classList.add('all-selected');
+      if (btn) { btn.textContent = 'ยกเลิกกลุ่ม'; btn.classList.add('deselect'); }
+      if (countEl) { countEl.textContent = `✓ ${g.items.length} รายการ`; countEl.classList.add('selected-count'); }
+    } else {
+      hdr?.classList.remove('all-selected');
+      if (btn) { btn.textContent = 'เลือกทั้งกลุ่ม'; btn.classList.remove('deselect'); }
+      if (countEl) { countEl.textContent = `${g.items.length} รายการ`; countEl.classList.remove('selected-count'); }
+    }
+    gIdx++;
+  });
   updateReturnCount();
 }
 
@@ -956,6 +1078,92 @@ function updateReturnCount() {
   const count = selectedReturn.size;
   document.getElementById('return-count').textContent = count;
   document.getElementById('confirmReturnBtn').disabled = count === 0;
+  updateReturnSummary();
+}
+
+function updateReturnSummary() {
+  const count = selectedReturn.size;
+  const total = borrowedItems.length;
+  const summaryBar = document.getElementById('return-summary-bar');
+  if (!summaryBar) return;
+  if (total === 0) { summaryBar.classList.remove('visible'); return; }
+  summaryBar.classList.add('visible');
+  document.getElementById('return-summary-text').textContent =
+    count === 0 ? `มีอุปกรณ์ถูกยืม ${total} รายการ — เลือกรายการที่ต้องการคืน`
+                : `เลือกแล้ว ${count} จาก ${total} รายการ`;
+}
+
+// จัดกลุ่มเพื่อเลือกทั้งกลุ่ม
+function toggleGroup(key, gIdx) {
+  const groups = {};
+  borrowedItems.forEach((item, idx) => {
+    const k = (item.borrowedBy || 'ไม่ระบุ') + '|||' + (item.event || 'ไม่ระบุงาน');
+    if (!groups[k]) groups[k] = [];
+    groups[k].push({ ...item, _idx: idx });
+  });
+
+  const groupItems = groups[key] || [];
+  const allSelected = groupItems.every(item => selectedReturn.has(item.name));
+
+  groupItems.forEach(item => {
+    const chk = document.getElementById('ret-chk-' + item._idx);
+    const row = document.getElementById('ret-row-' + item._idx);
+    if (allSelected) {
+      selectedReturn.delete(item.name);
+      if (chk) chk.checked = false;
+      if (row) row.classList.remove('selected');
+    } else {
+      selectedReturn.add(item.name);
+      if (chk) chk.checked = true;
+      if (row) row.classList.add('selected');
+    }
+  });
+
+  // อัปเดต UI ของ group header
+  const hdr = document.getElementById('grp-hdr-' + gIdx);
+  const btn = document.getElementById('grp-btn-' + gIdx);
+  const countEl = document.getElementById('grp-count-' + gIdx);
+  const selectedInGroup = groupItems.filter(i => selectedReturn.has(i.name)).length;
+
+  if (selectedInGroup === groupItems.length) {
+    hdr?.classList.add('all-selected');
+    if (btn) { btn.textContent = 'ยกเลิกกลุ่ม'; btn.classList.add('deselect'); }
+    if (countEl) { countEl.textContent = `✓ ${groupItems.length} รายการ`; countEl.classList.add('selected-count'); }
+  } else {
+    hdr?.classList.remove('all-selected');
+    if (btn) { btn.textContent = 'เลือกทั้งกลุ่ม'; btn.classList.remove('deselect'); }
+    if (countEl) { countEl.textContent = `${groupItems.length} รายการ`; countEl.classList.remove('selected-count'); }
+  }
+
+  updateReturnCount();
+}
+
+function selectAllItems() {
+  borrowedItems.forEach((item, idx) => {
+    selectedReturn.add(item.name);
+    const chk = document.getElementById('ret-chk-' + idx);
+    const row = document.getElementById('ret-row-' + idx);
+    if (chk) chk.checked = true;
+    if (row) row.classList.add('selected');
+  });
+  // อัปเดต group headers
+  const groups = {};
+  borrowedItems.forEach((item, idx) => {
+    const k = (item.borrowedBy || 'ไม่ระบุ') + '|||' + (item.event || 'ไม่ระบุงาน');
+    if (!groups[k]) groups[k] = { items: [], gIdx: Object.keys(groups).length };
+    groups[k].items.push(idx);
+  });
+  let gIdx = 0;
+  Object.values(groups).forEach(g => {
+    const hdr = document.getElementById('grp-hdr-' + gIdx);
+    const btn = document.getElementById('grp-btn-' + gIdx);
+    const countEl = document.getElementById('grp-count-' + gIdx);
+    hdr?.classList.add('all-selected');
+    if (btn) { btn.textContent = 'ยกเลิกกลุ่ม'; btn.classList.add('deselect'); }
+    if (countEl) { countEl.textContent = `✓ ${g.items.length} รายการ`; countEl.classList.add('selected-count'); }
+    gIdx++;
+  });
+  updateReturnCount();
 }
 
 function clearReturnSelection() {
@@ -965,6 +1173,23 @@ function clearReturnSelection() {
     if (chk) chk.checked = false;
     const row = document.getElementById('ret-row-'+idx);
     if (row) row.classList.remove('selected');
+  });
+  // reset all group headers
+  document.querySelectorAll('.return-group-header').forEach(hdr => hdr.classList.remove('all-selected'));
+  document.querySelectorAll('.btn-select-group').forEach(btn => { btn.textContent = 'เลือกทั้งกลุ่ม'; btn.classList.remove('deselect'); });
+  document.querySelectorAll('.return-group-count').forEach(el => { el.classList.remove('selected-count'); });
+  // restore original counts
+  const groups = {};
+  borrowedItems.forEach(item => {
+    const k = (item.borrowedBy || 'ไม่ระบุ') + '|||' + (item.event || 'ไม่ระบุงาน');
+    if (!groups[k]) groups[k] = 0;
+    groups[k]++;
+  });
+  let gIdx = 0;
+  Object.values(groups).forEach(count => {
+    const el = document.getElementById('grp-count-' + gIdx);
+    if (el) el.textContent = count + ' รายการ';
+    gIdx++;
   });
   updateReturnCount();
 }
