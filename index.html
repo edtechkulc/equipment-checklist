@@ -2,49 +2,899 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<title>ระบบยืมอุปกรณ์ (Professional Flow)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ระบบจองและยืมอุปกรณ์ — University Booking System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-body{font-family:sans-serif;background:#f5f6fa;padding:20px}
-.card{background:#fff;padding:20px;border-radius:10px;margin-bottom:15px;box-shadow:0 2px 6px rgba(0,0,0,.1)}
-.badge{padding:4px 10px;border-radius:20px;font-size:12px}
-.ok{background:#d4edda;color:#155724}
-.busy{background:#f8d7da;color:#721c24}
-.pending{background:#fff3cd;color:#856404}
-button{padding:8px 16px;border:none;border-radius:6px;cursor:pointer}
-.primary{background:#007bff;color:#fff}
-.success{background:#28a745;color:#fff}
-.danger{background:#dc3545;color:#fff}
+:root {
+  --ku-green:#006b3f;
+  --ku-green-2:#0b8a55;
+  --ku-light:#e9f7ef;
+  --blue:#1a6fb5;
+  --blue-light:#e8f0f9;
+  --navy:#073b5c;
+  --yellow:#f59e0b;
+  --yellow-light:#fff7df;
+  --red:#c0392b;
+  --red-light:#fdecea;
+  --green:#1a7a4a;
+  --green-light:#e6f4ed;
+  --gray:#f5f7f9;
+  --gray-2:#e5e7eb;
+  --gray-3:#6b7280;
+  --text:#111827;
+  --muted:#6b7280;
+  --radius:14px;
+  --shadow:0 8px 24px rgba(15,23,42,.08);
+  --shadow-soft:0 2px 8px rgba(15,23,42,.06);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Sarabun','Segoe UI',sans-serif;background:linear-gradient(180deg,#f4faf7 0%,#f4f6f9 45%,#eef2f6 100%);color:var(--text);font-size:15px}
+.header{
+  background:linear-gradient(135deg,var(--ku-green),var(--navy));
+  color:#fff;padding:18px 22px;position:sticky;top:0;z-index:1000;
+  box-shadow:0 6px 20px rgba(0,0,0,.18)
+}
+.header-inner{max-width:1180px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand{display:flex;align-items:center;gap:14px}
+.logo{width:48px;height:48px;border-radius:16px;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;font-weight:800;letter-spacing:-1px;border:1px solid rgba(255,255,255,.22)}
+.title{font-size:18px;font-weight:800}
+.sub{font-size:12px;opacity:.82;margin-top:2px}
+.header-status{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:6px 10px;font-size:12px;font-weight:700;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.18)}
+.tabs{position:sticky;top:84px;z-index:999;background:rgba(255,255,255,.93);backdrop-filter:blur(10px);border-bottom:1px solid var(--gray-2)}
+.tabs-inner{max-width:1180px;margin:0 auto;display:flex;overflow-x:auto}
+.tab-btn{border:0;background:transparent;padding:14px 13px;cursor:pointer;font:inherit;font-size:13px;font-weight:700;color:var(--muted);border-bottom:3px solid transparent;white-space:nowrap;transition:.18s}
+.tab-btn:hover{background:var(--gray)}
+.tab-btn.active{color:var(--ku-green);border-bottom-color:var(--ku-green);background:var(--ku-light)}
+.container{max-width:1180px;margin:0 auto;padding:18px}
+.grid-main{display:grid;grid-template-columns:360px 1fr;gap:16px;align-items:start}
+@media(max-width:900px){.grid-main{grid-template-columns:1fr}.tabs{top:84px}}
+.card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow-soft);border:1px solid rgba(15,23,42,.06);overflow:hidden;margin-bottom:14px}
+.card-header{padding:13px 16px;background:linear-gradient(180deg,#fff,#f8fafc);border-bottom:1px solid var(--gray-2);font-weight:800;color:var(--navy);display:flex;justify-content:space-between;align-items:center;gap:10px}
+.card-body{padding:16px}
+.section-title{font-size:14px;font-weight:800;color:var(--navy);margin-bottom:10px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.span2{grid-column:1/-1}
+.form-group{display:flex;flex-direction:column;gap:5px}
+label.form-label{font-size:12px;font-weight:800;color:var(--muted)}
+.form-control{width:100%;padding:10px 11px;border:1px solid var(--gray-2);border-radius:10px;font:inherit;background:#fff}
+.form-control:focus{outline:3px solid rgba(0,107,63,.14);border-color:var(--ku-green)}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--gray-2);border-radius:10px;background:#fff;padding:9px 14px;font:inherit;font-size:13px;font-weight:800;cursor:pointer;transition:.16s;text-decoration:none;color:var(--text)}
+.btn:hover{transform:translateY(-1px);box-shadow:var(--shadow-soft)}
+.btn.primary{background:var(--ku-green);color:#fff;border-color:var(--ku-green)}
+.btn.blue{background:var(--blue);color:#fff;border-color:var(--blue)}
+.btn.success{background:var(--green);color:#fff;border-color:var(--green)}
+.btn.warn{background:var(--yellow-light);color:#9a5b00;border-color:#f7c948}
+.btn.danger{background:var(--red-light);color:var(--red);border-color:#f3b6b0}
+.btn:disabled{opacity:.55;cursor:not-allowed;transform:none;box-shadow:none}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.stat{background:#fff;border:1px solid var(--gray-2);border-radius:14px;padding:12px;text-align:center;box-shadow:var(--shadow-soft)}
+.stat .n{font-size:25px;font-weight:800;color:var(--ku-green)}
+.stat .l{font-size:11px;color:var(--muted);font-weight:700}
+@media(max-width:700px){.stats{grid-template-columns:repeat(2,1fr)}.form-grid{grid-template-columns:1fr}.span2{grid-column:auto}}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+.eq-section{background:#fff;border:1px solid var(--gray-2);border-radius:14px;overflow:hidden;margin-bottom:9px}
+.eq-header{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;background:#fff}
+.eq-header.open{background:var(--ku-light);border-bottom:1px solid var(--gray-2)}
+.eq-title{font-weight:800;color:var(--navy);font-size:14px;display:flex;gap:8px;align-items:center}
+.eq-badge{font-size:11px;padding:3px 8px;border-radius:999px;background:var(--gray-2);color:var(--muted);font-weight:800}
+.eq-badge.has{background:var(--green-light);color:var(--green)}
+.eq-body{display:none}
+.eq-body.open{display:block}
+.item-row{position:relative;display:grid;grid-template-columns:22px 1fr auto auto;gap:10px;align-items:center;padding:10px 14px;border-top:1px solid #f1f3f5}
+.item-row:hover{background:#fafafa}
+.item-row.checked{background:#f0faf4}
+.item-row.conflict{background:#fff7f7;border-left:4px solid var(--red)}
+.item-row.pending-row{background:#fffaf0;border-left:4px solid var(--yellow)}
+.item-check{width:17px;height:17px;accent-color:var(--ku-green)}
+.item-check:disabled + .item-name{color:#9ca3af;text-decoration:line-through}
+.item-name{font-size:13px;font-weight:600}
+.qty-select{width:66px;padding:6px;border:1px solid var(--gray-2);border-radius:9px;background:#fff}
+.badge{display:inline-flex;align-items:center;gap:4px;white-space:nowrap;font-size:11px;font-weight:800;padding:4px 9px;border-radius:999px;border:1px solid transparent}
+.badge.ok{background:var(--green-light);color:var(--green);border-color:#b8dfc9}
+.badge.busy{background:var(--red-light);color:var(--red);border-color:#f3b6b0}
+.badge.pending{background:var(--yellow-light);color:#9a5b00;border-color:#f7c948}
+.badge.idle{background:#edf2f7;color:#64748b;border-color:#dbe3ea}
+.badge.approved{background:#dbeafe;color:#1d4ed8;border-color:#bfdbfe}
+.badge.returned{background:#ecfdf5;color:#047857;border-color:#bbf7d0}
+.tooltip{display:none;position:absolute;right:12px;top:38px;background:#111827;color:#fff;padding:9px 11px;border-radius:10px;font-size:12px;line-height:1.7;z-index:20;box-shadow:var(--shadow);max-width:280px}
+.item-row:hover .tooltip{display:block}
+.alert{border-radius:14px;padding:12px 14px;margin-bottom:12px;font-size:13px;font-weight:700;line-height:1.6}
+.alert.info{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe}
+.alert.warn{background:var(--yellow-light);color:#92400e;border:1px solid #f7c948}
+.alert.danger{background:var(--red-light);color:var(--red);border:1px solid #f3b6b0}
+.calendar-card{padding:14px}
+.calendar-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:8px}
+.month-title{font-size:17px;font-weight:800;color:var(--navy)}
+.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.day-name{font-size:11px;font-weight:800;text-align:center;color:var(--muted);padding:6px}
+.day{min-height:92px;background:#fff;border:1px solid var(--gray-2);border-radius:12px;padding:7px;cursor:pointer;transition:.15s;position:relative;overflow:hidden}
+.day:hover{border-color:var(--ku-green);box-shadow:var(--shadow-soft)}
+.day.muted{opacity:.45;background:#f8fafc}
+.day.selected{outline:3px solid rgba(0,107,63,.2);border-color:var(--ku-green);background:var(--ku-light)}
+.day.conflict-day{background:#fff7f7;border-color:#fecaca}
+.day-num{font-weight:800;font-size:12px;margin-bottom:4px}
+.event-chip{font-size:10px;padding:2px 5px;border-radius:6px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:#edf2f7;color:#475569}
+.event-chip.pending{background:var(--yellow-light);color:#92400e}
+.event-chip.approved{background:#dbeafe;color:#1d4ed8}
+.event-chip.borrowed{background:var(--red-light);color:var(--red)}
+.request-card{border:1px solid var(--gray-2);border-radius:14px;padding:13px;background:#fff;margin-bottom:10px;box-shadow:var(--shadow-soft)}
+.request-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.request-title{font-size:15px;font-weight:800;color:var(--navy)}
+.request-meta{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.6}
+.request-items{margin-top:10px;border-top:1px solid var(--gray-2);padding-top:8px;font-size:12px;color:#374151;line-height:1.8}
+.toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.status-flow{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.flow-step{background:#fff;border:1px solid var(--gray-2);border-radius:14px;padding:12px;text-align:center;font-size:12px;font-weight:800;color:var(--muted)}
+.flow-step.active{background:var(--ku-light);color:var(--ku-green);border-color:#b7e4ca}
+.flow-step .icon{display:block;font-size:20px;margin-bottom:4px}
+#toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);background:#111827;color:#fff;border-radius:999px;padding:11px 18px;font-size:13px;font-weight:700;box-shadow:var(--shadow);display:none;z-index:9999;max-width:calc(100vw - 24px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .75s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.print-area{display:none}
+@media print{body>*:not(.print-area){display:none!important}.print-area{display:block!important;padding:24px;background:#fff}}
 </style>
 </head>
 <body>
+<header class="header">
+  <div class="header-inner">
+    <div class="brand">
+      <div class="logo">KU</div>
+      <div>
+        <div class="title">ระบบจองและยืมอุปกรณ์แบบมืออาชีพ</div>
+        <div class="sub">University Equipment Booking · Request · Approval · Calendar Conflict Check</div>
+      </div>
+    </div>
+    <div class="header-status">
+      <span class="pill">🟢 พร้อมใช้</span>
+      <span class="pill">🟡 รออนุมัติ</span>
+      <span class="pill">🔴 ถูกยืม/ชนคิว</span>
+    </div>
+  </div>
+</header>
 
-<div class="card">
-<h2>📋 ส่งคำขอยืมอุปกรณ์</h2>
-<input placeholder="ชื่อผู้ยืม"><br><br>
-<input placeholder="ชื่องาน"><br><br>
+<nav class="tabs">
+  <div class="tabs-inner">
+    <button class="tab-btn active" onclick="showTab('request')">📋 ส่งคำขอยืม</button>
+    <button class="tab-btn" onclick="showTab('calendar')">📅 Calendar กันชนงาน</button>
+    <button class="tab-btn" onclick="showTab('approval')">✅ อนุมัติคำขอ</button>
+    <button class="tab-btn" onclick="showTab('return')">↩️ คืนอุปกรณ์</button>
+    <button class="tab-btn" onclick="showTab('history')">🗂 ประวัติ/รายการ</button>
+    <button class="tab-btn" onclick="showTab('guide')">⚙️ ตั้งค่า</button>
+  </div>
+</nav>
 
-<div>
-<label><input type="checkbox"> กล้อง Canon XF705 <span class="badge ok">พร้อมใช้</span></label><br>
-<label><input type="checkbox" disabled> กล้อง Canon C70 <span class="badge busy">ไม่พร้อมใช้</span></label>
+<div id="panel-request" class="tab-panel active">
+  <div class="container">
+    <div class="status-flow">
+      <div class="flow-step active"><span class="icon">1</span>กรอกคำขอ</div>
+      <div class="flow-step active"><span class="icon">2</span>เช็กปฏิทิน</div>
+      <div class="flow-step"><span class="icon">3</span>เจ้าหน้าที่อนุมัติ</div>
+      <div class="flow-step"><span class="icon">4</span>ยืม/คืน</div>
+    </div>
+
+    <div class="grid-main">
+      <div>
+        <div class="card">
+          <div class="card-header">📝 ข้อมูลคำขอยืม</div>
+          <div class="card-body">
+            <div class="form-grid">
+              <div class="form-group span2">
+                <label class="form-label">ชื่อผู้ขอยืม *</label>
+                <input class="form-control" id="userName" placeholder="กรอกชื่อ-นามสกุล">
+              </div>
+              <div class="form-group span2">
+                <label class="form-label">ชื่องาน / กิจกรรม *</label>
+                <input class="form-control" id="eventName" placeholder="เช่น ถ่ายทอดสด / ถ่ายภาพกิจกรรม / ประชุม">
+              </div>
+              <div class="form-group">
+                <label class="form-label">วันที่ใช้งาน *</label>
+                <input class="form-control" type="date" id="useDate" onchange="autoCheckByDate()">
+              </div>
+              <div class="form-group">
+                <label class="form-label">วันที่คืนอุปกรณ์ *</label>
+                <input class="form-control" type="date" id="returnDate" onchange="autoCheckByDate()">
+              </div>
+              <div class="form-group span2">
+                <label class="form-label">หมายเหตุ</label>
+                <input class="form-control" id="note" placeholder="รายละเอียดเพิ่มเติม / สถานที่ / ผู้ประสานงาน">
+              </div>
+            </div>
+            <div class="btn-row">
+              <button class="btn warn" onclick="checkAvailabilitySmart()">🔍 ตรวจสอบความพร้อมใช้</button>
+              <button class="btn primary" id="submitBtn" onclick="submitRequest()">📤 ส่งคำขอยืม</button>
+              <button class="btn" onclick="clearForm()">🔄 ล้างข้อมูล</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">📊 สรุปคำขอ</div>
+          <div class="card-body">
+            <div class="stats">
+              <div class="stat"><div class="n" id="s-checked">0</div><div class="l">รายการที่เลือก</div></div>
+              <div class="stat"><div class="n" id="s-total">0</div><div class="l">ชิ้นรวม</div></div>
+              <div class="stat"><div class="n" id="s-conflict">0</div><div class="l">ชนคิว</div></div>
+              <div class="stat"><div class="n" id="s-pending">0</div><div class="l">รออนุมัติ</div></div>
+            </div>
+            <div id="request-alert" class="alert info">เลือกวันที่ใช้งานและวันที่คืน จากนั้นกด “ตรวจสอบความพร้อมใช้” เพื่อกันชนคิวก่อนส่งคำขอ</div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="toolbar">
+          <div class="section-title">📦 เลือกอุปกรณ์</div>
+          <button class="btn blue" onclick="selectAvailableOnly()">เลือกเฉพาะที่พร้อมใช้</button>
+        </div>
+        <div id="equipment-sections"></div>
+      </div>
+    </div>
+  </div>
 </div>
 
-<br>
-<button class="primary">📤 ส่งคำขอยืม</button>
+<div id="panel-calendar" class="tab-panel">
+  <div class="container">
+    <div class="card">
+      <div class="card-header">
+        <span>📅 Calendar กันชนงาน</span>
+        <div class="btn-row" style="margin-top:0">
+          <button class="btn" onclick="moveMonth(-1)">← เดือนก่อน</button>
+          <button class="btn" onclick="goToday()">วันนี้</button>
+          <button class="btn" onclick="moveMonth(1)">เดือนถัดไป →</button>
+        </div>
+      </div>
+      <div class="card-body calendar-card">
+        <div class="calendar-head">
+          <div class="month-title" id="month-title">—</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <span class="badge pending">รออนุมัติ</span>
+            <span class="badge approved">อนุมัติแล้ว</span>
+            <span class="badge busy">ถูกยืม/ชนคิว</span>
+          </div>
+        </div>
+        <div class="calendar-grid" id="calendar-grid"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">รายการในวันที่เลือก <span id="selected-date-label" class="badge idle">ยังไม่เลือกวัน</span></div>
+      <div class="card-body" id="day-detail">
+        <div class="alert info">คลิกวันที่ในปฏิทินเพื่อดูงานและอุปกรณ์ที่จอง/ยืมอยู่</div>
+      </div>
+    </div>
+  </div>
 </div>
 
-<div class="card">
-<h2>🛠 ตรวจสอบคำขอ (เจ้าหน้าที่)</h2>
-<p><strong>ผู้ยืม:</strong> สมชาย</p>
-<p><strong>งาน:</strong> ถ่ายวิดีโอ</p>
-
-<ul>
-<li>Canon XF705 <span class="badge ok">พร้อมใช้</span></li>
-<li>Canon C70 <span class="badge busy">ไม่พร้อมใช้</span></li>
-</ul>
-
-<button class="success">✅ อนุมัติ</button>
-<button class="danger">❌ ไม่อนุมัติ</button>
+<div id="panel-approval" class="tab-panel">
+  <div class="container">
+    <div class="toolbar">
+      <div>
+        <div class="section-title">✅ หน้าตรวจสอบคำขอสำหรับเจ้าหน้าที่</div>
+        <div style="font-size:12px;color:var(--muted)">ใช้อนุมัติ แก้ไขสถานะ หรือไม่อนุมัติคำขอยืมก่อนตัดสถานะเป็น “ถูกยืม”</div>
+      </div>
+      <button class="btn warn" onclick="syncFromGoogle()">🔄 โหลด/ซิงก์ข้อมูล</button>
+    </div>
+    <div id="approval-list"></div>
+  </div>
 </div>
 
+<div id="panel-return" class="tab-panel">
+  <div class="container">
+    <div class="toolbar">
+      <div>
+        <div class="section-title">↩️ คืนอุปกรณ์</div>
+        <div style="font-size:12px;color:var(--muted)">แสดงเฉพาะคำขอที่อนุมัติแล้ว/ถูกยืมอยู่</div>
+      </div>
+      <button class="btn warn" onclick="renderReturnList()">🔄 รีเฟรช</button>
+    </div>
+    <div id="return-list"></div>
+  </div>
+</div>
+
+<div id="panel-history" class="tab-panel">
+  <div class="container">
+    <div class="toolbar">
+      <div>
+        <div class="section-title">🗂 ประวัติและรายการทั้งหมด</div>
+        <div style="font-size:12px;color:var(--muted)">เก็บในเครื่อง และสามารถเชื่อม Google Apps Script เดิมเพื่อส่งข้อมูลได้</div>
+      </div>
+      <button class="btn danger" onclick="clearDemoData()">ล้างข้อมูลตัวอย่าง</button>
+    </div>
+    <div id="history-list"></div>
+  </div>
+</div>
+
+<div id="panel-guide" class="tab-panel">
+  <div class="container">
+    <div class="card">
+      <div class="card-header">⚙️ การตั้งค่า Google Apps Script</div>
+      <div class="card-body">
+        <div class="form-group">
+          <label class="form-label">Web App URL</label>
+          <input class="form-control" id="scriptUrl" oninput="saveScriptUrl()" placeholder="https://script.google.com/macros/s/.../exec">
+        </div>
+        <div id="url-status" style="font-size:12px;color:var(--muted);margin-top:8px">ยังไม่ได้ตั้งค่า</div>
+        <div class="alert info" style="margin-top:12px">
+          ไฟล์นี้ออกแบบให้ทำงานได้ทันทีด้วย localStorage และยังคงรองรับการส่งข้อมูลไปยัง Google Sheets ผ่าน Apps Script URL เดิม โดย workflow ใหม่เพิ่มสถานะ pending / approved / rejected / returned
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">🧭 Flow การใช้งานที่แนะนำ</div>
+      <div class="card-body" style="line-height:1.9">
+        <ol style="margin-left:20px">
+          <li>ผู้ขอยืมกรอกข้อมูลและเลือกวันที่ใช้งาน/วันที่คืน</li>
+          <li>ระบบตรวจสอบจาก Calendar ว่าอุปกรณ์ชนกับรายการที่รออนุมัติหรืออนุมัติแล้วหรือไม่</li>
+          <li>ผู้ขอยืมส่งคำขอ สถานะเริ่มต้นคือ <strong>รออนุมัติ</strong></li>
+          <li>เจ้าหน้าที่เปิดหน้า <strong>อนุมัติคำขอ</strong> เพื่อตรวจสอบและอนุมัติ/ไม่อนุมัติ</li>
+          <li>เมื่ออนุมัติแล้ว รายการจะไปปรากฏในหน้า <strong>คืนอุปกรณ์</strong></li>
+          <li>เมื่อคืนแล้ว สถานะเปลี่ยนเป็น <strong>คืนแล้ว</strong> และ Calendar จะไม่กันชนต่อ</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="print-area" id="print-area"></div>
+<div id="toast"></div>
+
+<script>
+const EQUIPMENT = [
+  {id:'cam', label:'กล้องถ่ายทำ', items:[
+    {id:'xf705',name:'Canon XF705'},{id:'xf605',name:'Canon XF605'},
+    {id:'xf405',name:'Canon XF405'},{id:'xf305',name:'Canon XF305'},
+    {id:'c70',name:'Canon Cinema C70'},{id:'r6',name:'Canon R6 Mark II'},
+    {id:'eosr',name:'Canon EOS R'},{id:'6d',name:'Canon 6D'},
+    {id:'m50',name:'Canon M50'},{id:'d7k',name:'Nikon D7000'},
+    {id:'i360',name:'Insta360 1-inch Edition'},{id:'i360t',name:'Insta360 Twin Edition'}
+  ]},
+  {id:'lens', label:'เลนส์', items:[
+    {id:'rf1020',name:'Canon RF 10-20 mm (Fisheye)'},
+    {id:'ep1635',name:'Canon EP 16-35 mm (Wide)'},
+    {id:'rf24usm',name:'Canon RF 24-105 mm USM (Normal)'},
+    {id:'rf24',name:'Canon RF 24-105 mm (Normal)'},
+    {id:'rf24ii',name:'Canon RF 24-105 mm II (Normal)'},
+    {id:'nk18',name:'Nikon DX 18-105 mm (Normal)'},
+    {id:'c1845',name:'Canon 18-45 mm (Normal)'},
+    {id:'c70l',name:'Canon 70-200 mm (Tele)'},
+    {id:'c50',name:'Canon 50 mm (Fix)'},
+    {id:'mount',name:'เม้าท์เลนส์ Canon'}
+  ]},
+  {id:'batt', label:'แบตเตอรี่', qty:true, maxQty:7, items:[
+    {id:'lpe6p',name:'Canon LP-E6P'},{id:'lpe17',name:'Canon LP-E17'},
+    {id:'pana',name:'Panasonic AG-VBR59'},{id:'sony',name:'Sony NP-FV100A'},
+    {id:'ledB',name:'ไฟ LED สตูดิโอ NP-F960'},{id:'niken',name:'Nikon EN-EL15'}
+  ]},
+  {id:'flash', label:'แฟลช', items:[
+    {id:'f600',name:'Canon SPEEDLITE 600EX-RT'},
+    {id:'f600ii',name:'Canon SPEEDLITE 600EX II RT'},
+    {id:'fel10',name:'Canon SPEEDLITE EL-10'},
+    {id:'nsb900',name:'Nikon SPEEDLITE SB-900'},
+    {id:'nsb910',name:'Nikon SPEEDLITE SB-910'}
+  ]},
+  {id:'mem', label:'Memory Card', qty:true, maxQty:5, items:[
+    {id:'m8',name:'8GB'},{id:'m32',name:'32GB'},{id:'m64',name:'64GB'},
+    {id:'m128',name:'128GB'},{id:'m1t',name:'1TB'}
+  ]},
+  {id:'ledl', label:'ไฟ LED', qty:true, maxQty:3, items:[
+    {id:'ledset',name:'ชุดไฟ LED'}
+  ]},
+  {id:'lstand', label:'ขาตั้งไฟสตูดิโอ', qty:true, maxQty:3, items:[
+    {id:'lstd',name:'ขาตั้งไฟสตูดิโอ'}
+  ]},
+  {id:'tripod', label:'ขาตั้งกล้อง SACHTLER', qty:true, maxQty:3, items:[
+    {id:'sach',name:'ขาตั้งกล้อง SACHTLER'}
+  ]},
+  {id:'wmic', label:'ไวเลสไมโครโฟน', qty:true, maxQty:3, items:[
+    {id:'blink',name:'Saramonic Blink500'},
+    {id:'tx10',name:'Saramonic TX-10'},
+    {id:'senn',name:'Sennheiser ew-112p G3'}
+  ]},
+  {id:'shure', label:'ไมโครโฟน SHURE Dynamic', qty:true, maxQty:4, items:[
+    {id:'shured',name:'SHURE Dynamic'}
+  ]},
+  {id:'shures', label:'ไมโครโฟนสตูดิโอ SHURE ตั้งโต๊ะ', qty:true, maxQty:2, items:[
+    {id:'shurest',name:'SHURE Studio ตั้งโต๊ะ'}
+  ]},
+  {id:'mixer', label:'Mixer', items:[
+    {id:'toa',name:'TOA Power Mixer'},
+    {id:'emx7',name:'Yamaha EMX7'},
+    {id:'mg10',name:'Yamaha MG10XU'}
+  ]},
+  {id:'wireless', label:'ชุดส่งสัญญาณภาพและเสียงไร้สาย', qty:true, maxQty:3, items:[
+    {id:'snap',name:'Dongle Snapshow'},
+    {id:'holly',name:'Monitor Wireless Hollyland'}
+  ]},
+  {id:'speaker', label:'ลำโพง', qty:true, maxQty:7, items:[
+    {id:'toabs',name:'TOA BS-1030W 30W สีขาว'},
+    {id:'jbl',name:'JBL EON ONE COMPACT'},
+    {id:'yamaha500',name:'YAMAHA 500S'}
+  ]},
+  {id:'switcher', label:'Switcher / Splitter', qty:true, maxQty:4, items:[
+    {id:'aten1',name:'Splitter ATEN VS0110HA'},
+    {id:'aten10',name:'Splitter ATEN 10-Port'},
+    {id:'hdmi4',name:'HDMI Splitter 1 Input 4 Output'},
+    {id:'hdmi2',name:'HDMI Splitter 1 Input 2 Output'},
+    {id:'hdmisw',name:'HDMI Switcher'},
+    {id:'devwell',name:'Switcher DeviceWell'}
+  ]},
+  {id:'tv', label:'TV', qty:true, maxQty:10, items:[
+    {id:'tv32',name:'32"'},{id:'tv42',name:'42"'},{id:'tv55',name:'55"'}
+  ]},
+  {id:'laptop', label:'Laptop', items:[
+    {id:'msi1',name:'MSI AX201 I'},{id:'msi2',name:'MSI AX201 II'},
+    {id:'rog',name:'ASUS ROG Strix G531G'},{id:'f17',name:'ASUS F17 FX707Z'},
+    {id:'dell',name:'DELL'},{id:'aio',name:'All-in-One Lenovo'}
+  ]},
+  {id:'backdrop', label:'Backdrop', items:[
+    {id:'bd1',name:'2.30 × 3 เมตร'},{id:'bd2',name:'2.30 × 5 เมตร'}
+  ]}
+];
+
+const STATUS_LABEL = {
+  pending: ['🟡 รออนุมัติ','pending'],
+  approved: ['🔵 อนุมัติแล้ว','approved'],
+  borrowed: ['🔴 ถูกยืมอยู่','busy'],
+  rejected: ['⚫ ไม่อนุมัติ','idle'],
+  returned: ['🟢 คืนแล้ว','returned']
+};
+
+let state = {};
+let openSecs = {};
+let availability = {};
+let currentMonth = new Date();
+let selectedCalendarDate = null;
+
+function initState(){
+  EQUIPMENT.forEach(cat => cat.items.forEach(item => {
+    state[item.id] = {checked:false, qty:1};
+  }));
+}
+initState();
+
+function getRecords(){
+  return JSON.parse(localStorage.getItem('university_equipment_requests') || '[]');
+}
+function setRecords(records){
+  localStorage.setItem('university_equipment_requests', JSON.stringify(records));
+  updateHeaderStats();
+}
+function seedDemo(){
+  if(localStorage.getItem('university_equipment_seeded')) return;
+  const today = new Date();
+  const iso = d => d.toISOString().slice(0,10);
+  const d1 = new Date(today); d1.setDate(today.getDate()+2);
+  const d2 = new Date(today); d2.setDate(today.getDate()+4);
+  const d3 = new Date(today); d3.setDate(today.getDate()+7);
+  const d4 = new Date(today); d4.setDate(today.getDate()+8);
+  const demo = [
+    {id:'rq-demo-1',user:'เจ้าหน้าที่โสตฯ',event:'ถ่ายทำวิดีโอประชาสัมพันธ์',date:iso(d1),returnDate:iso(d2),note:'ข้อมูลตัวอย่าง',status:'approved',savedAt:new Date().toISOString(),items:[{cat:'กล้องถ่ายทำ',name:'Canon XF705',qty:1},{cat:'ไวเลสไมโครโฟน',name:'Saramonic Blink500',qty:1}]},
+    {id:'rq-demo-2',user:'ฝ่ายประชาสัมพันธ์',event:'บันทึกภาพกิจกรรมอบรม',date:iso(d3),returnDate:iso(d4),note:'รออนุมัติ',status:'pending',savedAt:new Date().toISOString(),items:[{cat:'กล้องถ่ายทำ',name:'Canon R6 Mark II',qty:1},{cat:'เลนส์',name:'Canon RF 24-105 mm USM (Normal)',qty:1}]}
+  ];
+  setRecords(demo);
+  localStorage.setItem('university_equipment_seeded','1');
+}
+seedDemo();
+
+function buildSections(){
+  const container = document.getElementById('equipment-sections');
+  container.innerHTML = '';
+  EQUIPMENT.forEach(cat => {
+    const sec = document.createElement('div');
+    sec.className = 'eq-section';
+    sec.innerHTML = `
+      <div class="eq-header" id="hdr-${cat.id}" onclick="toggleSec('${cat.id}')">
+        <div class="eq-title">${cat.label} <span class="eq-badge" id="bdg-${cat.id}">0/${cat.items.length}</span></div>
+        <span>⌄</span>
+      </div>
+      <div class="eq-body" id="bdy-${cat.id}">
+        ${cat.items.map(item => `
+          <div class="item-row" id="row-${item.id}">
+            <input type="checkbox" class="item-check" id="chk-${item.id}" onchange="toggleItem('${item.id}','${cat.id}')">
+            <label class="item-name" for="chk-${item.id}">${item.name}</label>
+            ${cat.qty ? `<select class="qty-select" id="qty-${item.id}" onchange="changeQty('${item.id}')" disabled>
+              ${Array.from({length:cat.maxQty||5},(_,i)=>`<option value="${i+1}">${i+1}</option>`).join('')}
+            </select>` : `<span></span>`}
+            <span class="badge idle" id="av-${item.id}">⚪ ยังไม่ตรวจ</span>
+            <div class="tooltip" id="tip-${item.id}"></div>
+          </div>`).join('')}
+      </div>`;
+    container.appendChild(sec);
+  });
+}
+function toggleSec(id){
+  openSecs[id] = !openSecs[id];
+  document.getElementById('bdy-'+id).classList.toggle('open', openSecs[id]);
+  document.getElementById('hdr-'+id).classList.toggle('open', openSecs[id]);
+}
+function toggleItem(itemId, catId){
+  const chk = document.getElementById('chk-'+itemId);
+  state[itemId].checked = chk.checked;
+  document.getElementById('row-'+itemId).classList.toggle('checked', chk.checked);
+  const qty = document.getElementById('qty-'+itemId);
+  if(qty) qty.disabled = !chk.checked;
+  updateBadge(catId); updateStats();
+}
+function changeQty(itemId){
+  const qty = document.getElementById('qty-'+itemId);
+  if(qty) state[itemId].qty = parseInt(qty.value||'1',10);
+  updateStats();
+}
+function updateBadge(catId){
+  const cat = EQUIPMENT.find(c=>c.id===catId);
+  const n = cat.items.filter(i=>state[i.id]?.checked).length;
+  const bdg = document.getElementById('bdg-'+catId);
+  bdg.textContent = `${n}/${cat.items.length}`;
+  bdg.classList.toggle('has', n>0);
+}
+function updateStats(){
+  let checked=0,total=0,conflict=0,pending=0;
+  EQUIPMENT.forEach(cat=>cat.items.forEach(item=>{
+    if(state[item.id]?.checked){checked++;total += state[item.id].qty||1;}
+    if(availability[item.name]?.type === 'busy') conflict++;
+    if(availability[item.name]?.type === 'pending') pending++;
+  }));
+  document.getElementById('s-checked').textContent = checked;
+  document.getElementById('s-total').textContent = total;
+  document.getElementById('s-conflict').textContent = conflict;
+  document.getElementById('s-pending').textContent = pending;
+}
+function dateRangeOK(){
+  const start = document.getElementById('useDate').value;
+  const end = document.getElementById('returnDate').value || start;
+  if(!start) return false;
+  if(end < start) return false;
+  return true;
+}
+function rangesOverlap(aStart,aEnd,bStart,bEnd){
+  aEnd = aEnd || aStart; bEnd = bEnd || bStart;
+  return aStart <= bEnd && bStart <= aEnd;
+}
+function computeAvailability(){
+  const start = document.getElementById('useDate').value;
+  const end = document.getElementById('returnDate').value || start;
+  const records = getRecords().filter(r => ['pending','approved','borrowed'].includes(r.status));
+  const map = {};
+  if(!start) return map;
+  records.forEach(r=>{
+    if(!rangesOverlap(start,end,r.date,r.returnDate || r.date)) return;
+    r.items.forEach(it=>{
+      const type = (r.status === 'pending') ? 'pending' : 'busy';
+      if(!map[it.name] || map[it.name].type !== 'busy') {
+        map[it.name] = {type, records:[r]};
+      } else {
+        map[it.name].records.push(r);
+      }
+    });
+  });
+  return map;
+}
+function checkAvailabilitySmart(){
+  if(!dateRangeOK()) {
+    setAlert('กรุณาเลือกวันที่ใช้งานและวันที่คืนให้ถูกต้องก่อนตรวจสอบ', 'danger');
+    showToast('⚠️ กรุณาเลือกวันที่ให้ถูกต้อง');
+    return;
+  }
+  availability = computeAvailability();
+  renderAvailability();
+  const busy = Object.values(availability).filter(x=>x.type==='busy').length;
+  const pending = Object.values(availability).filter(x=>x.type==='pending').length;
+  if(busy>0) setAlert(`พบอุปกรณ์ชนคิว/ถูกยืมอยู่ ${busy} รายการ ระบบปิดการเลือกให้อัตโนมัติ`, 'danger');
+  else if(pending>0) setAlert(`มีอุปกรณ์ ${pending} รายการที่อยู่ระหว่างรออนุมัติ เจ้าหน้าที่ควรตรวจสอบก่อนอนุมัติ`, 'warn');
+  else setAlert('ไม่พบรายการชนคิวในช่วงวันที่เลือก สามารถส่งคำขอยืมได้', 'info');
+  updateStats();
+  showToast('✅ ตรวจสอบความพร้อมใช้แล้ว');
+}
+function autoCheckByDate(){
+  if(document.getElementById('useDate').value) checkAvailabilitySmart();
+}
+function renderAvailability(){
+  EQUIPMENT.forEach(cat=>cat.items.forEach(item=>{
+    const row = document.getElementById('row-'+item.id);
+    const badge = document.getElementById('av-'+item.id);
+    const tip = document.getElementById('tip-'+item.id);
+    const chk = document.getElementById('chk-'+item.id);
+    const qty = document.getElementById('qty-'+item.id);
+    row.classList.remove('conflict','pending-row');
+    chk.disabled = false;
+    if(qty && !state[item.id].checked) qty.disabled = true;
+
+    const av = availability[item.name];
+    if(!av){
+      badge.className = 'badge ok';
+      badge.textContent = '🟢 พร้อมใช้';
+      tip.innerHTML = 'ไม่พบรายการจอง/ยืมในช่วงวันที่เลือก';
+    } else {
+      const lines = av.records.map(r => `👤 ${escapeHtml(r.user)}<br>📌 ${escapeHtml(r.event)}<br>📅 ${r.date} → ${r.returnDate || r.date}<br>สถานะ: ${STATUS_LABEL[r.status]?.[0] || r.status}`).join('<hr style="border:0;border-top:1px solid #374151;margin:6px 0">');
+      tip.innerHTML = lines;
+      if(av.type === 'busy'){
+        badge.className = 'badge busy';
+        badge.textContent = '🔴 ไม่พร้อมใช้';
+        row.classList.add('conflict');
+        chk.checked = false; chk.disabled = true;
+        state[item.id].checked = false;
+        if(qty) qty.disabled = true;
+      } else {
+        badge.className = 'badge pending';
+        badge.textContent = '🟡 รออนุมัติ';
+        row.classList.add('pending-row');
+      }
+    }
+    updateBadge(cat.id);
+  }));
+  updateStats();
+}
+function setAlert(msg,type){
+  const el = document.getElementById('request-alert');
+  el.className = 'alert ' + type;
+  el.textContent = msg;
+}
+function selectedItems(){
+  const items = [];
+  EQUIPMENT.forEach(cat=>cat.items.forEach(item=>{
+    if(state[item.id]?.checked) items.push({cat:cat.label,name:item.name,qty:state[item.id].qty||1});
+  }));
+  return items;
+}
+async function submitRequest(){
+  const user = document.getElementById('userName').value.trim();
+  const event = document.getElementById('eventName').value.trim();
+  const date = document.getElementById('useDate').value;
+  const returnDate = document.getElementById('returnDate').value || date;
+  const note = document.getElementById('note').value.trim();
+  if(!user || !event || !date || !returnDate) {showToast('⚠️ กรุณากรอกข้อมูลคำขอให้ครบ');return;}
+  checkAvailabilitySmart();
+  const items = selectedItems();
+  if(items.length===0) {showToast('⚠️ กรุณาเลือกอุปกรณ์อย่างน้อย 1 รายการ');return;}
+  const conflictNames = items.filter(it => availability[it.name]?.type === 'busy').map(it=>it.name);
+  if(conflictNames.length) {
+    showToast('❌ มีอุปกรณ์ไม่พร้อมใช้ กรุณาแก้ไขรายการ');
+    setAlert('ไม่สามารถส่งคำขอได้ เพราะมีอุปกรณ์ไม่พร้อมใช้: ' + conflictNames.join(', '), 'danger');
+    return;
+  }
+  const record = {action:'request', id:'rq-'+Date.now(), user, event, date, returnDate, note, items, status:'pending', savedAt:new Date().toISOString()};
+  const records = getRecords(); records.unshift(record); setRecords(records);
+  await postToGoogle({...record, action:'request'});
+  clearForm(false);
+  renderAll();
+  showToast('✅ ส่งคำขอยืมแล้ว รอเจ้าหน้าที่อนุมัติ');
+  showTab('approval');
+}
+async function postToGoogle(payload){
+  const scriptUrl = localStorage.getItem('script_url');
+  if(!scriptUrl) return;
+  try {
+    await fetch(scriptUrl, {method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  } catch(e) {}
+}
+function selectAvailableOnly(){
+  if(!dateRangeOK()) {showToast('⚠️ กรุณาเลือกวันที่ก่อน');return;}
+  checkAvailabilitySmart();
+  EQUIPMENT.forEach(cat=>cat.items.forEach(item=>{
+    const chk = document.getElementById('chk-'+item.id);
+    if(!availability[item.name] && chk && !chk.disabled && !chk.checked) {
+      chk.checked = true; toggleItem(item.id, cat.id);
+    }
+  }));
+}
+function clearForm(resetDates=true){
+  ['userName','eventName','note'].forEach(id=>document.getElementById(id).value='');
+  if(resetDates) ['useDate','returnDate'].forEach(id=>document.getElementById(id).value='');
+  EQUIPMENT.forEach(cat=>cat.items.forEach(item=>{
+    state[item.id]={checked:false,qty:1};
+    const chk=document.getElementById('chk-'+item.id); if(chk){chk.checked=false;chk.disabled=false;}
+    const qty=document.getElementById('qty-'+item.id); if(qty){qty.value=1;qty.disabled=true;}
+    const row=document.getElementById('row-'+item.id); if(row) row.classList.remove('checked','conflict','pending-row');
+    const badge=document.getElementById('av-'+item.id); if(badge){badge.className='badge idle';badge.textContent='⚪ ยังไม่ตรวจ';}
+    updateBadge(cat.id);
+  }));
+  availability={}; updateStats(); setAlert('เลือกวันที่ใช้งานและวันที่คืน จากนั้นกด “ตรวจสอบความพร้อมใช้” เพื่อกันชนคิวก่อนส่งคำขอ','info');
+}
+
+function renderCalendar(){
+  const grid = document.getElementById('calendar-grid');
+  const title = document.getElementById('month-title');
+  const y = currentMonth.getFullYear(), m = currentMonth.getMonth();
+  title.textContent = currentMonth.toLocaleDateString('th-TH', {month:'long', year:'numeric'});
+  const first = new Date(y,m,1);
+  const start = new Date(first); start.setDate(1 - first.getDay());
+  const names = ['อา','จ','อ','พ','พฤ','ศ','ส'];
+  let html = names.map(n=>`<div class="day-name">${n}</div>`).join('');
+  const records = getRecords().filter(r=>['pending','approved','borrowed'].includes(r.status));
+  for(let i=0;i<42;i++){
+    const d = new Date(start); d.setDate(start.getDate()+i);
+    const iso = d.toISOString().slice(0,10);
+    const dayRecords = records.filter(r=>rangesOverlap(iso, iso, r.date, r.returnDate || r.date));
+    const cls = ['day'];
+    if(d.getMonth()!==m) cls.push('muted');
+    if(selectedCalendarDate===iso) cls.push('selected');
+    if(dayRecords.some(r=>['approved','borrowed'].includes(r.status))) cls.push('conflict-day');
+    html += `<div class="${cls.join(' ')}" onclick="selectCalendarDate('${iso}')">
+      <div class="day-num">${d.getDate()}</div>
+      ${dayRecords.slice(0,3).map(r=>`<div class="event-chip ${r.status==='pending'?'pending':(r.status==='approved'?'approved':'borrowed')}">${escapeHtml(r.event)}</div>`).join('')}
+      ${dayRecords.length>3?`<div class="event-chip">+${dayRecords.length-3} รายการ</div>`:''}
+    </div>`;
+  }
+  grid.innerHTML = html;
+}
+function selectCalendarDate(iso){
+  selectedCalendarDate = iso; renderCalendar(); renderDayDetail(iso);
+}
+function renderDayDetail(iso){
+  document.getElementById('selected-date-label').textContent = new Date(iso).toLocaleDateString('th-TH');
+  const records = getRecords().filter(r=>['pending','approved','borrowed'].includes(r.status) && rangesOverlap(iso, iso, r.date, r.returnDate || r.date));
+  const box = document.getElementById('day-detail');
+  if(records.length===0) {box.innerHTML = '<div class="alert info">วันนี้ยังไม่มีรายการจองหรือยืมอุปกรณ์</div>';return;}
+  box.innerHTML = records.map(requestCard).join('');
+}
+function moveMonth(n){currentMonth.setMonth(currentMonth.getMonth()+n);renderCalendar();}
+function goToday(){currentMonth = new Date(); selectedCalendarDate = new Date().toISOString().slice(0,10); renderCalendar(); renderDayDetail(selectedCalendarDate);}
+
+function requestCard(r, mode='view'){
+  const sl = STATUS_LABEL[r.status] || ['ไม่ทราบสถานะ','idle'];
+  const actions = mode==='approval' && r.status==='pending' ? `
+    <div class="btn-row">
+      <button class="btn success" onclick="approveRequest('${r.id}')">✅ อนุมัติ</button>
+      <button class="btn danger" onclick="rejectRequest('${r.id}')">❌ ไม่อนุมัติ</button>
+      <button class="btn" onclick="printRequest('${r.id}')">🖨️ พิมพ์ใบยืม</button>
+    </div>` : mode==='return' ? `
+    <div class="btn-row"><button class="btn success" onclick="markReturned('${r.id}')">↩️ ยืนยันคืนอุปกรณ์</button><button class="btn" onclick="printRequest('${r.id}')">🖨️ พิมพ์</button></div>` : `
+    <div class="btn-row"><button class="btn" onclick="printRequest('${r.id}')">🖨️ พิมพ์</button></div>`;
+  return `<div class="request-card">
+    <div class="request-top">
+      <div>
+        <div class="request-title">${escapeHtml(r.event)}</div>
+        <div class="request-meta">👤 ${escapeHtml(r.user)} · 📅 ${r.date} → ${r.returnDate || r.date}<br>🕒 ส่งคำขอ: ${formatDateTime(r.savedAt)} ${r.note?` · 📝 ${escapeHtml(r.note)}`:''}</div>
+      </div>
+      <span class="badge ${sl[1]}">${sl[0]}</span>
+    </div>
+    <div class="request-items">${r.items.map((it,i)=>`${i+1}. [${escapeHtml(it.cat)}] ${escapeHtml(it.name)} <strong>${it.qty}</strong> ชิ้น`).join('<br>')}</div>
+    ${actions}
+  </div>`;
+}
+function renderApproval(){
+  const records = getRecords().filter(r=>r.status==='pending');
+  document.getElementById('approval-list').innerHTML = records.length ? records.map(r=>requestCard(r,'approval')).join('') : '<div class="alert info">ไม่มีคำขอที่รออนุมัติ</div>';
+}
+function approveRequest(id){
+  const records = getRecords();
+  const r = records.find(x=>x.id===id); if(!r) return;
+  // Final conflict check: approved/borrowed records only, excluding this record
+  const conflicts = [];
+  records.filter(x=>x.id!==id && ['approved','borrowed'].includes(x.status) && rangesOverlap(r.date,r.returnDate||r.date,x.date,x.returnDate||x.date)).forEach(x=>{
+    x.items.forEach(xi=>{ if(r.items.some(ri=>ri.name===xi.name)) conflicts.push(xi.name); });
+  });
+  if(conflicts.length && !confirm('พบรายการชนคิว: '+[...new Set(conflicts)].join(', ')+'\nต้องการอนุมัติต่อหรือไม่?')) return;
+  r.status = 'approved';
+  r.approvedAt = new Date().toISOString();
+  setRecords(records); postToGoogle({...r,action:'approve'});
+  renderAll(); showToast('✅ อนุมัติคำขอแล้ว');
+}
+function rejectRequest(id){
+  const reason = prompt('ระบุเหตุผลที่ไม่อนุมัติ (ถ้ามี)','อุปกรณ์ไม่พร้อมใช้งาน / ชนคิว');
+  const records = getRecords(); const r = records.find(x=>x.id===id); if(!r) return;
+  r.status='rejected'; r.rejectedAt=new Date().toISOString(); r.rejectReason=reason||'';
+  setRecords(records); postToGoogle({...r,action:'reject'});
+  renderAll(); showToast('❌ ไม่อนุมัติคำขอแล้ว');
+}
+function renderReturnList(){
+  const records = getRecords().filter(r=>['approved','borrowed'].includes(r.status));
+  document.getElementById('return-list').innerHTML = records.length ? records.map(r=>requestCard(r,'return')).join('') : '<div class="alert info">ไม่มีรายการที่รอคืนอุปกรณ์</div>';
+}
+function markReturned(id){
+  const returnedBy = prompt('ชื่อผู้คืน / ผู้รับคืน','เจ้าหน้าที่');
+  if(returnedBy===null) return;
+  const records = getRecords(); const r = records.find(x=>x.id===id); if(!r) return;
+  r.status='returned'; r.returnedAt=new Date().toISOString(); r.returnedBy=returnedBy||'';
+  setRecords(records); postToGoogle({...r, action:'return', returnedBy:r.returnedBy, items:r.items.map(i=>i.name)});
+  renderAll(); showToast('✅ บันทึกการคืนอุปกรณ์แล้ว');
+}
+function renderHistory(){
+  const records = getRecords();
+  document.getElementById('history-list').innerHTML = records.length ? records.map(r=>requestCard(r,'history')).join('') : '<div class="alert info">ยังไม่มีรายการ</div>';
+}
+function clearDemoData(){
+  if(!confirm('ต้องการล้างข้อมูลทั้งหมดในเครื่องนี้หรือไม่?')) return;
+  localStorage.removeItem('university_equipment_requests');
+  localStorage.removeItem('university_equipment_seeded');
+  setRecords([]);
+  renderAll(); showToast('ล้างข้อมูลแล้ว');
+}
+async function syncFromGoogle(){
+  const scriptUrl = localStorage.getItem('script_url');
+  if(!scriptUrl) {showToast('⚠️ ยังไม่ได้ตั้งค่า Apps Script URL');return;}
+  showToast('กำลังโหลดข้อมูลจาก Google Sheets...');
+  try {
+    const res = await fetch(scriptUrl + '?action=requests');
+    const json = await res.json();
+    if(json.success && Array.isArray(json.items)) {
+      setRecords(json.items);
+      renderAll();
+      showToast('✅ ซิงก์ข้อมูลสำเร็จ');
+    } else {
+      showToast('⚠️ Apps Script เดิมอาจยังไม่มี endpoint action=requests');
+    }
+  } catch(e) {
+    showToast('⚠️ ไม่สามารถซิงก์ได้: ' + e.message);
+  }
+}
+function printRequest(id){
+  const r = getRecords().find(x=>x.id===id); if(!r) return;
+  const sl = STATUS_LABEL[r.status] || ['',''];
+  const html = `<div style="font-family:Sarabun,sans-serif">
+    <h2 style="text-align:center;margin-bottom:4px">ใบคำขอยืมอุปกรณ์</h2>
+    <div style="text-align:center;color:#666;margin-bottom:18px">University Equipment Booking System</div>
+    <table style="width:100%;border-collapse:collapse;margin-bottom:14px">
+      <tr><td style="border:1px solid #ddd;padding:8px"><strong>ผู้ขอยืม</strong><br>${escapeHtml(r.user)}</td><td style="border:1px solid #ddd;padding:8px"><strong>งาน/กิจกรรม</strong><br>${escapeHtml(r.event)}</td></tr>
+      <tr><td style="border:1px solid #ddd;padding:8px"><strong>วันที่ใช้</strong><br>${r.date}</td><td style="border:1px solid #ddd;padding:8px"><strong>วันที่คืน</strong><br>${r.returnDate || r.date}</td></tr>
+      <tr><td colspan="2" style="border:1px solid #ddd;padding:8px"><strong>สถานะ</strong><br>${sl[0]}</td></tr>
+    </table>
+    <table style="width:100%;border-collapse:collapse">
+      <thead><tr style="background:#073b5c;color:#fff"><th style="padding:8px;border:1px solid #ddd">#</th><th style="padding:8px;border:1px solid #ddd">หมวดหมู่</th><th style="padding:8px;border:1px solid #ddd">อุปกรณ์</th><th style="padding:8px;border:1px solid #ddd">จำนวน</th></tr></thead>
+      <tbody>${r.items.map((it,i)=>`<tr><td style="padding:8px;border:1px solid #ddd;text-align:center">${i+1}</td><td style="padding:8px;border:1px solid #ddd">${escapeHtml(it.cat)}</td><td style="padding:8px;border:1px solid #ddd">${escapeHtml(it.name)}</td><td style="padding:8px;border:1px solid #ddd;text-align:center">${it.qty}</td></tr>`).join('')}</tbody>
+    </table>
+    <div style="margin-top:34px;display:grid;grid-template-columns:1fr 1fr;gap:40px;text-align:center">
+      <div>ลงชื่อผู้ขอยืม<br><br>........................................</div>
+      <div>ลงชื่อเจ้าหน้าที่<br><br>........................................</div>
+    </div>
+  </div>`;
+  const pa = document.getElementById('print-area'); pa.innerHTML = html; window.print();
+}
+function showTab(name){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  const idx = ['request','calendar','approval','return','history','guide'].indexOf(name);
+  document.querySelectorAll('.tab-btn')[idx]?.classList.add('active');
+  if(name==='calendar') renderCalendar();
+  if(name==='approval') renderApproval();
+  if(name==='return') renderReturnList();
+  if(name==='history') renderHistory();
+}
+function saveScriptUrl(){
+  const val=document.getElementById('scriptUrl').value.trim();
+  localStorage.setItem('script_url',val);
+  const st=document.getElementById('url-status');
+  if(val.startsWith('https://script.google.com')){st.textContent='✅ URL ถูกต้อง — บันทึกแล้ว';st.style.color='var(--green)';}
+  else if(val){st.textContent='⚠️ URL ควรขึ้นต้นด้วย https://script.google.com';st.style.color='var(--red)';}
+  else{st.textContent='ยังไม่ได้ตั้งค่า';st.style.color='var(--muted)';}
+}
+function renderAll(){
+  renderCalendar(); renderApproval(); renderReturnList(); renderHistory(); updateHeaderStats();
+}
+function updateHeaderStats(){
+  const r=getRecords();
+  const pending=r.filter(x=>x.status==='pending').length;
+  const approved=r.filter(x=>['approved','borrowed'].includes(x.status)).length;
+}
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.style.display='block';
+  clearTimeout(window.toastTimer);
+  window.toastTimer=setTimeout(()=>t.style.display='none',3500);
+}
+function escapeHtml(s){
+  return String(s||'').replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+}
+function formatDateTime(s){
+  if(!s) return '-';
+  try{return new Date(s).toLocaleString('th-TH');}catch(e){return s;}
+}
+
+buildSections();
+renderAll();
+
+// Keep original hardcoded Apps Script URL if available
+const DEFAULT_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzjqableak_Hil82kQbUA2uwsBJLJb2kkumlnL3JE6GFPtSqeBXoL0lDQ9PY5XlW6FiCw/exec';
+if(!localStorage.getItem('script_url')) localStorage.setItem('script_url', DEFAULT_SCRIPT_URL);
+document.getElementById('scriptUrl').value = localStorage.getItem('script_url') || '';
+saveScriptUrl();
+</script>
 </body>
 </html>
