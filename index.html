@@ -162,6 +162,38 @@
   }
   .qty-select:disabled { background: var(--gray); color: var(--text-muted); }
 
+
+  /* ── ITEM AVAILABILITY ACTIONS ── */
+  .item-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+  .avail-check-btn {
+    padding: 4px 8px;
+    border-radius: 100px;
+    border: 1px solid var(--gray-mid);
+    background: #fff;
+    color: var(--text-muted);
+    font-size: 10px;
+    font-family: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s;
+  }
+  .avail-check-btn:hover { background: var(--blue-light); color: var(--blue); border-color: #bdd7f0; }
+  .avail-check-btn:disabled { opacity: 0.55; cursor: wait; }
+  .avail-unknown {
+    background: var(--gray);
+    color: var(--text-muted);
+    border-color: var(--gray-mid);
+  }
+  .item-row.unavailable { background: #fff5f5; }
+  .item-row.unavailable .item-name { color: var(--text-muted); }
+  .item-row.unavailable .item-check { cursor: not-allowed; }
+
   /* ── AVAILABILITY BADGES ── */
   .avail-badge {
     font-size: 10px; padding: 2px 8px;
@@ -502,14 +534,14 @@
     <span class="dot-ok">🟢</span><span id="avail-ok-count">0</span> พร้อมใช้
     &nbsp;·&nbsp;
     <span class="dot-busy">🔴</span><span id="avail-busy-count">0</span> ถูกยืมอยู่
-    <span style="margin-left:auto;font-size:11px;opacity:0.7">Hover ที่ 🔴 เพื่อดูรายละเอียด</span>
+    <span style="margin-left:auto;font-size:11px;opacity:0.7">ชี้ที่ 🔴 เพื่อดูรายละเอียด</span>
   </div>
 
   <div id="equipment-sections"></div>
 
   <div class="btn-row">
     <button class="btn primary" id="saveBtn" onclick="saveChecklist()">💾 บันทึกและส่งข้อมูล</button>
-    <button class="btn avail" id="availBtn" onclick="checkAvailability()">🔍 ตรวจสอบความพร้อมใช้</button>
+    <button class="btn avail" id="availBtn" onclick="checkAvailability()">🔍 ตรวจสอบความพร้อมใช้ทั้งหมด</button>
     <button class="btn" onclick="clearAll()">🔄 ล้างข้อมูล</button>
     <button class="btn success" onclick="printView()">🖨️ พิมพ์ใบยืม</button>
   </div>
@@ -693,7 +725,7 @@
         <div class="step-num">5</div>
         <div>
           <div class="step-title">ตรวจสอบความพร้อมใช้งาน</div>
-          <div class="step-desc">กลับไปที่แท็บ <strong>สร้างรายการ</strong> → กดปุ่ม <strong>🔍 ตรวจสอบความพร้อมใช้</strong><br>ระบบจะแสดง 🟢 พร้อมใช้ / 🔴 ถูกยืม ข้างชื่ออุปกรณ์แต่ละรายการ<br>Hover ที่ป้าย 🔴 เพื่อดูว่าใครยืมไปและจะคืนเมื่อไหร่</div>
+          <div class="step-desc">กลับไปที่แท็บ <strong>สร้างรายการ</strong> → กดปุ่ม <strong>🔍 ตรวจสอบความพร้อมใช้</strong><br>ระบบจะแสดง ⚪ ยังไม่ตรวจ / 🟢 พร้อมใช้ / 🔴 ไม่พร้อมใช้ ข้างชื่ออุปกรณ์แต่ละรายการ และสามารถกดปุ่ม <strong>ตรวจสอบ</strong> เฉพาะรายการได้<br>ชี้ที่ป้าย 🔴 เพื่อดูว่าใครยืมไปและจะคืนเมื่อไหร่</div>
         </div>
       </div>
 
@@ -853,6 +885,11 @@ function buildSections() {
               onchange="changeQty('${item.id}','${cat.id}')" disabled>
               ${Array.from({length:cat.maxQty||5},(_,i)=>`<option value="${i+1}">${i+1}</option>`).join('')}
             </select>` : ''}
+            <div class="item-actions">
+              <span class="avail-badge avail-unknown" id="avail-${item.id}">⚪ ยังไม่ตรวจ</span>
+              <button type="button" class="avail-check-btn" id="btn-avail-${item.id}"
+                onclick="event.stopPropagation(); checkItemAvailability('${item.id}', '${escapeAttr(item.name)}')">ตรวจสอบ</button>
+            </div>
           </div>`).join('')}
       </div>`;
     container.appendChild(sec);
@@ -905,30 +942,102 @@ function updateStats() {
 // ══════════════════════════════════════════════
 // AVAILABILITY CHECK
 // ══════════════════════════════════════════════
-async function checkAvailability() {
+async function fetchAvailabilityData(forceRefresh = false) {
   const scriptUrl = localStorage.getItem('script_url');
-  if (!scriptUrl) { showToast('⚠️ ยังไม่ได้ตั้งค่า Google Sheets URL'); return; }
+  if (!scriptUrl) throw new Error('ยังไม่ได้ตั้งค่า Google Sheets URL');
+  if (availData && !forceRefresh) return availData;
 
+  const res = await fetch(scriptUrl + '?action=availability');
+  const json = await res.json();
+  if (!json.success) throw new Error(json.error || 'ไม่สามารถดึงข้อมูลได้');
+  availData = json.borrowed || {};
+  return availData;
+}
+
+async function checkAvailability() {
   const btn = document.getElementById('availBtn');
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner" style="border-top-color:var(--orange)"></span>กำลังตรวจสอบ...';
 
   try {
-    const res = await fetch(scriptUrl + '?action=availability');
-    const json = await res.json();
-    if (!json.success) throw new Error(json.error || 'ไม่สามารถดึงข้อมูลได้');
-
-    availData = json.borrowed;
+    await fetchAvailabilityData(true);
     renderAvailability();
 
     const busyCount = Object.keys(availData).length;
-    showToast(`✅ ตรวจสอบเสร็จ — ถูกยืมอยู่ ${busyCount} รายการ`);
+    showToast(`✅ ตรวจสอบเสร็จ — ไม่พร้อมใช้ ${busyCount} รายการ`);
   } catch (err) {
     showToast('❌ ตรวจสอบไม่สำเร็จ: ' + err.message);
   } finally {
     btn.disabled = false;
-    btn.innerHTML = '🔍 ตรวจสอบความพร้อมใช้';
+    btn.innerHTML = '🔍 ตรวจสอบความพร้อมใช้ทั้งหมด';
   }
+}
+
+async function checkItemAvailability(itemId, itemName) {
+  const btn = document.getElementById('btn-avail-' + itemId);
+  if (btn) { btn.disabled = true; btn.textContent = 'กำลังตรวจ...'; }
+
+  try {
+    await fetchAvailabilityData(false);
+    applyAvailabilityToItem(itemId, itemName);
+    const isBusy = !!availData[itemName];
+    showToast(isBusy ? `🔴 ${itemName} ไม่พร้อมใช้` : `🟢 ${itemName} พร้อมใช้`);
+  } catch (err) {
+    showToast('❌ ตรวจสอบไม่สำเร็จ: ' + err.message);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'ตรวจสอบ'; }
+  }
+}
+
+function applyAvailabilityToItem(itemId, itemName) {
+  const row = document.getElementById('row-' + itemId);
+  const badge = document.getElementById('avail-' + itemId);
+  const chk = document.getElementById('chk-' + itemId);
+  if (!row || !badge) return { ok: false };
+
+  row.querySelector('.avail-tooltip')?.remove();
+  row.classList.remove('busy', 'unavailable');
+  badge.className = 'avail-badge';
+  badge.onmouseenter = null;
+  badge.onmouseleave = null;
+
+  if (availData && availData[itemName]) {
+    const info = availData[itemName];
+    badge.classList.add('avail-busy');
+    badge.textContent = '🔴 ไม่พร้อมใช้';
+    row.classList.add('busy', 'unavailable');
+
+    // ป้องกันการเลือกอุปกรณ์ที่ไม่พร้อมใช้ ลดโอกาสบันทึกซ้ำกับรายการที่ถูกยืมอยู่
+    if (chk) {
+      chk.checked = false;
+      chk.disabled = true;
+      state[itemId].checked = false;
+      row.classList.remove('checked');
+    }
+    const qty = document.getElementById('qty-' + itemId);
+    if (qty) qty.disabled = true;
+
+    badge.addEventListener('mouseenter', () => {
+      document.getElementById('tip-' + itemId)?.remove();
+      const tip = document.createElement('div');
+      tip.className = 'avail-tooltip';
+      tip.id = 'tip-' + itemId;
+      tip.innerHTML =
+        `👤 <strong>${info.borrowedBy || 'ไม่ระบุ'}</strong><br>` +
+        `📌 ${info.event || 'ไม่ระบุงาน'}<br>` +
+        `📅 กำหนดคืน: ${info.returnDate || 'ไม่ระบุ'}`;
+      row.appendChild(tip);
+    });
+    badge.addEventListener('mouseleave', () => {
+      document.getElementById('tip-' + itemId)?.remove();
+    });
+    return { ok: false };
+  }
+
+  badge.classList.add('avail-ok');
+  badge.textContent = '🟢 พร้อมใช้';
+  if (chk) chk.disabled = false;
+  return { ok: true };
 }
 
 function renderAvailability() {
@@ -938,47 +1047,14 @@ function renderAvailability() {
 
   EQUIPMENT.forEach(cat => {
     cat.items.forEach(item => {
-      const row = document.getElementById('row-' + item.id);
-      if (!row) return;
-
-      row.querySelector('.avail-badge')?.remove();
-      row.querySelector('.avail-tooltip')?.remove();
-      row.classList.remove('busy');
-
-      const badge = document.createElement('span');
-      badge.className = 'avail-badge';
-
-      if (availData[item.name]) {
-        const info = availData[item.name];
-        badge.className += ' avail-busy';
-        badge.textContent = '🔴 ถูกยืม';
-        row.classList.add('busy');
-        busyCount++;
-
-        badge.addEventListener('mouseenter', () => {
-          document.getElementById('tip-' + item.id)?.remove();
-          const tip = document.createElement('div');
-          tip.className = 'avail-tooltip';
-          tip.id = 'tip-' + item.id;
-          tip.innerHTML =
-            `👤 <strong>${info.borrowedBy || 'ไม่ระบุ'}</strong><br>` +
-            `📌 ${info.event || 'ไม่ระบุงาน'}<br>` +
-            `📅 คืน: ${info.returnDate || 'ไม่ระบุ'}`;
-          row.appendChild(tip);
-        });
-        badge.addEventListener('mouseleave', () => {
-          document.getElementById('tip-' + item.id)?.remove();
-        });
-      } else {
-        badge.className += ' avail-ok';
-        badge.textContent = '🟢 พร้อมใช้';
-        okCount++;
-      }
-
-      row.appendChild(badge);
+      const result = applyAvailabilityToItem(item.id, item.name);
+      if (result.ok) okCount++;
+      else busyCount++;
     });
+    updateBadge(cat.id);
   });
 
+  updateStats();
   document.getElementById('avail-ok-count').textContent = okCount;
   document.getElementById('avail-busy-count').textContent = busyCount;
   document.getElementById('avail-status-bar').classList.add('visible');
