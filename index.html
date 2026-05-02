@@ -7,373 +7,507 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root {
-  --ku-green:#006b3f;--ku-green-2:#0b8a55;--ku-light:#e9f7ef;
+:root{
+  --ku-green:#006b3f;--ku-light:#e9f7ef;--ku-green2:#0b8a55;
   --blue:#1a6fb5;--blue-light:#e8f0f9;--navy:#073b5c;
   --yellow:#f59e0b;--yellow-light:#fff7df;
   --red:#c0392b;--red-light:#fdecea;
   --green:#1a7a4a;--green-light:#e6f4ed;
-  --gray:#f5f7f9;--gray-2:#e5e7eb;--gray-3:#6b7280;
-  --text:#111827;--muted:#6b7280;--radius:14px;
-  --shadow:0 8px 24px rgba(15,23,42,.08);--shadow-soft:0 2px 8px rgba(15,23,42,.06);
+  --orange:#e65100;--orange-light:#fff3e0;
+  --gray:#f5f7f9;--gray-2:#e5e7eb;--muted:#6b7280;--text:#111827;
+  --radius:14px;--shadow:0 8px 24px rgba(15,23,42,.08);--shadow-soft:0 2px 8px rgba(15,23,42,.06);
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Sarabun','Segoe UI',sans-serif;background:linear-gradient(180deg,#f4faf7 0%,#f4f6f9 45%,#eef2f6 100%);color:var(--text);font-size:15px}
-.header{background:linear-gradient(135deg,var(--ku-green),var(--navy));color:#fff;padding:18px 22px;position:sticky;top:0;z-index:1000;box-shadow:0 6px 20px rgba(0,0,0,.18)}
-.header-inner{max-width:1180px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px}
+body{font-family:'Sarabun','Segoe UI',sans-serif;background:linear-gradient(180deg,#f4faf7 0%,#f0f4f9 100%);color:var(--text);font-size:15px;min-height:100vh}
+
+/* ── HEADER ── */
+.header{background:linear-gradient(135deg,var(--ku-green),var(--navy));color:#fff;padding:16px 22px;position:sticky;top:0;z-index:1000;box-shadow:0 6px 20px rgba(0,0,0,.18)}
+.header-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
 .brand{display:flex;align-items:center;gap:14px}
-.logo{width:48px;height:48px;border-radius:16px;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;font-weight:800;letter-spacing:-1px;border:1px solid rgba(255,255,255,.22)}
-.title{font-size:18px;font-weight:800}.sub{font-size:12px;opacity:.82;margin-top:2px}
-.header-status{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
-/* ── FIX 2: pill IDs สำหรับ updateHeaderStats ── */
-.pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:6px 10px;font-size:12px;font-weight:700;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.18);transition:.2s}
-.tabs{position:sticky;top:84px;z-index:999;background:rgba(255,255,255,.93);backdrop-filter:blur(10px);border-bottom:1px solid var(--gray-2)}
-.tabs-inner{max-width:1180px;margin:0 auto;display:flex;overflow-x:auto}
-.tab-btn{border:0;background:transparent;padding:14px 13px;cursor:pointer;font:inherit;font-size:13px;font-weight:700;color:var(--muted);border-bottom:3px solid transparent;white-space:nowrap;transition:.18s}
-.tab-btn:hover{background:var(--gray)}.tab-btn.active{color:var(--ku-green);border-bottom-color:var(--ku-green);background:var(--ku-light)}
-.container{max-width:1180px;margin:0 auto;padding:18px}
-.grid-main{display:grid;grid-template-columns:360px 1fr;gap:16px;align-items:start}
-@media(max-width:900px){.grid-main{grid-template-columns:1fr}}
+.logo{width:46px;height:46px;border-radius:14px;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;font-weight:800;letter-spacing:-1px;border:1px solid rgba(255,255,255,.22);font-size:15px;flex-shrink:0}
+.title{font-size:17px;font-weight:800}.sub{font-size:11px;opacity:.8;margin-top:2px}
+.pills{display:flex;gap:7px;flex-wrap:wrap}
+.pill{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:5px 10px;font-size:12px;font-weight:700;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.18)}
+
+/* ── STEP TABS ── */
+.steps-wrap{background:rgba(255,255,255,.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--gray-2);position:sticky;top:78px;z-index:999;overflow-x:auto}
+.steps-inner{max-width:1200px;margin:0 auto;display:flex}
+.step-btn{flex:1;min-width:120px;padding:14px 10px;text-align:center;font:inherit;font-size:12px;font-weight:800;cursor:pointer;border:0;background:none;color:var(--muted);border-bottom:3px solid transparent;transition:.18s;position:relative;white-space:nowrap}
+.step-btn:hover{background:var(--gray)}
+.step-btn.active{color:var(--ku-green);border-bottom-color:var(--ku-green);background:var(--ku-light)}
+.step-btn.done{color:var(--green);border-bottom-color:var(--green-light)}
+.step-num{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:var(--gray-2);color:var(--muted);font-size:11px;font-weight:800;margin-bottom:4px}
+.step-btn.active .step-num{background:var(--ku-green);color:#fff}
+.step-btn.done .step-num{background:var(--green);color:#fff}
+.step-label{display:block;font-size:11px}
+
+/* ── LAYOUT ── */
+.container{max-width:1200px;margin:0 auto;padding:18px}
+.tab-panel{display:none}.tab-panel.active{display:block}
+.grid-main{display:grid;grid-template-columns:370px 1fr;gap:16px;align-items:start}
+@media(max-width:920px){.grid-main{grid-template-columns:1fr}}
+
+/* ── CARD ── */
 .card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow-soft);border:1px solid rgba(15,23,42,.06);overflow:hidden;margin-bottom:14px}
-.card-header{padding:13px 16px;background:linear-gradient(180deg,#fff,#f8fafc);border-bottom:1px solid var(--gray-2);font-weight:800;color:var(--navy);display:flex;justify-content:space-between;align-items:center;gap:10px}
+.card-header{padding:13px 16px;background:linear-gradient(180deg,#fff,#f8fafc);border-bottom:1px solid var(--gray-2);font-weight:800;color:var(--navy);display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:14px}
 .card-body{padding:16px}
-.section-title{font-size:14px;font-weight:800;color:var(--navy);margin-bottom:10px}
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.span2{grid-column:1/-1}
+
+/* ── FORM ── */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.span2{grid-column:1/-1}
 .form-group{display:flex;flex-direction:column;gap:5px}
-label.form-label{font-size:12px;font-weight:800;color:var(--muted)}
-.form-control{width:100%;padding:10px 11px;border:1px solid var(--gray-2);border-radius:10px;font:inherit;background:#fff}
+.form-label{font-size:12px;font-weight:800;color:var(--muted)}
+.form-control{width:100%;padding:10px 11px;border:1px solid var(--gray-2);border-radius:10px;font:inherit;font-size:14px;background:#fff;transition:.15s}
 .form-control:focus{outline:3px solid rgba(0,107,63,.14);border-color:var(--ku-green)}
+@media(max-width:600px){.form-grid{grid-template-columns:1fr}.span2{grid-column:auto}}
+
+/* ── BUTTONS ── */
 .btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--gray-2);border-radius:10px;background:#fff;padding:9px 14px;font:inherit;font-size:13px;font-weight:800;cursor:pointer;transition:.16s;text-decoration:none;color:var(--text)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--gray-2);border-radius:10px;background:#fff;padding:10px 16px;font:inherit;font-size:13px;font-weight:800;cursor:pointer;transition:.16s;color:var(--text);white-space:nowrap}
 .btn:hover{transform:translateY(-1px);box-shadow:var(--shadow-soft)}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
 .btn.primary{background:var(--ku-green);color:#fff;border-color:var(--ku-green)}
-.btn.blue{background:var(--blue);color:#fff;border-color:var(--blue)}
+.btn.primary:hover{background:#005530}
 .btn.success{background:var(--green);color:#fff;border-color:var(--green)}
-.btn.warn{background:var(--yellow-light);color:#9a5b00;border-color:#f7c948}
+.btn.warn{background:var(--yellow-light);color:#92400e;border-color:#f7c948}
 .btn.danger{background:var(--red-light);color:var(--red);border-color:#f3b6b0}
-.btn:disabled{opacity:.55;cursor:not-allowed;transform:none;box-shadow:none}
+.btn.blue{background:var(--blue);color:#fff;border-color:var(--blue)}
+.btn.lg{padding:13px 22px;font-size:15px;border-radius:12px}
+.btn.full{width:100%;justify-content:center}
+
+/* ── STATS ── */
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
 .stat{background:#fff;border:1px solid var(--gray-2);border-radius:14px;padding:12px;text-align:center;box-shadow:var(--shadow-soft)}
-.stat .n{font-size:25px;font-weight:800;color:var(--ku-green)}.stat .l{font-size:11px;color:var(--muted);font-weight:700}
-@media(max-width:700px){.stats{grid-template-columns:repeat(2,1fr)}.form-grid{grid-template-columns:1fr}.span2{grid-column:auto}}
-.tab-panel{display:none}.tab-panel.active{display:block}
-.eq-section{background:#fff;border:1px solid var(--gray-2);border-radius:14px;overflow:hidden;margin-bottom:9px}
-.eq-header{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;background:#fff}
+.stat .n{font-size:24px;font-weight:800;color:var(--ku-green)}
+.stat .l{font-size:11px;color:var(--muted);font-weight:700;margin-top:2px}
+@media(max-width:600px){.stats{grid-template-columns:repeat(2,1fr)}}
+
+/* ── EQUIPMENT SECTIONS ── */
+.eq-section{background:#fff;border:1px solid var(--gray-2);border-radius:14px;overflow:hidden;margin-bottom:8px;box-shadow:var(--shadow-soft)}
+.eq-header{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;user-select:none;transition:.15s}
+.eq-header:hover{background:#fafafa}
 .eq-header.open{background:var(--ku-light);border-bottom:1px solid var(--gray-2)}
 .eq-title{font-weight:800;color:var(--navy);font-size:14px;display:flex;gap:8px;align-items:center}
 .eq-badge{font-size:11px;padding:3px 8px;border-radius:999px;background:var(--gray-2);color:var(--muted);font-weight:800}
 .eq-badge.has{background:var(--green-light);color:var(--green)}
 .eq-body{display:none}.eq-body.open{display:block}
-.item-row{position:relative;display:grid;grid-template-columns:22px 1fr auto auto;gap:10px;align-items:center;padding:10px 14px;border-top:1px solid #f1f3f5}
-.item-row:hover{background:#fafafa}.item-row.checked{background:#f0faf4}
+.item-row{position:relative;display:grid;grid-template-columns:20px 1fr auto auto;gap:10px;align-items:center;padding:9px 14px;border-top:1px solid #f1f3f5;transition:.1s}
+.item-row:hover{background:#fafafa}
+.item-row.checked{background:#f0faf4}
 .item-row.conflict{background:#fff7f7;border-left:4px solid var(--red)}
 .item-row.pending-row{background:#fffaf0;border-left:4px solid var(--yellow)}
-.item-check{width:17px;height:17px;accent-color:var(--ku-green)}
-.item-check:disabled + .item-name{color:#9ca3af;text-decoration:line-through}
-.item-name{font-size:13px;font-weight:600}
-.qty-select{width:66px;padding:6px;border:1px solid var(--gray-2);border-radius:9px;background:#fff}
+.item-check{width:16px;height:16px;accent-color:var(--ku-green);cursor:pointer}
+.item-check:disabled+.item-name{color:#9ca3af;text-decoration:line-through}
+.item-name{font-size:13px;font-weight:600;cursor:pointer}
+.qty-select{width:64px;padding:5px;border:1px solid var(--gray-2);border-radius:9px;background:#fff;font-size:13px}
 .badge{display:inline-flex;align-items:center;gap:4px;white-space:nowrap;font-size:11px;font-weight:800;padding:4px 9px;border-radius:999px;border:1px solid transparent}
 .badge.ok{background:var(--green-light);color:var(--green);border-color:#b8dfc9}
 .badge.busy{background:var(--red-light);color:var(--red);border-color:#f3b6b0}
-.badge.pending{background:var(--yellow-light);color:#9a5b00;border-color:#f7c948}
+.badge.pending-b{background:var(--yellow-light);color:#9a5b00;border-color:#f7c948}
 .badge.idle{background:#edf2f7;color:#64748b;border-color:#dbe3ea}
 .badge.approved{background:#dbeafe;color:#1d4ed8;border-color:#bfdbfe}
 .badge.returned{background:#ecfdf5;color:#047857;border-color:#bbf7d0}
-.badge.maint{background:#fff3e0;color:#e65100;border-color:#ffcc80}
-.badge.lost{background:var(--gray-2);color:var(--muted);border-color:#d1d5db}
-.tooltip{display:none;position:absolute;right:12px;top:38px;background:#111827;color:#fff;padding:9px 11px;border-radius:10px;font-size:12px;line-height:1.7;z-index:20;box-shadow:var(--shadow);max-width:280px}
-.item-row:hover .tooltip{display:block}
-.alert{border-radius:14px;padding:12px 14px;margin-bottom:12px;font-size:13px;font-weight:700;line-height:1.6}
-.alert.info{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe}
-.alert.warn{background:var(--yellow-light);color:#92400e;border:1px solid #f7c948}
-.alert.danger{background:var(--red-light);color:var(--red);border:1px solid #f3b6b0}
-.alert.success{background:var(--green-light);color:var(--green);border:1px solid #b8dfc9}
-.calendar-card{padding:14px}
-.calendar-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:8px}
+.badge.maint{background:var(--orange-light);color:var(--orange);border-color:#ffcc80}
+
+/* ── STEP 2: PHYSICAL CHECK ── */
+.check-table{width:100%;border-collapse:collapse;margin-top:6px}
+.check-table th{background:var(--navy);color:#fff;padding:10px 12px;text-align:left;font-size:12px;font-weight:800}
+.check-table th:last-child{text-align:center}
+.check-table td{padding:10px 12px;border-bottom:1px solid var(--gray-2);vertical-align:middle;font-size:13px}
+.check-table tr:last-child td{border-bottom:none}
+.check-table tr.ready-row{background:var(--green-light)}
+.check-table tr.notready-row{background:var(--red-light)}
+.check-table tr:hover{filter:brightness(.98)}
+.check-radio-group{display:flex;gap:6px;justify-content:center}
+.radio-btn{display:inline-flex;align-items:center;gap:5px;padding:7px 12px;border-radius:9px;border:2px solid var(--gray-2);cursor:pointer;font-size:12px;font-weight:800;transition:.15s;white-space:nowrap}
+.radio-btn:hover{border-color:var(--ku-green)}
+.radio-btn.selected-ok{background:var(--green-light);border-color:var(--green);color:var(--green)}
+.radio-btn.selected-notok{background:var(--red-light);border-color:var(--red);color:var(--red)}
+.check-note-input{width:100%;padding:7px 10px;border:1px solid var(--gray-2);border-radius:8px;font:inherit;font-size:12px;background:#fff}
+.check-note-input:focus{outline:2px solid rgba(0,107,63,.15);border-color:var(--ku-green)}
+.check-summary{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.check-sum-box{flex:1;min-width:90px;background:#fff;border:1px solid var(--gray-2);border-radius:12px;padding:12px;text-align:center;box-shadow:var(--shadow-soft)}
+.check-sum-box .csn{font-size:22px;font-weight:800}
+.check-sum-box .csl{font-size:11px;color:var(--muted);font-weight:700;margin-top:2px}
+.csn-ok{color:var(--green)}.csn-notok{color:var(--red)}.csn-pending{color:var(--yellow)}.csn-total{color:var(--blue)}
+.check-item-name{font-weight:700}
+.check-item-cat{font-size:11px;color:var(--muted);margin-top:1px}
+.check-calendar-conflict{display:inline-flex;align-items:center;gap:4px;font-size:11px;background:var(--yellow-light);color:#92400e;border-radius:6px;padding:2px 7px;margin-left:6px;font-weight:700;border:1px solid #f7c948}
+
+/* ── ALERT ── */
+.alert{border-radius:12px;padding:12px 14px;margin-bottom:12px;font-size:13px;font-weight:700;line-height:1.6;border:1px solid transparent}
+.alert.info{background:#eff6ff;color:#1d4ed8;border-color:#bfdbfe}
+.alert.warn{background:var(--yellow-light);color:#92400e;border-color:#f7c948}
+.alert.danger{background:var(--red-light);color:var(--red);border-color:#f3b6b0}
+.alert.success{background:var(--green-light);color:var(--green);border-color:#b8dfc9}
+.alert.orange{background:var(--orange-light);color:var(--orange);border-color:#ffcc80}
+
+/* ── CALENDAR ── */
+.cal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:8px;flex-wrap:wrap}
 .month-title{font-size:17px;font-weight:800;color:var(--navy)}
-.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
-.day-name{font-size:11px;font-weight:800;text-align:center;color:var(--muted);padding:6px}
-.day{min-height:92px;background:#fff;border:1px solid var(--gray-2);border-radius:12px;padding:7px;cursor:pointer;transition:.15s;position:relative;overflow:hidden}
-.day:hover{border-color:var(--ku-green);box-shadow:var(--shadow-soft)}
-.day.muted{opacity:.45;background:#f8fafc}
-.day.selected{outline:3px solid rgba(0,107,63,.2);border-color:var(--ku-green);background:var(--ku-light)}
-.day.conflict-day{background:#fff7f7;border-color:#fecaca}
-.day-num{font-weight:800;font-size:12px;margin-bottom:4px}
-.event-chip{font-size:10px;padding:2px 5px;border-radius:6px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:#edf2f7;color:#475569}
-.event-chip.pending{background:var(--yellow-light);color:#92400e}
-.event-chip.approved{background:#dbeafe;color:#1d4ed8}
-.event-chip.borrowed{background:var(--red-light);color:var(--red)}
-.request-card{border:1px solid var(--gray-2);border-radius:14px;padding:13px;background:#fff;margin-bottom:10px;box-shadow:var(--shadow-soft)}
-.request-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
-.request-title{font-size:15px;font-weight:800;color:var(--navy)}
-.request-meta{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.6}
-.request-items{margin-top:10px;border-top:1px solid var(--gray-2);padding-top:8px;font-size:12px;color:#374151;line-height:1.8}
+.cal-legend{display:flex;gap:10px;flex-wrap:wrap;align-items:center;font-size:12px;font-weight:700;color:var(--muted)}
+.legend-dot{width:10px;height:10px;border-radius:3px;display:inline-block;margin-right:3px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:0;border:1px solid var(--gray-2);border-radius:14px;overflow:hidden;background:var(--gray-2)}
+.cal-day-name{background:#fff;border-right:1px solid var(--gray-2);border-bottom:1px solid var(--gray-2);padding:9px 6px;font-size:11px;font-weight:800;text-align:center;color:var(--muted)}
+.cal-day-name:nth-child(7){border-right:none}
+.cal-day{min-height:110px;border-right:1px solid var(--gray-2);border-bottom:1px solid var(--gray-2);padding:6px 5px;background:#fff;cursor:pointer;position:relative;transition:.12s}
+.cal-day:nth-child(7n){border-right:none}
+.cal-day:hover{box-shadow:inset 0 0 0 2px rgba(0,107,63,.25)}
+.cal-day.muted{opacity:.4;background:#f8fafc}
+.cal-day.today{background:#f0fff7}
+.cal-day.today .cal-dnum{background:var(--ku-green);color:#fff;width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center}
+.cal-day.selected{box-shadow:inset 0 0 0 3px rgba(0,107,63,.28)}
+.cal-day.conflict-day{background:#fff7f7}
+.cal-day.pending-day{background:#fffdf3}
+.cal-dtop{display:flex;justify-content:space-between;align-items:center;min-height:24px;margin-bottom:3px}
+.cal-dnum{font-size:12px;font-weight:800}
+.cal-dcount{font-size:10px;font-weight:800;background:#f1f5f9;color:#64748b;border-radius:999px;padding:1px 6px}
+.cal-events{display:flex;flex-direction:column;gap:3px}
+.cal-event{border-radius:5px;padding:2px 6px;font-size:10px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;border-left:4px solid transparent;line-height:1.5}
+.cal-event:hover{filter:brightness(.96)}
+.cal-event.pending{background:#fff3cd;color:#8a5a00;border-left-color:#f59e0b}
+.cal-event.approved{background:#dbeafe;color:#1d4ed8;border-left-color:#3b82f6}
+.cal-event.borrowed{background:#fdecea;color:#c0392b;border-left-color:#c0392b}
+.cal-more{font-size:10px;color:#475569;font-weight:800;cursor:pointer;padding:2px 5px}
+.cal-more:hover{text-decoration:underline}
+@media(max-width:700px){.cal-day{min-height:80px}.cal-event{font-size:9px}.cal-dcount{display:none}}
+
+/* ── REQUEST CARD ── */
+.request-card{border:1px solid var(--gray-2);border-radius:14px;padding:14px;background:#fff;margin-bottom:10px;box-shadow:var(--shadow-soft)}
+.request-card.selected-card{border-color:var(--ku-green);outline:2px solid rgba(0,107,63,.15)}
+.req-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.req-title{font-size:15px;font-weight:800;color:var(--navy)}
+.req-meta{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.7}
+.req-items{margin-top:10px;border-top:1px solid var(--gray-2);padding-top:8px;font-size:12px;color:#374151;line-height:1.9}
+.req-check-result{margin-top:8px;background:var(--gray);border-radius:10px;padding:10px 12px;font-size:12px}
 .toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
-.status-flow{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
-.flow-step{background:#fff;border:1px solid var(--gray-2);border-radius:14px;padding:12px;text-align:center;font-size:12px;font-weight:800;color:var(--muted)}
-.flow-step.active{background:var(--ku-light);color:var(--ku-green);border-color:#b7e4ca}
-.flow-step .icon{display:block;font-size:20px;margin-bottom:4px}
-/* Google Calendar Styles */
-.calendar-grid.google-style{gap:0;border:1px solid var(--gray-2);border-radius:14px;overflow:hidden;background:var(--gray-2)}
-.calendar-grid.google-style .day-name{background:#fff;border-right:1px solid var(--gray-2);border-bottom:1px solid var(--gray-2);border-radius:0;padding:9px 6px}
-.calendar-grid.google-style .day-name:nth-child(7){border-right:none}
-.calendar-grid.google-style .day{min-height:128px;border:0;border-right:1px solid var(--gray-2);border-bottom:1px solid var(--gray-2);border-radius:0;padding:7px 5px 6px;background:#fff}
-.calendar-grid.google-style .day:nth-child(7n){border-right:none}
-.calendar-grid.google-style .day:hover{z-index:2;box-shadow:inset 0 0 0 2px rgba(0,107,63,.25)}
-.calendar-grid.google-style .day.today{background:#f8fffb}
-.calendar-grid.google-style .day.today .day-num{background:var(--ku-green);color:#fff;width:24px;height:24px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center}
-.calendar-grid.google-style .day.selected{outline:none;box-shadow:inset 0 0 0 3px rgba(0,107,63,.22)}
-.day-top{display:flex;align-items:center;justify-content:space-between;gap:6px;min-height:25px}
-.day-count{font-size:10px;font-weight:800;color:#64748b;background:#f1f5f9;border-radius:999px;padding:2px 6px}
-.day-events{margin-top:3px;display:flex;flex-direction:column;gap:3px}
-.gcal-event{min-height:19px;border-radius:5px;padding:2px 6px;font-size:10px;font-weight:800;line-height:1.45;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;border-left:4px solid transparent}
-.gcal-event:hover{filter:brightness(.96);transform:translateX(1px)}
-.gcal-event.pending{background:#fff3cd;color:#8a5a00;border-left-color:#f59e0b}
-.gcal-event.approved,.gcal-event.borrowed{background:#dbeafe;color:#1d4ed8;border-left-color:#3b82f6}
-.gcal-event.borrowed{background:#fdecea;color:#c0392b;border-left-color:#c0392b}
-.gcal-more{font-size:10px;color:#475569;font-weight:800;padding:2px 5px;cursor:pointer}
-.gcal-more:hover{text-decoration:underline}
-.calendar-legend{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.legend-dot{width:10px;height:10px;border-radius:3px;display:inline-block}
-.legend-pending{background:#f59e0b}.legend-approved{background:#3b82f6}.legend-borrowed{background:#c0392b}
-.day.pending-day{background:#fffdf3}
-/* Availability check loading */
-.avail-loading{display:inline-block;width:12px;height:12px;border:2px solid rgba(0,107,63,.3);border-top-color:var(--ku-green);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:4px}
-#toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);background:#111827;color:#fff;border-radius:999px;padding:11px 18px;font-size:13px;font-weight:700;box-shadow:var(--shadow);display:none;z-index:9999;max-width:calc(100vw - 24px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .75s linear infinite}
+
+/* ── EMAIL TAG ── */
+.email-tag{display:inline-flex;align-items:center;gap:5px;background:#eff6ff;color:var(--blue);font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;border:1px solid #bfdbfe;text-decoration:none}
+.email-tag:hover{background:#dbeafe}
+
+/* ── TOAST ── */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#111827;color:#fff;border-radius:999px;padding:10px 18px;font-size:13px;font-weight:700;box-shadow:var(--shadow);display:none;z-index:9999;white-space:nowrap;max-width:90vw;overflow:hidden;text-overflow:ellipsis}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.35);border-top-color:currentColor;border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .print-area{display:none}
 @media print{body>*:not(.print-area){display:none!important}.print-area{display:block!important;padding:24px;background:#fff}}
-@media(max-width:700px){.calendar-grid.google-style .day{min-height:96px;padding:5px 3px}.gcal-event{font-size:9px;padding:2px 4px}.day-count{display:none}}
+
+/* ── STEP DIVIDER ── */
+.step-divider{display:flex;align-items:center;gap:12px;margin:20px 0 14px}
+.step-divider-num{width:32px;height:32px;border-radius:50%;background:var(--ku-green);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;flex-shrink:0}
+.step-divider-line{flex:1;height:2px;background:var(--gray-2)}
+.step-divider-title{font-size:16px;font-weight:800;color:var(--navy)}
 </style>
 </head>
 <body>
+
+<!-- HEADER -->
 <header class="header">
   <div class="header-inner">
     <div class="brand">
       <div class="logo">KU</div>
       <div>
         <div class="title">ระบบจองและยืมอุปกรณ์</div>
-        <div class="sub">University Equipment Booking · Request · Approval · Calendar Conflict Check</div>
+        <div class="sub">University Equipment Booking · ฝ่ายเทคโนโลยีการศึกษา มก.</div>
       </div>
     </div>
-    <!-- FIX 2: เพิ่ม id ให้ pill เพื่อให้ updateHeaderStats() แก้ค่าได้ -->
-    <div class="header-status">
-      <span class="pill" id="pill-available">🟢 พร้อมใช้ <span id="pill-n-available">–</span></span>
-      <span class="pill" id="pill-pending">🟡 รออนุมัติ <span id="pill-n-pending">0</span></span>
-      <span class="pill" id="pill-borrowed">🔴 ถูกยืม <span id="pill-n-borrowed">0</span></span>
+    <div class="pills">
+      <span class="pill">🟢 พร้อมใช้ <strong id="pill-n-available">–</strong></span>
+      <span class="pill">🟡 รออนุมัติ <strong id="pill-n-pending">0</strong></span>
+      <span class="pill">🔴 ถูกยืม <strong id="pill-n-borrowed">0</strong></span>
     </div>
   </div>
 </header>
 
-<nav class="tabs">
-  <div class="tabs-inner">
-    <button class="tab-btn active" onclick="showTab('request')">📋 ส่งคำขอยืม</button>
-    <button class="tab-btn" onclick="showTab('calendar')">📅 Calendar กันชนงาน</button>
-    <button class="tab-btn" onclick="showTab('approval')">✅ อนุมัติคำขอ</button>
-    <button class="tab-btn" onclick="showTab('return')">↩️ คืนอุปกรณ์</button>
-    <button class="tab-btn" onclick="showTab('history')">🗂 ประวัติ/รายการ</button>
-    <button class="tab-btn" onclick="showTab('guide')">⚙️ ตั้งค่า</button>
+<!-- STEP TABS -->
+<nav class="steps-wrap">
+  <div class="steps-inner">
+    <button class="step-btn active" id="stab-1" onclick="showTab('step1')">
+      <div class="step-num">1</div>
+      <span class="step-label">📋 กรอกคำขอ</span>
+    </button>
+    <button class="step-btn" id="stab-2" onclick="showTab('step2')">
+      <div class="step-num">2</div>
+      <span class="step-label">🔍 ตรวจสอบพร้อมใช้</span>
+    </button>
+    <button class="step-btn" id="stab-3" onclick="showTab('step3')">
+      <div class="step-num">3</div>
+      <span class="step-label">📅 เช็กปฏิทิน</span>
+    </button>
+    <button class="step-btn" id="stab-4" onclick="showTab('step4')">
+      <div class="step-num">4</div>
+      <span class="step-label">✅ อนุมัติคำขอ</span>
+    </button>
+    <button class="step-btn" id="stab-5" onclick="showTab('step5')">
+      <div class="step-num">5</div>
+      <span class="step-label">↩️ ยืม/คืน</span>
+    </button>
+    <button class="step-btn" id="stab-hist" onclick="showTab('history')">
+      <div class="step-num" style="background:var(--gray-2);color:var(--muted)">📂</div>
+      <span class="step-label">ประวัติ</span>
+    </button>
+    <button class="step-btn" id="stab-set" onclick="showTab('settings')">
+      <div class="step-num" style="background:var(--gray-2);color:var(--muted)">⚙️</div>
+      <span class="step-label">ตั้งค่า</span>
+    </button>
   </div>
 </nav>
 
-<!-- ════ TAB: ส่งคำขอยืม ════ -->
-<div id="panel-request" class="tab-panel active">
-  <div class="container">
-    <div class="status-flow">
-      <div class="flow-step active"><span class="icon">1</span>กรอกคำขอ</div>
-      <div class="flow-step active"><span class="icon">2</span>เช็กปฏิทิน</div>
-      <div class="flow-step"><span class="icon">3</span>เจ้าหน้าที่อนุมัติ</div>
-      <div class="flow-step"><span class="icon">4</span>ยืม/คืน</div>
-    </div>
-    <div class="grid-main">
-      <div>
-        <div class="card">
-          <div class="card-header">📝 ข้อมูลคำขอยืม</div>
-          <div class="card-body">
-            <div class="form-grid">
-              <div class="form-group span2">
-                <label class="form-label">ชื่อผู้ขอยืม *</label>
-                <input class="form-control" id="userName" placeholder="กรอกชื่อ-นามสกุล">
-              </div>
-              <div class="form-group span2">
-                <label class="form-label">ชื่องาน / กิจกรรม *</label>
-                <input class="form-control" id="eventName" placeholder="เช่น ถ่ายทอดสด / ถ่ายภาพกิจกรรม / ประชุม">
-              </div>
-              <div class="form-group">
-                <label class="form-label">วันที่ใช้งาน *</label>
-                <input class="form-control" type="date" id="useDate" onchange="autoCheckByDate()">
-              </div>
-              <div class="form-group">
-                <label class="form-label">วันที่คืนอุปกรณ์ *</label>
-                <input class="form-control" type="date" id="returnDate" onchange="autoCheckByDate()">
-              </div>
-              <div class="form-group span2">
-                <label class="form-label">หมายเหตุ</label>
-                <input class="form-control" id="note" placeholder="รายละเอียดเพิ่มเติม / สถานที่ / ผู้ประสานงาน">
-              </div>
+<!-- ═══════════════════════════════════════════════
+  STEP 1: กรอกคำขอ + เลือกอุปกรณ์
+════════════════════════════════════════════════ -->
+<div class="tab-panel active" id="panel-step1">
+<div class="container">
+  <div class="grid-main">
+    <!-- ซ้าย: ฟอร์ม -->
+    <div>
+      <div class="card">
+        <div class="card-header">📝 ข้อมูลคำขอยืมอุปกรณ์</div>
+        <div class="card-body">
+          <div class="form-grid">
+            <div class="form-group span2">
+              <label class="form-label">ชื่อผู้ขอยืม *</label>
+              <input class="form-control" id="userName" placeholder="กรอกชื่อ-นามสกุล">
             </div>
-            <div class="btn-row">
-              <!-- FIX 3: ปุ่มตรวจสอบดึงข้อมูลจาก Sheets + localStorage พร้อมกัน -->
-              <button class="btn warn" id="checkBtn" onclick="checkAvailabilitySmart()">🔍 ตรวจสอบความพร้อมใช้</button>
-              <button class="btn primary" id="submitBtn" onclick="submitRequest()">📤 ส่งคำขอยืม</button>
-              <button class="btn" onclick="clearForm()">🔄 ล้างข้อมูล</button>
+            <div class="form-group span2">
+              <label class="form-label">ชื่องาน / กิจกรรม *</label>
+              <input class="form-control" id="eventName" placeholder="เช่น ถ่ายทอดสด / ถ่ายภาพกิจกรรม">
+            </div>
+            <div class="form-group">
+              <label class="form-label">วันที่ใช้งาน *</label>
+              <input class="form-control" type="date" id="useDate">
+            </div>
+            <div class="form-group">
+              <label class="form-label">วันที่คืนอุปกรณ์ *</label>
+              <input class="form-control" type="date" id="returnDate">
+            </div>
+            <div class="form-group span2">
+              <label class="form-label">หมายเหตุ / สถานที่ / ผู้ประสานงาน</label>
+              <input class="form-control" id="note" placeholder="(ถ้ามี)">
             </div>
           </div>
         </div>
-        <div class="card">
-          <div class="card-header">📊 สรุปคำขอ</div>
-          <div class="card-body">
-            <div class="stats">
-              <div class="stat"><div class="n" id="s-checked">0</div><div class="l">รายการที่เลือก</div></div>
-              <div class="stat"><div class="n" id="s-total">0</div><div class="l">ชิ้นรวม</div></div>
-              <div class="stat"><div class="n" id="s-conflict">0</div><div class="l">ชนคิว</div></div>
-              <div class="stat"><div class="n" id="s-pending">0</div><div class="l">รออนุมัติ</div></div>
-            </div>
-            <div id="request-alert" class="alert info">เลือกวันที่ใช้งานและวันที่คืน จากนั้นกด "ตรวจสอบความพร้อมใช้" เพื่อกันชนคิวก่อนส่งคำขอ</div>
+      </div>
+      <div class="card">
+        <div class="card-header">📊 สรุปรายการที่เลือก</div>
+        <div class="card-body">
+          <div class="stats">
+            <div class="stat"><div class="n" id="s-checked">0</div><div class="l">รายการที่เลือก</div></div>
+            <div class="stat"><div class="n" id="s-total">0</div><div class="l">ชิ้นรวม</div></div>
+            <div class="stat"><div class="n" id="s-cats">0</div><div class="l">หมวดหมู่</div></div>
+            <div class="stat"><div class="n" id="s-qty-max">0</div><div class="l">มากสุดต่อรายการ</div></div>
+          </div>
+          <div id="step1-alert" class="alert info">เลือกอุปกรณ์ที่ต้องการทางขวามือ จากนั้นกด "ไปขั้นที่ 2" เพื่อตรวจสอบความพร้อมใช้งาน</div>
+          <div class="btn-row">
+            <button class="btn primary lg full" onclick="goToStep2()">ไปขั้นที่ 2: ตรวจสอบความพร้อมใช้ →</button>
+          </div>
+          <div class="btn-row">
+            <button class="btn" onclick="clearForm()">🔄 ล้างข้อมูล</button>
+            <button class="btn warn" onclick="selectAllVisible()">เลือกทั้งหมด</button>
           </div>
         </div>
       </div>
-      <div>
-        <div class="toolbar">
-          <div class="section-title">📦 เลือกอุปกรณ์</div>
-          <button class="btn blue" onclick="selectAvailableOnly()">เลือกเฉพาะที่พร้อมใช้</button>
+    </div>
+    <!-- ขวา: เลือกอุปกรณ์ -->
+    <div>
+      <div class="toolbar">
+        <div style="font-size:14px;font-weight:800;color:var(--navy)">📦 เลือกอุปกรณ์</div>
+        <button class="btn" onclick="collapseAll()">ย่อทั้งหมด</button>
+      </div>
+      <div id="equipment-sections"></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+  STEP 2: ตรวจสอบความพร้อมใช้งาน (physical + calendar)
+════════════════════════════════════════════════ -->
+<div class="tab-panel" id="panel-step2">
+<div class="container">
+  <div class="step-divider">
+    <div class="step-divider-num">2</div>
+    <div class="step-divider-title">ตรวจสอบความพร้อมใช้งานของอุปกรณ์แต่ละรายการ</div>
+    <div class="step-divider-line"></div>
+  </div>
+  <div class="alert info" id="step2-guide">เจ้าหน้าที่ตรวจสอบสภาพอุปกรณ์จริงแต่ละชิ้น กด <strong>ปกติ</strong> หรือ <strong>ไม่พร้อม</strong> และบันทึกข้อเสนอแนะ (ถ้ามี) จากนั้นกด "บันทึกและไปขั้นที่ 3"</div>
+
+  <div class="check-summary" id="check-summary">
+    <div class="check-sum-box"><div class="csn csn-total" id="cs-total">0</div><div class="csl">รายการทั้งหมด</div></div>
+    <div class="check-sum-box"><div class="csn csn-ok" id="cs-ok">0</div><div class="csl">ปกติ / พร้อมใช้</div></div>
+    <div class="check-sum-box"><div class="csn csn-notok" id="cs-notok">0</div><div class="csl">ไม่พร้อม</div></div>
+    <div class="check-sum-box"><div class="csn csn-pending" id="cs-unchecked">0</div><div class="csl">ยังไม่ได้ตรวจ</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span>รายการอุปกรณ์ที่ขอยืม</span>
+      <button class="btn warn" id="loadSheetsBtn" onclick="loadSheetsAvailability()">🔄 ดึงข้อมูลจาก Sheets</button>
+    </div>
+    <div class="card-body" style="padding:0;overflow:hidden">
+      <div id="check-table-wrap">
+        <div class="alert info" style="margin:16px">กลับไปขั้นที่ 1 เพื่อเลือกอุปกรณ์ก่อน</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn" onclick="showTab('step1')">← กลับขั้นที่ 1</button>
+    <button class="btn primary lg" onclick="goToStep3()">บันทึกและไปขั้นที่ 3: ปฏิทิน →</button>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+  STEP 3: เช็กปฏิทิน
+════════════════════════════════════════════════ -->
+<div class="tab-panel" id="panel-step3">
+<div class="container">
+  <div class="step-divider">
+    <div class="step-divider-num">3</div>
+    <div class="step-divider-title">เช็กปฏิทินกันชนงาน</div>
+    <div class="step-divider-line"></div>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <span class="month-title" id="month-title">—</span>
+      <div style="display:flex;gap:6px">
+        <button class="btn" onclick="moveMonth(-1)">← ก่อนหน้า</button>
+        <button class="btn" onclick="goToday()">วันนี้</button>
+        <button class="btn" onclick="moveMonth(1)">ถัดไป →</button>
+      </div>
+    </div>
+    <div class="card-body" style="padding:14px">
+      <div class="cal-head">
+        <div class="cal-legend">
+          <span><i class="legend-dot" style="background:#f59e0b"></i>รออนุมัติ</span>
+          <span><i class="legend-dot" style="background:#3b82f6"></i>อนุมัติแล้ว</span>
+          <span><i class="legend-dot" style="background:#c0392b"></i>ถูกยืม/ชนคิว</span>
         </div>
-        <div id="equipment-sections"></div>
+      </div>
+      <div class="cal-grid" id="cal-grid"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header">รายการในวันที่เลือก <span class="badge idle" id="sel-date-label">ยังไม่เลือกวัน</span></div>
+    <div class="card-body" id="day-detail"><div class="alert info">คลิกวันที่ในปฏิทินเพื่อดูรายการ</div></div>
+  </div>
+  <div id="step3-conflict-alert"></div>
+  <div class="btn-row">
+    <button class="btn" onclick="showTab('step2')">← กลับขั้นที่ 2</button>
+    <button class="btn primary lg" onclick="goToStep4()">ส่งคำขอยืมและไปขั้นที่ 4 →</button>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+  STEP 4: อนุมัติคำขอ + Email
+════════════════════════════════════════════════ -->
+<div class="tab-panel" id="panel-step4">
+<div class="container">
+  <div class="step-divider">
+    <div class="step-divider-num">4</div>
+    <div class="step-divider-title">อนุมัติคำขอ (เจ้าหน้าที่)</div>
+    <div class="step-divider-line"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span>🔐 สิทธิ์เจ้าหน้าที่</span>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <a class="email-tag" href="mailto:nuttawuth.n@ku.th">📧 nuttawuth.n@ku.th</a>
+        <button class="btn warn" onclick="syncFromGoogle()">🔄 ซิงก์จาก Sheets</button>
+      </div>
+    </div>
+    <div class="card-body">
+      <div id="admin-status"></div>
+      <div class="alert orange" style="margin-top:10px">
+        เมื่ออนุมัติแล้ว ระบบจะส่งอีเมลแจ้งผลไปยัง <strong>nuttawuth.n@ku.th</strong> อัตโนมัติ
+        พร้อมรายการอุปกรณ์และผลการตรวจสอบความพร้อมใช้
       </div>
     </div>
   </div>
+  <div id="approval-list"></div>
+</div>
 </div>
 
-<!-- ════ TAB: Calendar ════ -->
-<div id="panel-calendar" class="tab-panel">
-  <div class="container">
-    <div class="card">
-      <div class="card-header">
-        <span>📅 Calendar กันชนงาน</span>
-        <div class="btn-row" style="margin-top:0">
-          <button class="btn" onclick="moveMonth(-1)">← เดือนก่อน</button>
-          <button class="btn" onclick="goToday()">วันนี้</button>
-          <button class="btn" onclick="moveMonth(1)">เดือนถัดไป →</button>
-        </div>
-      </div>
-      <div class="card-body calendar-card">
-        <div class="calendar-head">
-          <div class="month-title" id="month-title">—</div>
-          <div class="calendar-legend">
-            <span><i class="legend-dot legend-pending"></i> รออนุมัติ</span>
-            <span><i class="legend-dot legend-approved"></i> อนุมัติแล้ว</span>
-            <span><i class="legend-dot legend-borrowed"></i> ถูกยืม/ชนคิว</span>
-          </div>
-        </div>
-        <div class="calendar-grid google-style" id="calendar-grid"></div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-header">รายการในวันที่เลือก <span id="selected-date-label" class="badge idle">ยังไม่เลือกวัน</span></div>
-      <div class="card-body" id="day-detail">
-        <div class="alert info">คลิกวันที่ในปฏิทินเพื่อดูงานและอุปกรณ์ที่จอง/ยืมอยู่</div>
-      </div>
-    </div>
+<!-- ═══════════════════════════════════════════════
+  STEP 5: ยืม/คืน
+════════════════════════════════════════════════ -->
+<div class="tab-panel" id="panel-step5">
+<div class="container">
+  <div class="step-divider">
+    <div class="step-divider-num">5</div>
+    <div class="step-divider-title">ยืม / คืนอุปกรณ์</div>
+    <div class="step-divider-line"></div>
   </div>
-</div>
-
-<!-- ════ TAB: อนุมัติ ════ -->
-<div id="panel-approval" class="tab-panel">
-  <div class="container">
-    <div class="toolbar">
-      <div>
-        <div class="section-title">✅ หน้าตรวจสอบคำขอสำหรับเจ้าหน้าที่</div>
-        <div style="font-size:12px;color:var(--muted)">ใช้อนุมัติ แก้ไขสถานะ หรือไม่อนุมัติคำขอยืมก่อนตัดสถานะเป็น "ถูกยืม"</div>
-      </div>
-      <!-- FIX 4: syncFromGoogle ใช้ action=requests ซึ่งมีใน Code.gs แล้ว -->
-      <button class="btn warn" onclick="syncFromGoogle()">🔄 โหลด/ซิงก์จาก Sheets</button>
-    </div>
-    <div class="card">
-      <div class="card-header">🔐 สิทธิ์เจ้าหน้าที่</div>
-      <div class="card-body">
-        <div id="admin-status"></div>
-        <div class="alert warn" style="margin-top:12px">การอนุมัติ / ไม่อนุมัติ / ยืนยันคืน ต้องกรอก Admin key ก่อน เหมาะสำหรับการใช้งานภายในหน่วยงาน</div>
-      </div>
-    </div>
-    <div id="approval-list"></div>
+  <div class="toolbar">
+    <div style="font-size:13px;color:var(--muted)">แสดงเฉพาะคำขอที่อนุมัติแล้วหรือกำลังยืมอยู่</div>
+    <button class="btn warn" onclick="renderReturnList()">🔄 รีเฟรช</button>
   </div>
+  <div id="return-list"></div>
+</div>
 </div>
 
-<!-- ════ TAB: คืนอุปกรณ์ ════ -->
-<div id="panel-return" class="tab-panel">
-  <div class="container">
-    <div class="toolbar">
-      <div>
-        <div class="section-title">↩️ คืนอุปกรณ์</div>
-        <div style="font-size:12px;color:var(--muted)">แสดงเฉพาะคำขอที่อนุมัติแล้ว/ถูกยืมอยู่</div>
-      </div>
-      <button class="btn warn" onclick="renderReturnList()">🔄 รีเฟรช</button>
-    </div>
-    <div id="return-list"></div>
+<!-- HISTORY -->
+<div class="tab-panel" id="panel-history">
+<div class="container">
+  <div class="toolbar">
+    <div style="font-size:14px;font-weight:800;color:var(--navy)">🗂 ประวัติรายการทั้งหมด</div>
+    <button class="btn danger" onclick="clearAllLocal()">🗑 ล้างข้อมูลทั้งหมด</button>
   </div>
+  <div id="history-list"></div>
+</div>
 </div>
 
-<!-- ════ TAB: ประวัติ ════ -->
-<div id="panel-history" class="tab-panel">
-  <div class="container">
-    <div class="toolbar">
-      <div>
-        <div class="section-title">🗂 ประวัติและรายการทั้งหมด</div>
-        <div style="font-size:12px;color:var(--muted)">ข้อมูลในเครื่อง — ซิงก์จาก Google Sheets ได้จากหน้าอนุมัติคำขอ</div>
-      </div>
-      <button class="btn danger" onclick="clearDemoData()">🗑 ล้างข้อมูลตัวอย่าง</button>
-    </div>
-    <div id="history-list"></div>
-  </div>
-</div>
-
-<!-- ════ TAB: ตั้งค่า ════ -->
-<div id="panel-guide" class="tab-panel">
-  <div class="container">
-    <div class="card">
-      <div class="card-header">⚙️ การตั้งค่า Google Apps Script</div>
-      <div class="card-body">
-        <div class="form-group">
-          <label class="form-label">Web App URL</label>
+<!-- SETTINGS -->
+<div class="tab-panel" id="panel-settings">
+<div class="container">
+  <div class="card">
+    <div class="card-header">⚙️ ตั้งค่าระบบ</div>
+    <div class="card-body">
+      <div class="form-grid">
+        <div class="form-group span2">
+          <label class="form-label">Google Apps Script Web App URL</label>
           <input class="form-control" id="scriptUrl" oninput="saveScriptUrl()" placeholder="https://script.google.com/macros/s/.../exec">
+          <div id="url-status" style="font-size:12px;color:var(--muted);margin-top:6px">ยังไม่ได้ตั้งค่า</div>
         </div>
-        <div id="url-status" style="font-size:12px;color:var(--muted);margin-top:8px">ยังไม่ได้ตั้งค่า</div>
-        <hr style="border:0;border-top:1px solid var(--gray-2);margin:16px 0">
-        <div class="form-group">
+        <div class="form-group span2">
           <label class="form-label">Admin key สำหรับเจ้าหน้าที่</label>
           <input class="form-control" id="adminKeySetting" placeholder="เช่น KU-ADMIN-2569">
         </div>
-        <div class="btn-row">
-          <button class="btn primary" onclick="saveAdminKey()">💾 บันทึก Admin key</button>
-        </div>
-        <div class="alert warn" style="margin-top:12px">ค่าเริ่มต้นคือ <strong>KU-ADMIN-2569</strong> ควรเปลี่ยนก่อนใช้งานจริงภายในหน่วยงาน</div>
       </div>
-    </div>
-    <div class="card">
-      <div class="card-header">🧭 Flow การใช้งานที่แนะนำ</div>
-      <div class="card-body" style="line-height:1.9">
-        <ol style="margin-left:20px">
-          <li>ผู้ขอยืมกรอกข้อมูลและเลือกวันที่ใช้งาน/วันที่คืน</li>
-          <li>กด <strong>"ตรวจสอบความพร้อมใช้"</strong> — ระบบดึงข้อมูลจาก Google Sheets + เครื่องพร้อมกัน</li>
-          <li>ส่งคำขอ → สถานะ <strong>🟡 รออนุมัติ</strong> (อุปกรณ์ยังไม่ถูก lock)</li>
-          <li>เจ้าหน้าที่เปิดหน้า <strong>อนุมัติคำขอ</strong> → กดอนุมัติ → สถานะเปลี่ยนเป็น <strong>🔴 ถูกยืม</strong></li>
-          <li>เมื่อคืนอุปกรณ์ → กด <strong>ยืนยันคืน</strong> → สถานะกลับเป็น <strong>🟢 พร้อมใช้</strong></li>
-        </ol>
+      <div class="btn-row">
+        <button class="btn primary" onclick="saveAdminKey()">💾 บันทึก Admin key</button>
       </div>
+      <div class="alert warn" style="margin-top:12px">ค่าเริ่มต้น Admin key: <strong>KU-ADMIN-2569</strong></div>
     </div>
   </div>
+  <div class="card">
+    <div class="card-header">🧭 Flow การทำงานของระบบ</div>
+    <div class="card-body">
+      <ol style="margin-left:20px;line-height:2.2;font-size:13px">
+        <li><strong>ขั้นที่ 1 กรอกคำขอ</strong> — กรอกชื่อ/งาน/วันที่ และเลือกอุปกรณ์</li>
+        <li><strong>ขั้นที่ 2 ตรวจสอบพร้อมใช้</strong> — เจ้าหน้าที่ตรวจสภาพอุปกรณ์จริง: ปกติ / ไม่พร้อม / ข้อเสนอแนะ</li>
+        <li><strong>ขั้นที่ 3 เช็กปฏิทิน</strong> — ดูว่าช่วงวันที่ขอมีงานชนคิวหรือไม่</li>
+        <li><strong>ขั้นที่ 4 อนุมัติ</strong> — เจ้าหน้าที่กดอนุมัติ → ระบบส่งอีเมลแจ้ง <a href="mailto:nuttawuth.n@ku.th" class="email-tag">nuttawuth.n@ku.th</a> อัตโนมัติ</li>
+        <li><strong>ขั้นที่ 5 ยืม/คืน</strong> — ยืนยันการยืมและบันทึกการคืนอุปกรณ์</li>
+      </ol>
+    </div>
+  </div>
+</div>
 </div>
 
 <div class="print-area" id="print-area"></div>
 <div id="toast"></div>
 
 <script>
-// ════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════
 // EQUIPMENT DATA
-// ════════════════════════════════════════════════════════════
-const EQUIPMENT = [
-  {id:'cam', label:'กล้องถ่ายทำ', items:[
+// ════════════════════════════════════════════════
+const EQUIPMENT=[
+  {id:'cam',label:'กล้องถ่ายทำ',items:[
     {id:'xf705',name:'Canon XF705'},{id:'xf605',name:'Canon XF605'},
     {id:'xf405',name:'Canon XF405'},{id:'xf305',name:'Canon XF305'},
     {id:'c70',name:'Canon Cinema C70'},{id:'r6',name:'Canon R6 Mark II'},
@@ -381,664 +515,721 @@ const EQUIPMENT = [
     {id:'m50',name:'Canon M50'},{id:'d7k',name:'Nikon D7000'},
     {id:'i360',name:'Insta360 1-inch Edition'},{id:'i360t',name:'Insta360 Twin Edition'}
   ]},
-  {id:'lens', label:'เลนส์', items:[
+  {id:'lens',label:'เลนส์',items:[
     {id:'rf1020',name:'Canon RF 10-20 mm (Fisheye)'},{id:'ep1635',name:'Canon EP 16-35 mm (Wide)'},
     {id:'rf24usm',name:'Canon RF 24-105 mm USM (Normal)'},{id:'rf24',name:'Canon RF 24-105 mm (Normal)'},
     {id:'rf24ii',name:'Canon RF 24-105 mm II (Normal)'},{id:'nk18',name:'Nikon DX 18-105 mm (Normal)'},
     {id:'c1845',name:'Canon 18-45 mm (Normal)'},{id:'c70l',name:'Canon 70-200 mm (Tele)'},
     {id:'c50',name:'Canon 50 mm (Fix)'},{id:'mount',name:'เม้าท์เลนส์ Canon'}
   ]},
-  {id:'batt', label:'แบตเตอรี่', qty:true, maxQty:7, items:[
+  {id:'batt',label:'แบตเตอรี่',qty:true,maxQty:7,items:[
     {id:'lpe6p',name:'Canon LP-E6P'},{id:'lpe17',name:'Canon LP-E17'},
     {id:'pana',name:'Panasonic AG-VBR59'},{id:'sony',name:'Sony NP-FV100A'},
     {id:'ledB',name:'ไฟ LED สตูดิโอ NP-F960'},{id:'niken',name:'Nikon EN-EL15'}
   ]},
-  {id:'flash', label:'แฟลช', items:[
+  {id:'flash',label:'แฟลช',items:[
     {id:'f600',name:'Canon SPEEDLITE 600EX-RT'},{id:'f600ii',name:'Canon SPEEDLITE 600EX II RT'},
     {id:'fel10',name:'Canon SPEEDLITE EL-10'},{id:'nsb900',name:'Nikon SPEEDLITE SB-900'},
     {id:'nsb910',name:'Nikon SPEEDLITE SB-910'}
   ]},
-  {id:'mem', label:'Memory Card', qty:true, maxQty:5, items:[
+  {id:'mem',label:'Memory Card',qty:true,maxQty:5,items:[
     {id:'m8',name:'8GB'},{id:'m32',name:'32GB'},{id:'m64',name:'64GB'},
     {id:'m128',name:'128GB'},{id:'m1t',name:'1TB'}
   ]},
-  {id:'ledl', label:'ไฟ LED', qty:true, maxQty:3, items:[{id:'ledset',name:'ชุดไฟ LED'}]},
-  {id:'lstand', label:'ขาตั้งไฟสตูดิโอ', qty:true, maxQty:3, items:[{id:'lstd',name:'ขาตั้งไฟสตูดิโอ'}]},
-  {id:'tripod', label:'ขาตั้งกล้อง SACHTLER', qty:true, maxQty:3, items:[{id:'sach',name:'ขาตั้งกล้อง SACHTLER'}]},
-  {id:'wmic', label:'ไวเลสไมโครโฟน', qty:true, maxQty:3, items:[
+  {id:'ledl',label:'ไฟ LED',qty:true,maxQty:3,items:[{id:'ledset',name:'ชุดไฟ LED'}]},
+  {id:'lstand',label:'ขาตั้งไฟสตูดิโอ',qty:true,maxQty:3,items:[{id:'lstd',name:'ขาตั้งไฟสตูดิโอ'}]},
+  {id:'tripod',label:'ขาตั้งกล้อง SACHTLER',qty:true,maxQty:3,items:[{id:'sach',name:'ขาตั้งกล้อง SACHTLER'}]},
+  {id:'wmic',label:'ไวเลสไมโครโฟน',qty:true,maxQty:3,items:[
     {id:'blink',name:'Saramonic Blink500'},{id:'tx10',name:'Saramonic TX-10'},
     {id:'senn',name:'Sennheiser ew-112p G3'}
   ]},
-  {id:'shure', label:'ไมโครโฟน SHURE Dynamic', qty:true, maxQty:4, items:[{id:'shured',name:'SHURE Dynamic'}]},
-  {id:'shures', label:'ไมโครโฟนสตูดิโอ SHURE ตั้งโต๊ะ', qty:true, maxQty:2, items:[{id:'shurest',name:'SHURE Studio ตั้งโต๊ะ'}]},
-  {id:'mixer', label:'Mixer', items:[
+  {id:'shure',label:'ไมโครโฟน SHURE Dynamic',qty:true,maxQty:4,items:[{id:'shured',name:'SHURE Dynamic'}]},
+  {id:'shures',label:'ไมโครโฟนสตูดิโอ SHURE ตั้งโต๊ะ',qty:true,maxQty:2,items:[{id:'shurest',name:'SHURE Studio ตั้งโต๊ะ'}]},
+  {id:'mixer',label:'Mixer',items:[
     {id:'toa',name:'TOA Power Mixer'},{id:'emx7',name:'Yamaha EMX7'},{id:'mg10',name:'Yamaha MG10XU'}
   ]},
-  {id:'wireless', label:'ชุดส่งสัญญาณภาพและเสียงไร้สาย', qty:true, maxQty:3, items:[
+  {id:'wireless',label:'ชุดส่งสัญญาณภาพและเสียงไร้สาย',qty:true,maxQty:3,items:[
     {id:'snap',name:'Dongle Snapshow'},{id:'holly',name:'Monitor Wireless Hollyland'}
   ]},
-  {id:'speaker', label:'ลำโพง', qty:true, maxQty:7, items:[
+  {id:'speaker',label:'ลำโพง',qty:true,maxQty:7,items:[
     {id:'toabs',name:'TOA BS-1030W 30W สีขาว'},{id:'jbl',name:'JBL EON ONE COMPACT'},{id:'yamaha500',name:'YAMAHA 500S'}
   ]},
-  {id:'switcher', label:'Switcher / Splitter', qty:true, maxQty:4, items:[
+  {id:'switcher',label:'Switcher / Splitter',qty:true,maxQty:4,items:[
     {id:'aten1',name:'Splitter ATEN VS0110HA'},{id:'aten10',name:'Splitter ATEN 10-Port'},
     {id:'hdmi4',name:'HDMI Splitter 1 Input 4 Output'},{id:'hdmi2',name:'HDMI Splitter 1 Input 2 Output'},
     {id:'hdmisw',name:'HDMI Switcher'},{id:'devwell',name:'Switcher DeviceWell'}
   ]},
-  {id:'tv', label:'TV', qty:true, maxQty:10, items:[
+  {id:'tv',label:'TV',qty:true,maxQty:10,items:[
     {id:'tv32',name:'32"'},{id:'tv42',name:'42"'},{id:'tv55',name:'55"'}
   ]},
-  {id:'laptop', label:'Laptop', items:[
+  {id:'laptop',label:'Laptop',items:[
     {id:'msi1',name:'MSI AX201 I'},{id:'msi2',name:'MSI AX201 II'},
     {id:'rog',name:'ASUS ROG Strix G531G'},{id:'f17',name:'ASUS F17 FX707Z'},
     {id:'dell',name:'DELL'},{id:'aio',name:'All-in-One Lenovo'}
   ]},
-  {id:'backdrop', label:'Backdrop', items:[
+  {id:'backdrop',label:'Backdrop',items:[
     {id:'bd1',name:'2.30 × 3 เมตร'},{id:'bd2',name:'2.30 × 5 เมตร'}
   ]}
 ];
 
-const STATUS_LABEL = {
-  pending:  ['🟡 รออนุมัติ','pending'],
-  approved: ['🔵 อนุมัติแล้ว','approved'],
-  borrowed: ['🔴 ถูกยืมอยู่','busy'],
-  rejected: ['⚫ ไม่อนุมัติ','idle'],
-  returned: ['🟢 คืนแล้ว','returned']
+const STATUS_LABEL={
+  pending:['🟡 รออนุมัติ','pending-b'],
+  approved:['🔵 อนุมัติแล้ว','approved'],
+  borrowed:['🔴 ถูกยืมอยู่','busy'],
+  rejected:['⚫ ไม่อนุมัติ','idle'],
+  returned:['🟢 คืนแล้ว','returned']
 };
+const NOTIFY_EMAIL = 'nuttawuth.n@ku.th';
 
-// ════════════════════════════════════════════════════════════
-// ADMIN
-// ════════════════════════════════════════════════════════════
-const ADMIN_KEY_STORAGE = 'equipment_admin_verified';
-const DEFAULT_ADMIN_KEY = 'KU-ADMIN-2569';
-
-function requireAdmin(actionText='ดำเนินการสำหรับเจ้าหน้าที่') {
-  if (sessionStorage.getItem(ADMIN_KEY_STORAGE)==='1') return true;
-  const key = prompt(`กรอกรหัสเจ้าหน้าที่เพื่อ${actionText}`);
-  const adminKey = localStorage.getItem('equipment_admin_key') || DEFAULT_ADMIN_KEY;
-  if (key===adminKey) {
-    sessionStorage.setItem(ADMIN_KEY_STORAGE,'1');
-    showToast('✅ ยืนยันสิทธิ์เจ้าหน้าที่แล้ว'); renderAdminStatus(); return true;
-  }
-  showToast('❌ รหัสเจ้าหน้าที่ไม่ถูกต้อง'); return false;
-}
-function logoutAdmin() {
-  sessionStorage.removeItem(ADMIN_KEY_STORAGE); renderAdminStatus(); showToast('ออกจากโหมดเจ้าหน้าที่แล้ว');
-}
-function renderAdminStatus() {
-  const el = document.getElementById('admin-status'); if (!el) return;
-  const ok = sessionStorage.getItem(ADMIN_KEY_STORAGE)==='1';
-  el.innerHTML = ok
-    ? '<span class="badge ok">🔐 โหมดเจ้าหน้าที่</span> <button class="btn danger" onclick="logoutAdmin()">ออกจากโหมดเจ้าหน้าที่</button>'
-    : '<span class="badge idle">🔒 ยังไม่ได้ยืนยันสิทธิ์เจ้าหน้าที่</span> <button class="btn primary" onclick="requireAdmin(\'เข้าสู่โหมดเจ้าหน้าที่\')">เข้าสู่โหมดเจ้าหน้าที่</button>';
-}
-function saveAdminKey() {
-  const val = document.getElementById('adminKeySetting')?.value.trim();
-  if (!val) { showToast('⚠️ กรุณากรอกรหัส Admin key'); return; }
-  localStorage.setItem('equipment_admin_key', val);
-  sessionStorage.removeItem(ADMIN_KEY_STORAGE);
-  renderAdminStatus(); showToast('✅ บันทึก Admin key แล้ว');
-}
-
-// ════════════════════════════════════════════════════════════
-// RECORDS (localStorage)
-// ════════════════════════════════════════════════════════════
-let state = {};
-let openSecs = {};
-let availability = {};   // ผลตรวจสอบ: { itemName: { type:'busy'|'pending', records:[] } }
-let sheetsStatuses = {}; // FIX 3: cache จาก Google Sheets
-let currentMonth = new Date();
-let selectedCalendarDate = null;
+// ════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════
+let state={}, openSecs={}, sheetsStatuses={};
+let checkResults={};   // { itemName: { status:'ok'|'notok'|'', note:'' } }
+let calendarAvailability={};
+let currentMonth=new Date(), selCalDate=null;
+const ADMIN_KEY='equipment_admin_verified', DEF_KEY='KU-ADMIN-2569';
 
 function initState(){
-  EQUIPMENT.forEach(cat => cat.items.forEach(item => {
-    state[item.id] = {checked:false, qty:1};
-  }));
+  EQUIPMENT.forEach(cat=>cat.items.forEach(item=>{state[item.id]={checked:false,qty:1};}));
 }
 initState();
-
-function getRecords(){ return JSON.parse(localStorage.getItem('university_equipment_requests') || '[]'); }
-function setRecords(records){ localStorage.setItem('university_equipment_requests', JSON.stringify(records)); updateHeaderStats(); }
+function getRecords(){return JSON.parse(localStorage.getItem('university_equipment_requests')||'[]');}
+function setRecords(r){localStorage.setItem('university_equipment_requests',JSON.stringify(r));updateHeaderStats();}
 
 function seedDemo(){
-  if (localStorage.getItem('university_equipment_seeded')) return;
-  const today = new Date();
-  const iso = d => d.toISOString().slice(0,10);
-  const d1 = new Date(today); d1.setDate(today.getDate()+2);
-  const d2 = new Date(today); d2.setDate(today.getDate()+4);
-  const d3 = new Date(today); d3.setDate(today.getDate()+7);
-  const d4 = new Date(today); d4.setDate(today.getDate()+8);
+  if(localStorage.getItem('university_equipment_seeded')) return;
+  const t=new Date(), iso=d=>d.toISOString().slice(0,10);
+  const d1=new Date(t);d1.setDate(t.getDate()+3);
+  const d2=new Date(t);d2.setDate(t.getDate()+5);
   setRecords([
-    {id:'rq-demo-1',user:'เจ้าหน้าที่โสตฯ',event:'ถ่ายทำวิดีโอประชาสัมพันธ์',date:iso(d1),returnDate:iso(d2),note:'ข้อมูลตัวอย่าง',status:'approved',savedAt:new Date().toISOString(),items:[{cat:'กล้องถ่ายทำ',name:'Canon XF705',qty:1},{cat:'ไวเลสไมโครโฟน',name:'Saramonic Blink500',qty:1}]},
-    {id:'rq-demo-2',user:'ฝ่ายประชาสัมพันธ์',event:'บันทึกภาพกิจกรรมอบรม',date:iso(d3),returnDate:iso(d4),note:'รออนุมัติ',status:'pending',savedAt:new Date().toISOString(),items:[{cat:'กล้องถ่ายทำ',name:'Canon R6 Mark II',qty:1},{cat:'เลนส์',name:'Canon RF 24-105 mm USM (Normal)',qty:1}]}
+    {id:'rq-demo-1',user:'เจ้าหน้าที่โสตฯ',event:'ถ่ายทำวิดีโอประชาสัมพันธ์',date:iso(d1),returnDate:iso(d2),note:'ข้อมูลตัวอย่าง',status:'approved',savedAt:new Date().toISOString(),
+     items:[{cat:'กล้องถ่ายทำ',name:'Canon XF705',qty:1},{cat:'ไวเลสไมโครโฟน',name:'Saramonic Blink500',qty:1}],
+     checkResults:{}}
   ]);
   localStorage.setItem('university_equipment_seeded','1');
 }
 seedDemo();
 
-// ════════════════════════════════════════════════════════════
-// FIX 2: updateHeaderStats — อัปเดต pill ใน header จริง
-// ════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════
+// HEADER STATS
+// ════════════════════════════════════════════════
 function updateHeaderStats(){
-  const records  = getRecords();
-  const pending  = records.filter(x => x.status==='pending').length;
-  const borrowed = records.filter(x => ['approved','borrowed'].includes(x.status)).length;
-  // นับ available จาก sheetsStatuses ถ้ามี ไม่งั้นแสดง –
-  const totalEquip  = EQUIPMENT.reduce((s,c) => s+c.items.length, 0);
-  const notAvail    = Object.values(sheetsStatuses).filter(v => v.status!=='available').length;
-  const availableN  = Object.keys(sheetsStatuses).length
-    ? (totalEquip - notAvail)
-    : '–';
-  const pN = document.getElementById('pill-n-pending');
-  const bN = document.getElementById('pill-n-borrowed');
-  const aN = document.getElementById('pill-n-available');
-  if (pN) pN.textContent = pending;
-  if (bN) bN.textContent = borrowed;
-  if (aN) aN.textContent = availableN;
+  const r=getRecords();
+  const pen=r.filter(x=>x.status==='pending').length;
+  const bor=r.filter(x=>['approved','borrowed'].includes(x.status)).length;
+  const total=EQUIPMENT.reduce((s,c)=>s+c.items.length,0);
+  const notav=Object.values(sheetsStatuses).filter(v=>v.status!=='available').length;
+  const av=Object.keys(sheetsStatuses).length?(total-notav):'–';
+  document.getElementById('pill-n-available').textContent=av;
+  document.getElementById('pill-n-pending').textContent=pen;
+  document.getElementById('pill-n-borrowed').textContent=bor;
 }
 
-// ════════════════════════════════════════════════════════════
-// BUILD UI
-// ════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════
+// ADMIN
+// ════════════════════════════════════════════════
+function requireAdmin(txt=''){
+  if(sessionStorage.getItem(ADMIN_KEY)==='1') return true;
+  const k=prompt('กรอกรหัสเจ้าหน้าที่'+(txt?` เพื่อ${txt}`:''));
+  const key=localStorage.getItem('equipment_admin_key')||DEF_KEY;
+  if(k===key){sessionStorage.setItem(ADMIN_KEY,'1');renderAdminStatus();showToast('✅ ยืนยันสิทธิ์แล้ว');return true;}
+  showToast('❌ รหัสไม่ถูกต้อง');return false;
+}
+function logoutAdmin(){sessionStorage.removeItem(ADMIN_KEY);renderAdminStatus();showToast('ออกจากโหมดเจ้าหน้าที่');}
+function renderAdminStatus(){
+  const el=document.getElementById('admin-status');if(!el)return;
+  const ok=sessionStorage.getItem(ADMIN_KEY)==='1';
+  el.innerHTML=ok
+    ?'<span class="badge ok">🔐 โหมดเจ้าหน้าที่</span> <button class="btn danger" onclick="logoutAdmin()">ออก</button>'
+    :'<span class="badge idle">🔒 ยังไม่ยืนยันสิทธิ์</span> <button class="btn primary" onclick="requireAdmin()">เข้าสู่โหมดเจ้าหน้าที่</button>';
+}
+function saveAdminKey(){
+  const v=document.getElementById('adminKeySetting')?.value.trim();
+  if(!v){showToast('⚠️ กรุณากรอก key');return;}
+  localStorage.setItem('equipment_admin_key',v);
+  sessionStorage.removeItem(ADMIN_KEY);renderAdminStatus();showToast('✅ บันทึก Admin key แล้ว');
+}
+
+// ════════════════════════════════════════════════
+// BUILD EQUIPMENT SECTIONS (Step 1)
+// ════════════════════════════════════════════════
 function buildSections(){
-  const container = document.getElementById('equipment-sections');
-  container.innerHTML = '';
-  EQUIPMENT.forEach(cat => {
-    const sec = document.createElement('div');
-    sec.className = 'eq-section';
-    sec.innerHTML = `
+  const c=document.getElementById('equipment-sections');c.innerHTML='';
+  EQUIPMENT.forEach(cat=>{
+    const sec=document.createElement('div');sec.className='eq-section';
+    sec.innerHTML=`
       <div class="eq-header" id="hdr-${cat.id}" onclick="toggleSec('${cat.id}')">
         <div class="eq-title">${cat.label} <span class="eq-badge" id="bdg-${cat.id}">0/${cat.items.length}</span></div>
-        <span>⌄</span>
+        <span style="color:var(--muted)">⌄</span>
       </div>
       <div class="eq-body" id="bdy-${cat.id}">
-        ${cat.items.map(item => `
+        ${cat.items.map(item=>`
           <div class="item-row" id="row-${item.id}">
             <input type="checkbox" class="item-check" id="chk-${item.id}" onchange="toggleItem('${item.id}','${cat.id}')">
             <label class="item-name" for="chk-${item.id}">${item.name}</label>
-            ${cat.qty ? `<select class="qty-select" id="qty-${item.id}" onchange="changeQty('${item.id}')" disabled>
+            ${cat.qty?`<select class="qty-select" id="qty-${item.id}" onchange="changeQty('${item.id}')" disabled>
               ${Array.from({length:cat.maxQty||5},(_,i)=>`<option value="${i+1}">${i+1}</option>`).join('')}
-            </select>` : `<span></span>`}
-            <span class="badge idle" id="av-${item.id}">⚪ ยังไม่ตรวจ</span>
-            <div class="tooltip" id="tip-${item.id}"></div>
+            </select>`:`<span></span>`}
+            <span></span>
           </div>`).join('')}
       </div>`;
-    container.appendChild(sec);
+    c.appendChild(sec);
   });
 }
 function toggleSec(id){
-  openSecs[id] = !openSecs[id];
-  document.getElementById('bdy-'+id).classList.toggle('open', openSecs[id]);
-  document.getElementById('hdr-'+id).classList.toggle('open', openSecs[id]);
+  openSecs[id]=!openSecs[id];
+  document.getElementById('bdy-'+id).classList.toggle('open',openSecs[id]);
+  document.getElementById('hdr-'+id).classList.toggle('open',openSecs[id]);
 }
-function toggleItem(itemId, catId){
-  const chk = document.getElementById('chk-'+itemId);
-  state[itemId].checked = chk.checked;
-  document.getElementById('row-'+itemId).classList.toggle('checked', chk.checked);
-  const qty = document.getElementById('qty-'+itemId); if(qty) qty.disabled = !chk.checked;
-  updateBadge(catId); updateStats();
+function toggleItem(itemId,catId){
+  const chk=document.getElementById('chk-'+itemId);
+  state[itemId].checked=chk.checked;
+  document.getElementById('row-'+itemId).classList.toggle('checked',chk.checked);
+  const qty=document.getElementById('qty-'+itemId);if(qty)qty.disabled=!chk.checked;
+  updateBadge(catId);updateStats1();
 }
-function changeQty(itemId){
-  const qty = document.getElementById('qty-'+itemId); if(qty) state[itemId].qty = parseInt(qty.value||'1',10); updateStats();
-}
+function changeQty(id){const q=document.getElementById('qty-'+id);if(q)state[id].qty=parseInt(q.value||1);}
 function updateBadge(catId){
-  const cat = EQUIPMENT.find(c=>c.id===catId);
-  const n = cat.items.filter(i=>state[i.id]?.checked).length;
-  const bdg = document.getElementById('bdg-'+catId); if(!bdg) return;
-  bdg.textContent = `${n}/${cat.items.length}`; bdg.classList.toggle('has', n>0);
+  const cat=EQUIPMENT.find(c=>c.id===catId);
+  const n=cat.items.filter(i=>state[i.id]?.checked).length;
+  const b=document.getElementById('bdg-'+catId);if(!b)return;
+  b.textContent=`${n}/${cat.items.length}`;b.classList.toggle('has',n>0);
 }
-function updateStats(){
-  let checked=0,total=0,conflict=0,pending=0;
+function updateStats1(){
+  let checked=0,total=0,cats=new Set(),maxq=0;
   EQUIPMENT.forEach(cat=>cat.items.forEach(item=>{
-    if(state[item.id]?.checked){checked++;total += state[item.id].qty||1;}
-    if(availability[item.name]?.type==='busy') conflict++;
-    if(availability[item.name]?.type==='pending') pending++;
+    if(state[item.id]?.checked){
+      checked++;const q=state[item.id].qty||1;total+=q;cats.add(cat.id);if(q>maxq)maxq=q;
+    }
   }));
-  document.getElementById('s-checked').textContent = checked;
-  document.getElementById('s-total').textContent = total;
-  document.getElementById('s-conflict').textContent = conflict;
-  document.getElementById('s-pending').textContent = pending;
+  document.getElementById('s-checked').textContent=checked;
+  document.getElementById('s-total').textContent=total;
+  document.getElementById('s-cats').textContent=cats.size;
+  document.getElementById('s-qty-max').textContent=maxq||0;
+}
+function collapseAll(){EQUIPMENT.forEach(cat=>{openSecs[cat.id]=false;document.getElementById('bdy-'+cat.id).classList.remove('open');document.getElementById('hdr-'+cat.id).classList.remove('open');});}
+function selectAllVisible(){
+  EQUIPMENT.forEach(cat=>cat.items.forEach(item=>{
+    const chk=document.getElementById('chk-'+item.id);
+    if(chk&&!chk.disabled&&!chk.checked){chk.checked=true;toggleItem(item.id,cat.id);}
+  }));
 }
 
-// ════════════════════════════════════════════════════════════
-// FIX 3: checkAvailabilitySmart — ดึงข้อมูลจาก Sheets + localStorage
-// ════════════════════════════════════════════════════════════
-async function checkAvailabilitySmart(){
-  if(!dateRangeOK()){
-    setAlert('กรุณาเลือกวันที่ใช้งานและวันที่คืนให้ถูกต้องก่อนตรวจสอบ','danger');
-    showToast('⚠️ กรุณาเลือกวันที่ให้ถูกต้อง'); return;
+// ════════════════════════════════════════════════
+// STEP 1 → STEP 2
+// ════════════════════════════════════════════════
+function goToStep2(){
+  const user=document.getElementById('userName').value.trim();
+  const event=document.getElementById('eventName').value.trim();
+  const date=document.getElementById('useDate').value;
+  const rdate=document.getElementById('returnDate').value;
+  if(!user||!event||!date){
+    document.getElementById('step1-alert').className='alert danger';
+    document.getElementById('step1-alert').textContent='⚠️ กรุณากรอกชื่อผู้ขอยืม ชื่องาน และวันที่ใช้งานให้ครบ';
+    return;
   }
-  const btn = document.getElementById('checkBtn');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner" style="border-top-color:#9a5b00"></span> กำลังตรวจสอบ...';
-
-  // ดึง Sheets status ก่อน (ถ้ามี URL)
-  const scriptUrl = localStorage.getItem('script_url');
-  if(scriptUrl){
-    try {
-      const res  = await fetch(scriptUrl + '?action=availability');
-      const json = await res.json();
-      if(json.success && json.statuses) {
-        sheetsStatuses = json.statuses;
-        updateHeaderStats();
-      }
-    } catch(_) { /* ใช้ localStorage แทน */ }
+  if(rdate&&rdate<date){
+    document.getElementById('step1-alert').className='alert danger';
+    document.getElementById('step1-alert').textContent='⚠️ วันที่คืนต้องไม่ก่อนวันที่ใช้งาน';
+    return;
   }
-
-  // merge: Sheets ที่ถูกยืม/pending + localStorage records
-  availability = computeAvailability();
-  renderAvailability();
-
-  const busy    = Object.values(availability).filter(x=>x.type==='busy').length;
-  const pending = Object.values(availability).filter(x=>x.type==='pending').length;
-  if(busy>0)         setAlert(`พบอุปกรณ์ชนคิว/ถูกยืมอยู่ ${busy} รายการ ระบบปิดการเลือกให้อัตโนมัติ`,'danger');
-  else if(pending>0) setAlert(`มีอุปกรณ์ ${pending} รายการที่อยู่ระหว่างรออนุมัติ`,'warn');
-  else               setAlert('ไม่พบรายการชนคิวในช่วงวันที่เลือก สามารถส่งคำขอยืมได้','info');
-
-  updateStats();
-  btn.disabled = false;
-  btn.innerHTML = '🔍 ตรวจสอบความพร้อมใช้';
-  showToast('✅ ตรวจสอบความพร้อมใช้แล้ว');
+  const items=selectedItems();
+  if(items.length===0){
+    document.getElementById('step1-alert').className='alert danger';
+    document.getElementById('step1-alert').textContent='⚠️ กรุณาเลือกอุปกรณ์อย่างน้อย 1 รายการ';
+    return;
+  }
+  buildCheckTable(items);
+  showTab('step2');
 }
 
-function autoCheckByDate(){
-  if(document.getElementById('useDate').value) checkAvailabilitySmart();
+function selectedItems(){
+  const items=[];
+  EQUIPMENT.forEach(cat=>cat.items.forEach(item=>{
+    if(state[item.id]?.checked) items.push({cat:cat.label,name:item.name,qty:state[item.id].qty||1});
+  }));
+  return items;
 }
 
-function computeAvailability(){
-  const start   = document.getElementById('useDate').value;
-  const end     = document.getElementById('returnDate').value || start;
-  const map     = {};
-  if(!start) return map;
-
-  // 1. ตรวจจาก localStorage records
-  const records = getRecords().filter(r => ['pending','approved','borrowed'].includes(r.status));
-  records.forEach(r=>{
-    if(!rangesOverlap(start,end,r.date,r.returnDate||r.date)) return;
-    r.items.forEach(it=>{
-      const type = (r.status==='pending') ? 'pending' : 'busy';
-      if(!map[it.name] || map[it.name].type!=='busy') {
-        map[it.name] = {type, records:[r]};
-      } else { map[it.name].records.push(r); }
-    });
+// ════════════════════════════════════════════════
+// STEP 2: ตรวจสอบความพร้อมใช้
+// ════════════════════════════════════════════════
+function buildCheckTable(items){
+  checkResults={};
+  items.forEach(it=>{
+    if(!checkResults[it.name]) checkResults[it.name]={status:'',note:''};
   });
 
-  // 2. merge จาก Sheets statuses (FIX 3)
-  Object.entries(sheetsStatuses).forEach(([name, info])=>{
+  const wrap=document.getElementById('check-table-wrap');
+  if(!items.length){wrap.innerHTML='<div class="alert info" style="margin:16px">กลับไปขั้นที่ 1 เพื่อเลือกอุปกรณ์</div>';return;}
+
+  let rows=items.map((it,i)=>{
+    const catColor=getCatColor(it.cat);
+    const conflictTag=calendarAvailability[it.name]?`<span class="check-calendar-conflict">⚠️ ชนคิว</span>`:'';
+    return `<tr id="chkrow-${i}" class="">
+      <td>${i+1}</td>
+      <td>
+        <div class="check-item-name">${escHtml(it.name)}${conflictTag}</div>
+        <div class="check-item-cat" style="background:${catColor};display:inline-block;padding:1px 7px;border-radius:5px;color:#fff;margin-top:3px">${escHtml(it.cat)}</div>
+        <span style="font-size:12px;color:var(--muted);margin-left:8px">จำนวน: ${it.qty} ชิ้น</span>
+      </td>
+      <td>
+        <div class="check-radio-group">
+          <div class="radio-btn" id="rbOk-${i}" onclick="setCheckStatus(${i},'ok','${escHtml(it.name).replace(/'/g,"\\'")}')">✅ ปกติ</div>
+          <div class="radio-btn" id="rbNotok-${i}" onclick="setCheckStatus(${i},'notok','${escHtml(it.name).replace(/'/g,"\\'")}')">❌ ไม่พร้อม</div>
+        </div>
+      </td>
+      <td><input class="check-note-input" id="cknote-${i}" placeholder="ข้อเสนอแนะ / แก้ไข..." onchange="setCheckNote(${i},'${escHtml(it.name).replace(/'/g,"\\'")}',this.value)"></td>
+    </tr>`;
+  }).join('');
+
+  wrap.innerHTML=`<table class="check-table">
+    <thead><tr>
+      <th style="width:40px">#</th>
+      <th>อุปกรณ์</th>
+      <th style="width:200px;text-align:center">ผลตรวจสอบ</th>
+      <th style="width:240px">ข้อเสนอแนะ / แก้ไข</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+  updateCheckSummary();
+}
+
+function setCheckStatus(rowIdx,status,itemName){
+  checkResults[itemName]=checkResults[itemName]||{status:'',note:''};
+  checkResults[itemName].status=status;
+  // อัปเดต UI
+  const ok=document.getElementById('rbOk-'+rowIdx);
+  const no=document.getElementById('rbNotok-'+rowIdx);
+  const row=document.getElementById('chkrow-'+rowIdx);
+  if(status==='ok'){
+    ok.className='radio-btn selected-ok';no.className='radio-btn';
+    row.className='ready-row';
+  } else {
+    no.className='radio-btn selected-notok';ok.className='radio-btn';
+    row.className='notready-row';
+  }
+  updateCheckSummary();
+}
+function setCheckNote(rowIdx,itemName,val){
+  checkResults[itemName]=checkResults[itemName]||{status:'',note:''};
+  checkResults[itemName].note=val;
+}
+function updateCheckSummary(){
+  const vals=Object.values(checkResults);
+  const total=vals.length;
+  const ok=vals.filter(v=>v.status==='ok').length;
+  const notok=vals.filter(v=>v.status==='notok').length;
+  const unchecked=vals.filter(v=>v.status==='').length;
+  document.getElementById('cs-total').textContent=total;
+  document.getElementById('cs-ok').textContent=ok;
+  document.getElementById('cs-notok').textContent=notok;
+  document.getElementById('cs-unchecked').textContent=unchecked;
+}
+function getCatColor(cat){
+  const m={'กล้องถ่ายทำ':'#1a6fb5','เลนส์':'#0d4a80','แบตเตอรี่':'#374151','แฟลช':'#6d28d9','Memory Card':'#065f46','ไฟ LED':'#92400e','Mixer':'#be185d','ลำโพง':'#0369a1','Laptop':'#1a7a4a','TV':'#c0392b'};
+  return m[cat]||'#6b7280';
+}
+
+// ดึงสถานะจาก Sheets แล้ว update badge ในตาราง
+async function loadSheetsAvailability(){
+  const url=localStorage.getItem('script_url');
+  if(!url){showToast('⚠️ ยังไม่ได้ตั้งค่า Script URL');return;}
+  const btn=document.getElementById('loadSheetsBtn');
+  btn.disabled=true;btn.innerHTML='<span class="spinner"></span> กำลังดึงข้อมูล...';
+  try{
+    const res=await fetch(url+'?action=availability');
+    const json=await res.json();
+    if(json.success&&json.statuses){
+      sheetsStatuses=json.statuses;updateHeaderStats();
+      // อัปเดต calendar availability
+      const start=document.getElementById('useDate').value;
+      const end=document.getElementById('returnDate').value||start;
+      calendarAvailability=computeCalendarAvailability(start,end);
+      // rebuild table
+      buildCheckTable(selectedItems());
+      showToast('✅ ดึงข้อมูลจาก Sheets สำเร็จ');
+    }
+  }catch(e){showToast('⚠️ ดึงข้อมูลไม่สำเร็จ');}
+  btn.disabled=false;btn.innerHTML='🔄 ดึงข้อมูลจาก Sheets';
+}
+
+function computeCalendarAvailability(start,end){
+  const map={};
+  // จาก records ในเครื่อง
+  getRecords().filter(r=>['pending','approved','borrowed'].includes(r.status)).forEach(r=>{
+    if(!rangesOverlap(start,end||start,r.date,r.returnDate||r.date)) return;
+    (r.items||[]).forEach(it=>{map[it.name]={type:r.status==='pending'?'pending':'busy',event:r.event};});
+  });
+  // จาก Sheets
+  Object.entries(sheetsStatuses).forEach(([name,info])=>{
     if(['borrowed','maintenance','lost'].includes(info.status)){
-      if(!map[name] || map[name].type!=='busy') {
-        map[name] = {type:'busy', records:[{
-          user: info.borrowedBy || 'เจ้าหน้าที่',
-          event: info.event || info.note || info.status,
-          date: '', returnDate: info.returnDate || '',
-          status: info.status
-        }]};
-      }
+      if(!map[name]) map[name]={type:'busy',event:info.event||info.status};
     }
   });
   return map;
 }
 
-function renderAvailability(){
-  EQUIPMENT.forEach(cat=>cat.items.forEach(item=>{
-    const row   = document.getElementById('row-'+item.id);
-    const badge = document.getElementById('av-'+item.id);
-    const tip   = document.getElementById('tip-'+item.id);
-    const chk   = document.getElementById('chk-'+item.id);
-    const qty   = document.getElementById('qty-'+item.id);
-    row.classList.remove('conflict','pending-row');
-    chk.disabled = false;
-    if(qty && !state[item.id].checked) qty.disabled = true;
-
-    const av = availability[item.name];
-    if(!av){
-      badge.className='badge ok'; badge.textContent='🟢 พร้อมใช้';
-      tip.innerHTML = 'ไม่พบรายการจอง/ยืมในช่วงวันที่เลือก';
-    } else {
-      const lines = av.records.map(r => `👤 ${escapeHtml(r.user||'–')}<br>📌 ${escapeHtml(r.event||'–')}<br>📅 ${r.date||'–'} → ${r.returnDate||r.date||'–'}<br>สถานะ: ${STATUS_LABEL[r.status]?.[0] || r.status||'–'}`).join('<hr style="border:0;border-top:1px solid #374151;margin:6px 0">');
-      tip.innerHTML = lines;
-      if(av.type==='busy'){
-        badge.className='badge busy'; badge.textContent='🔴 ไม่พร้อมใช้';
-        row.classList.add('conflict');
-        chk.checked=false; chk.disabled=true; state[item.id].checked=false;
-        if(qty) qty.disabled=true;
-      } else {
-        badge.className='badge pending'; badge.textContent='🟡 รออนุมัติ';
-        row.classList.add('pending-row');
-      }
-    }
-    updateBadge(cat.id);
-  }));
-  updateStats();
-}
-
-function setAlert(msg,type){ const el=document.getElementById('request-alert'); el.className='alert '+type; el.textContent=msg; }
-function selectedItems(){
-  const items=[]; EQUIPMENT.forEach(cat=>cat.items.forEach(item=>{if(state[item.id]?.checked) items.push({cat:cat.label,name:item.name,qty:state[item.id].qty||1});})); return items;
-}
-function dateRangeOK(){ const s=document.getElementById('useDate').value,e=document.getElementById('returnDate').value||s; if(!s) return false; if(e<s) return false; return true; }
-function rangesOverlap(aS,aE,bS,bE){ aE=aE||aS; bE=bE||bS; return aS<=bE && bS<=aE; }
-
-// ════════════════════════════════════════════════════════════
-// FIX 1: submitRequest — ตั้งสถานะเป็น 'pending' เท่านั้น
-//         ไม่เปลี่ยน Status Sheet อุปกรณ์ (รอเจ้าหน้าที่อนุมัติก่อน)
-// ════════════════════════════════════════════════════════════
-async function submitRequest(){
-  const user       = document.getElementById('userName').value.trim();
-  const event      = document.getElementById('eventName').value.trim();
-  const date       = document.getElementById('useDate').value;
-  const returnDate = document.getElementById('returnDate').value || date;
-  const note       = document.getElementById('note').value.trim();
-  if(!user||!event||!date||!returnDate){showToast('⚠️ กรุณากรอกข้อมูลคำขอให้ครบ');return;}
-
-  await checkAvailabilitySmart();
-  const items = selectedItems();
-  if(items.length===0){showToast('⚠️ กรุณาเลือกอุปกรณ์อย่างน้อย 1 รายการ');return;}
-  const conflictNames = items.filter(it=>availability[it.name]?.type==='busy').map(it=>it.name);
-  if(conflictNames.length){
-    showToast('❌ มีอุปกรณ์ไม่พร้อมใช้ กรุณาแก้ไขรายการ');
-    setAlert('ไม่สามารถส่งคำขอได้ เพราะมีอุปกรณ์ไม่พร้อมใช้: '+conflictNames.join(', '),'danger');
-    return;
+// ════════════════════════════════════════════════
+// STEP 2 → STEP 3
+// ════════════════════════════════════════════════
+function goToStep3(){
+  const unchecked=Object.values(checkResults).filter(v=>v.status==='').length;
+  if(unchecked>0){
+    if(!confirm(`ยังมี ${unchecked} รายการที่ยังไม่ได้ตรวจสอบ ต้องการดำเนินการต่อหรือไม่?`)) return;
   }
+  renderCalendar();showTab('step3');
+  // แสดง conflict warning
+  const start=document.getElementById('useDate').value;
+  const end=document.getElementById('returnDate').value||start;
+  const av=computeCalendarAvailability(start,end);
+  const busy=Object.values(av).filter(x=>x.type==='busy').length;
+  const pend=Object.values(av).filter(x=>x.type==='pending').length;
+  const alertEl=document.getElementById('step3-conflict-alert');
+  if(busy>0)      alertEl.innerHTML=`<div class="alert danger">⚠️ พบอุปกรณ์ชนคิว ${busy} รายการในช่วงวันที่เลือก กรุณาตรวจสอบในปฏิทิน</div>`;
+  else if(pend>0) alertEl.innerHTML=`<div class="alert warn">🟡 มีอุปกรณ์ ${pend} รายการรออนุมัติในช่วงวันที่เลือก</div>`;
+  else            alertEl.innerHTML=`<div class="alert success">✅ ไม่พบรายการชนคิวในช่วงวันที่เลือก</div>`;
+}
 
-  const record = {
-    id:'rq-'+Date.now(), user, event, date, returnDate, note, items,
-    status:'pending',   // FIX 1: เริ่มต้นเป็น pending เสมอ
-    savedAt: new Date().toISOString()
+// ════════════════════════════════════════════════
+// STEP 3 → STEP 4 (ส่งคำขอ)
+// ════════════════════════════════════════════════
+async function goToStep4(){
+  const user=document.getElementById('userName').value.trim();
+  const event=document.getElementById('eventName').value.trim();
+  const date=document.getElementById('useDate').value;
+  const returnDate=document.getElementById('returnDate').value||date;
+  const note=document.getElementById('note').value.trim();
+  const items=selectedItems();
+
+  if(!user||!event||!date||items.length===0){showToast('⚠️ ข้อมูลไม่ครบ กรุณากลับไปขั้นที่ 1');return;}
+
+  const record={
+    id:'rq-'+Date.now(),user,event,date,returnDate,note,items,
+    checkResults:{...checkResults},
+    status:'pending',
+    savedAt:new Date().toISOString()
   };
-  const records = getRecords(); records.unshift(record); setRecords(records);
+  const records=getRecords();records.unshift(record);setRecords(records);
+  await postToGoogle({...record,action:'request'});
 
-  // ส่งไป Sheets โดยระบุ action:'request' (ไม่ใช่ 'borrow')
-  await postToGoogle({...record, action:'request'});
-
-  clearForm(false); renderAll();
-  showToast('✅ ส่งคำขอยืมแล้ว — รอเจ้าหน้าที่อนุมัติ');
-  showTab('approval');
+  showTab('step4');
+  renderApproval();
+  showToast('✅ ส่งคำขอแล้ว — รอเจ้าหน้าที่อนุมัติ (Step 4)');
 }
 
-// ════════════════════════════════════════════════════════════
-// POST to Google — ส่งข้อมูลไป Apps Script
-// ════════════════════════════════════════════════════════════
-async function postToGoogle(payload){
-  const scriptUrl = localStorage.getItem('script_url'); if(!scriptUrl) return;
-  try {
-    await fetch(scriptUrl, {method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)});
-  } catch(_){}
-}
-
-function selectAvailableOnly(){
-  if(!dateRangeOK()){showToast('⚠️ กรุณาเลือกวันที่ก่อน');return;}
-  checkAvailabilitySmart().then(()=>{
-    EQUIPMENT.forEach(cat=>cat.items.forEach(item=>{
-      const chk=document.getElementById('chk-'+item.id);
-      if(!availability[item.name] && chk && !chk.disabled && !chk.checked){
-        chk.checked=true; toggleItem(item.id, cat.id);
-      }
-    }));
-  });
-}
-
-function clearForm(resetDates=true){
-  ['userName','eventName','note'].forEach(id=>document.getElementById(id).value='');
-  if(resetDates)['useDate','returnDate'].forEach(id=>document.getElementById(id).value='');
-  EQUIPMENT.forEach(cat=>cat.items.forEach(item=>{
-    state[item.id]={checked:false,qty:1};
-    const chk=document.getElementById('chk-'+item.id); if(chk){chk.checked=false;chk.disabled=false;}
-    const qty=document.getElementById('qty-'+item.id); if(qty){qty.value=1;qty.disabled=true;}
-    const row=document.getElementById('row-'+item.id); if(row) row.classList.remove('checked','conflict','pending-row');
-    const badge=document.getElementById('av-'+item.id); if(badge){badge.className='badge idle';badge.textContent='⚪ ยังไม่ตรวจ';}
-    updateBadge(cat.id);
-  }));
-  availability={}; updateStats(); setAlert('เลือกวันที่ใช้งานและวันที่คืน จากนั้นกด "ตรวจสอบความพร้อมใช้" เพื่อกันชนคิวก่อนส่งคำขอ','info');
-}
-
-// ════════════════════════════════════════════════════════════
-// APPROVAL
-// ════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════
+// APPROVAL (Step 4) + Email notification
+// ════════════════════════════════════════════════
 function renderApproval(){
-  const records = getRecords().filter(r=>r.status==='pending');
-  document.getElementById('approval-list').innerHTML = records.length ? records.map(r=>requestCard(r,'approval')).join('') : '<div class="alert info">ไม่มีคำขอที่รออนุมัติ</div>';
+  const records=getRecords().filter(r=>r.status==='pending');
+  const el=document.getElementById('approval-list');
+  el.innerHTML=records.length?records.map(r=>requestCard(r,'approval')).join(''):'<div class="alert info">ไม่มีคำขอที่รออนุมัติ</div>';
 }
+
 function approveRequest(id){
   if(!requireAdmin('อนุมัติคำขอ')) return;
-  const records=getRecords(); const r=records.find(x=>x.id===id); if(!r) return;
-  // ตรวจชนคิวซ้ำก่อนอนุมัติ
-  const conflicts=[];
-  records.filter(x=>x.id!==id&&['approved','borrowed'].includes(x.status)&&rangesOverlap(r.date,r.returnDate||r.date,x.date,x.returnDate||x.date))
-    .forEach(x=>{ x.items.forEach(xi=>{ if(r.items.some(ri=>ri.name===xi.name)) conflicts.push(xi.name); }); });
-  if(conflicts.length&&!confirm('พบรายการชนคิว: '+[...new Set(conflicts)].join(', ')+'\nต้องการอนุมัติต่อหรือไม่?')) return;
-  r.status='approved'; r.approvedAt=new Date().toISOString();
+  const records=getRecords();const r=records.find(x=>x.id===id);if(!r) return;
+  r.status='approved';r.approvedAt=new Date().toISOString();
   setRecords(records);
-  // FIX 1: เปลี่ยน status อุปกรณ์ใน Sheets เป็น 'borrowed' เฉพาะตอนอนุมัติ
-  postToGoogle({...r, action:'approve'});
-  renderAll(); showToast('✅ อนุมัติคำขอแล้ว — อุปกรณ์ถูกล็อกใน Sheets');
+  postToGoogle({...r,action:'approve'});
+  sendEmailNotification(r,'approved');
+  renderAll();showToast('✅ อนุมัติแล้ว — ส่งอีเมลแจ้งไปที่ '+NOTIFY_EMAIL);
 }
 function rejectRequest(id){
   if(!requireAdmin('ไม่อนุมัติคำขอ')) return;
-  const reason=prompt('ระบุเหตุผลที่ไม่อนุมัติ (ถ้ามี)','อุปกรณ์ไม่พร้อมใช้งาน / ชนคิว');
-  const records=getRecords(); const r=records.find(x=>x.id===id); if(!r) return;
-  r.status='rejected'; r.rejectedAt=new Date().toISOString(); r.rejectReason=reason||'';
-  setRecords(records); postToGoogle({...r, action:'reject'});
-  renderAll(); showToast('❌ ไม่อนุมัติคำขอแล้ว');
+  const reason=prompt('ระบุเหตุผล (ถ้ามี)','อุปกรณ์ไม่พร้อม / ชนคิว');
+  const records=getRecords();const r=records.find(x=>x.id===id);if(!r) return;
+  r.status='rejected';r.rejectedAt=new Date().toISOString();r.rejectReason=reason||'';
+  setRecords(records);
+  postToGoogle({...r,action:'reject'});
+  sendEmailNotification(r,'rejected');
+  renderAll();showToast('❌ ไม่อนุมัติ — ส่งอีเมลแจ้งแล้ว');
 }
 
-// ════════════════════════════════════════════════════════════
-// RETURN
-// ════════════════════════════════════════════════════════════
+// ส่งอีเมลผ่าน Apps Script
+async function sendEmailNotification(r,action){
+  const url=localStorage.getItem('script_url');if(!url) return;
+  const checkSummary=Object.entries(r.checkResults||{}).map(([name,v])=>
+    `${name}: ${v.status==='ok'?'✅ ปกติ':'❌ ไม่พร้อม'}${v.note?' ('+v.note+')':''}`
+  ).join('\n');
+  await postToGoogle({
+    action:'sendEmail',
+    toEmail: NOTIFY_EMAIL,
+    requestId: r.id,
+    requestUser: r.user,
+    requestEvent: r.event,
+    requestDate: r.date,
+    returnDate: r.returnDate,
+    items: r.items,
+    checkResults: r.checkResults||{},
+    approvalStatus: action,
+    checkSummary
+  });
+}
+
+// ════════════════════════════════════════════════
+// RETURN (Step 5)
+// ════════════════════════════════════════════════
 function renderReturnList(){
   const records=getRecords().filter(r=>['approved','borrowed'].includes(r.status));
-  document.getElementById('return-list').innerHTML = records.length ? records.map(r=>requestCard(r,'return')).join('') : '<div class="alert info">ไม่มีรายการที่รอคืนอุปกรณ์</div>';
+  document.getElementById('return-list').innerHTML=records.length?records.map(r=>requestCard(r,'return')).join(''):'<div class="alert info">ไม่มีรายการที่รอคืนอุปกรณ์</div>';
 }
 function markReturned(id){
   if(!requireAdmin('ยืนยันคืนอุปกรณ์')) return;
-  const returnedBy=prompt('ชื่อผู้คืน / ผู้รับคืน','เจ้าหน้าที่'); if(returnedBy===null) return;
-  const records=getRecords(); const r=records.find(x=>x.id===id); if(!r) return;
-  r.status='returned'; r.returnedAt=new Date().toISOString(); r.returnedBy=returnedBy||'';
+  const by=prompt('ชื่อผู้คืน / ผู้รับคืน','เจ้าหน้าที่');if(by===null) return;
+  const records=getRecords();const r=records.find(x=>x.id===id);if(!r) return;
+  r.status='returned';r.returnedAt=new Date().toISOString();r.returnedBy=by||'';
   setRecords(records);
-  postToGoogle({...r, action:'return', returnedBy:r.returnedBy, items:r.items.map(i=>i.name)});
-  renderAll(); showToast('✅ บันทึกการคืนอุปกรณ์แล้ว — สถานะใน Sheets กลับเป็น available');
+  postToGoogle({...r,action:'return',returnedBy:r.returnedBy,items:r.items.map(i=>i.name)});
+  renderAll();showToast('✅ บันทึกการคืนแล้ว');
 }
 
-// ════════════════════════════════════════════════════════════
-// HISTORY + REQUEST CARD
-// ════════════════════════════════════════════════════════════
-function renderHistory(){
-  const records=getRecords();
-  document.getElementById('history-list').innerHTML = records.length ? records.map(r=>requestCard(r,'history')).join('') : '<div class="alert info">ยังไม่มีรายการ</div>';
-}
-function requestCard(r, mode=''){
-  const sl = STATUS_LABEL[r.status] || ['',''];
-  const actions = mode==='approval'
-    ? `<div class="btn-row">
-         <button class="btn success" onclick="approveRequest('${r.id}')">✅ อนุมัติ</button>
-         <button class="btn danger"  onclick="rejectRequest('${r.id}')">❌ ไม่อนุมัติ</button>
-         <button class="btn"         onclick="printRequest('${r.id}')">🖨️ พิมพ์ใบยืม</button>
-       </div>`
-    : mode==='return'
-    ? `<div class="btn-row"><button class="btn success" onclick="markReturned('${r.id}')">↩️ ยืนยันคืนอุปกรณ์</button><button class="btn" onclick="printRequest('${r.id}')">🖨️ พิมพ์</button></div>`
-    : `<div class="btn-row"><button class="btn" onclick="printRequest('${r.id}')">🖨️ พิมพ์</button></div>`;
+// ════════════════════════════════════════════════
+// REQUEST CARD
+// ════════════════════════════════════════════════
+function requestCard(r,mode=''){
+  const sl=STATUS_LABEL[r.status]||['',''];
+  // ผลการตรวจสอบ
+  let checkHtml='';
+  if(r.checkResults&&Object.keys(r.checkResults).length>0){
+    const cr=r.checkResults;
+    const ok=Object.values(cr).filter(v=>v.status==='ok').length;
+    const notok=Object.values(cr).filter(v=>v.status==='notok').length;
+    const notChecked=Object.values(cr).filter(v=>v.status==='').length;
+    const details=Object.entries(cr).filter(([,v])=>v.status==='notok'||v.note)
+      .map(([name,v])=>`<span style="color:var(--red)">${escHtml(name)}: ${v.status==='notok'?'❌ ไม่พร้อม':'⚠️'}${v.note?' — '+escHtml(v.note):''}</span>`).join('<br>');
+    checkHtml=`<div class="req-check-result">
+      <strong>ผลตรวจสอบ:</strong> ✅ ปกติ ${ok} / ❌ ไม่พร้อม ${notok}${notChecked>0?' / ⚪ ไม่ได้ตรวจ '+notChecked:''}<br>
+      ${details}
+    </div>`;
+  }
+  const actions=mode==='approval'
+    ?`<div class="btn-row">
+        <button class="btn success" onclick="approveRequest('${r.id}')">✅ อนุมัติ (ส่งอีเมล)</button>
+        <button class="btn danger"  onclick="rejectRequest('${r.id}')">❌ ไม่อนุมัติ</button>
+        <button class="btn"         onclick="printRequest('${r.id}')">🖨️ พิมพ์</button>
+      </div>`
+    :mode==='return'
+    ?`<div class="btn-row"><button class="btn success" onclick="markReturned('${r.id}')">↩️ ยืนยันคืนอุปกรณ์</button><button class="btn" onclick="printRequest('${r.id}')">🖨️ พิมพ์</button></div>`
+    :`<div class="btn-row"><button class="btn" onclick="printRequest('${r.id}')">🖨️ พิมพ์</button></div>`;
   return `<div class="request-card" id="req-${r.id}">
-    <div class="request-top">
-      <div>
-        <div class="request-title">${escapeHtml(r.event)}</div>
-        <div class="request-meta">👤 ${escapeHtml(r.user)} · 📅 ${r.date} → ${r.returnDate||r.date}<br>🕒 ส่งคำขอ: ${formatDateTime(r.savedAt)} ${r.note?` · 📝 ${escapeHtml(r.note)}`:''}</div>
+    <div class="req-top">
+      <div style="flex:1;min-width:0">
+        <div class="req-title">${escHtml(r.event)}</div>
+        <div class="req-meta">👤 ${escHtml(r.user)} · 📅 ${r.date} → ${r.returnDate||r.date}<br>🕒 ${formatDT(r.savedAt)}${r.note?` · 📝 ${escHtml(r.note)}`:''}</div>
       </div>
       <span class="badge ${sl[1]}">${sl[0]}</span>
     </div>
-    <div class="request-items">${r.items.map((it,i)=>`${i+1}. [${escapeHtml(it.cat)}] ${escapeHtml(it.name)} <strong>${it.qty}</strong> ชิ้น`).join('<br>')}</div>
+    <div class="req-items">${(r.items||[]).map((it,i)=>`${i+1}. [${escHtml(it.cat)}] ${escHtml(it.name)} <strong>${it.qty}</strong> ชิ้น`).join('<br>')}</div>
+    ${checkHtml}
     ${actions}
   </div>`;
 }
 
-function clearDemoData(){
-  if(!confirm('ต้องการล้างข้อมูลทั้งหมดในเครื่องนี้หรือไม่?')) return;
-  localStorage.removeItem('university_equipment_requests');
-  localStorage.removeItem('university_equipment_seeded');
-  setRecords([]); renderAll(); showToast('ล้างข้อมูลแล้ว');
-}
-
-// ════════════════════════════════════════════════════════════
-// FIX 4: syncFromGoogle — ใช้ action=requests ที่มีใน Code.gs แล้ว
-// ════════════════════════════════════════════════════════════
-async function syncFromGoogle(){
-  const scriptUrl = localStorage.getItem('script_url');
-  if(!scriptUrl){showToast('⚠️ ยังไม่ได้ตั้งค่า Apps Script URL');return;}
-  showToast('⏳ กำลังซิงก์จาก Google Sheets...');
-  try {
-    const res  = await fetch(scriptUrl + '?action=requests');
-    const json = await res.json();
-    if(json.success && Array.isArray(json.items)){
-      setRecords(json.items); renderAll();
-      showToast('✅ ซิงก์สำเร็จ — โหลด '+json.items.length+' รายการ');
-    } else {
-      showToast('⚠️ ไม่พบข้อมูลจาก Sheets: ' + (json.error || 'ไม่ทราบสาเหตุ'));
-    }
-  } catch(e){ showToast('⚠️ ไม่สามารถซิงก์ได้: ' + e.message); }
-}
-
-// ════════════════════════════════════════════════════════════
-// CALENDAR
-// ════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════
+// CALENDAR (Step 3)
+// ════════════════════════════════════════════════
 function renderCalendar(){
-  const grid=document.getElementById('calendar-grid');
+  const grid=document.getElementById('cal-grid');
   const title=document.getElementById('month-title');
-  const y=currentMonth.getFullYear(), m=currentMonth.getMonth();
-  title.textContent = currentMonth.toLocaleDateString('th-TH',{month:'long',year:'numeric'});
+  const y=currentMonth.getFullYear(),m=currentMonth.getMonth();
+  title.textContent=currentMonth.toLocaleDateString('th-TH',{month:'long',year:'numeric'});
   const first=new Date(y,m,1);
-  const start=new Date(first); start.setDate(1-first.getDay());
-  const names=['อา','จ','อ','พ','พฤ','ศ','ส'];
-  let html=names.map(n=>`<div class="day-name">${n}</div>`).join('');
-  const records=getCalendarRecords_();
+  const start=new Date(first);start.setDate(1-first.getDay());
+  const dn=['อา','จ','อ','พ','พฤ','ศ','ส'];
+  let html=dn.map(n=>`<div class="cal-day-name">${n}</div>`).join('');
+  const recs=getRecords().filter(r=>['pending','approved','borrowed'].includes(r.status));
   const todayIso=new Date().toISOString().slice(0,10);
   for(let i=0;i<42;i++){
-    const d=new Date(start); d.setDate(start.getDate()+i);
+    const d=new Date(start);d.setDate(start.getDate()+i);
     const iso=d.toISOString().slice(0,10);
-    const dayRecs=records.filter(r=>rangesOverlap(iso,iso,r.date,r.returnDate||r.date));
-    const cls=['day'];
+    const dayRecs=recs.filter(r=>rangesOverlap(iso,iso,r.date,r.returnDate||r.date));
+    const cls=['cal-day'];
     if(d.getMonth()!==m) cls.push('muted');
-    if(selectedCalendarDate===iso) cls.push('selected');
-    if(todayIso===iso) cls.push('today');
+    if(selCalDate===iso) cls.push('selected');
+    if(iso===todayIso) cls.push('today');
     if(dayRecs.some(r=>['approved','borrowed'].includes(r.status))) cls.push('conflict-day');
     else if(dayRecs.some(r=>r.status==='pending')) cls.push('pending-day');
-    html+=`<div class="${cls.join(' ')}" onclick="selectCalendarDate('${iso}')" title="${escapeHtml(dayRecs.map(r=>r.event).join(' | '))}">
-      <div class="day-top"><div class="day-num">${d.getDate()}</div>${dayRecs.length?`<div class="day-count">📦 ${dayRecs.length}</div>`:''}</div>
-      <div class="day-events" id="day-events-${iso}"></div></div>`;
+    html+=`<div class="${cls.join(' ')}" onclick="selectCalDate('${iso}')">
+      <div class="cal-dtop"><div class="cal-dnum">${d.getDate()}</div>${dayRecs.length?`<div class="cal-dcount">📦${dayRecs.length}</div>`:''}</div>
+      <div class="cal-events" id="cev-${iso}"></div>
+    </div>`;
   }
   grid.innerHTML=html;
-  renderGoogleCalendarEventBars_(records, start);
+  renderCalEventBars(recs,start);
 }
-function getCalendarRecords_(){ return getRecords().filter(r=>['pending','approved','borrowed'].includes(r.status)); }
-function renderGoogleCalendarEventBars_(records, calendarStartDate){
-  const maxPerDay=4; const vis={}, hid={};
-  records.slice().sort((a,b)=>{
-    const ad=daysBetween_(a.date,a.returnDate||a.date), bd=daysBetween_(b.date,b.returnDate||b.date);
-    return bd-ad||String(a.event).localeCompare(String(b.event),'th');
-  }).forEach(r=>{
-    getDatesBetween_(r.date,r.returnDate||r.date).forEach((iso,idx)=>{
-      const container=document.getElementById('day-events-'+iso); if(!container) return;
-      vis[iso]=vis[iso]||0; hid[iso]=hid[iso]||0;
-      if(vis[iso]>=maxPerDay){hid[iso]++;return;}
+function renderCalEventBars(recs,startDate){
+  recs.slice().sort((a,b)=>daysBetween(a.date,a.returnDate||a.date)-daysBetween(b.date,b.returnDate||b.date)).forEach(r=>{
+    getDates(r.date,r.returnDate||r.date).forEach((iso,idx)=>{
+      const c=document.getElementById('cev-'+iso);if(!c) return;
+      if(c.children.length>=3){
+        if(c.children.length===3){const m=document.createElement('div');m.className='cal-more';m.textContent='+more';m.onclick=ev=>{ev.stopPropagation();selectCalDate(iso);};c.appendChild(m);}
+        return;
+      }
       const bar=document.createElement('div');
-      bar.className='gcal-event '+(r.status==='pending'?'pending':(r.status==='borrowed'?'borrowed':'approved'));
-      const isFirst=idx===0, isMulti=getDatesBetween_(r.date,r.returnDate||r.date).length>1;
+      bar.className='cal-event '+(r.status==='pending'?'pending':(r.status==='borrowed'?'borrowed':'approved'));
       const pfx=r.status==='pending'?'🟡':(r.status==='borrowed'?'🔴':'🔵');
-      bar.textContent=isFirst?`${pfx} ${r.event||'ไม่ระบุงาน'}${isMulti?` (${daysBetween_(r.date,r.returnDate||r.date)} วัน)`:''}`:`↳ ${r.event||'ไม่ระบุงาน'}`;
-      bar.title=`${r.event||'-'}\nผู้ขอยืม: ${r.user||'-'}\nวันที่: ${r.date} - ${r.returnDate||r.date}\nสถานะ: ${(STATUS_LABEL[r.status]||[''])[0]}`;
-      bar.onclick=ev=>{ev.stopPropagation();selectCalendarDate(iso);focusRequestInDayDetail_(r.id);};
-      container.appendChild(bar); vis[iso]++;
+      const days=daysBetween(r.date,r.returnDate||r.date);
+      bar.textContent=idx===0?`${pfx} ${r.event||'-'}${days>1?` (${days}d)`:''}`:`↳ ${r.event||'-'}`;
+      bar.title=`${r.event||'-'}\n${r.user||'-'}\n${r.date}→${r.returnDate||r.date}`;
+      bar.onclick=ev=>{ev.stopPropagation();selectCalDate(iso);};
+      c.appendChild(bar);
     });
   });
-  Object.keys(hid).forEach(iso=>{
-    const container=document.getElementById('day-events-'+iso); if(!container||!hid[iso]) return;
-    const more=document.createElement('div'); more.className='gcal-more'; more.textContent=`+${hid[iso]} more`;
-    more.onclick=ev=>{ev.stopPropagation();selectCalendarDate(iso);}; container.appendChild(more);
-  });
 }
-function getDatesBetween_(startIso,endIso){ const dates=[],d=new Date(startIso),end=new Date(endIso||startIso); while(d<=end){dates.push(d.toISOString().slice(0,10));d.setDate(d.getDate()+1);} return dates; }
-function daysBetween_(startIso,endIso){ return getDatesBetween_(startIso,endIso).length; }
-function focusRequestInDayDetail_(id){
-  setTimeout(()=>{const el=document.getElementById('req-'+id); if(el){el.scrollIntoView({behavior:'smooth',block:'center'});el.style.boxShadow='0 0 0 3px rgba(0,107,63,.25), var(--shadow-soft)';setTimeout(()=>{el.style.boxShadow='var(--shadow-soft)';},1600);}},80);
-}
-function selectCalendarDate(iso){ selectedCalendarDate=iso; renderCalendar(); renderDayDetail(iso); }
-function renderDayDetail(iso){
-  document.getElementById('selected-date-label').textContent=new Date(iso).toLocaleDateString('th-TH');
-  const records=getRecords().filter(r=>['pending','approved','borrowed'].includes(r.status)&&rangesOverlap(iso,iso,r.date,r.returnDate||r.date));
+function selectCalDate(iso){
+  selCalDate=iso;renderCalendar();
+  document.getElementById('sel-date-label').textContent=new Date(iso).toLocaleDateString('th-TH');
+  const recs=getRecords().filter(r=>['pending','approved','borrowed'].includes(r.status)&&rangesOverlap(iso,iso,r.date,r.returnDate||r.date));
   const box=document.getElementById('day-detail');
-  if(records.length===0){box.innerHTML='<div class="alert info">วันนี้ยังไม่มีรายการจองหรือยืมอุปกรณ์</div>';return;}
-  box.innerHTML=records.map(requestCard).join('');
+  box.innerHTML=recs.length?recs.map(requestCard).join(''):'<div class="alert info">ไม่มีรายการในวันนี้</div>';
 }
-function moveMonth(n){ currentMonth.setMonth(currentMonth.getMonth()+n); renderCalendar(); }
-function goToday(){ currentMonth=new Date(); renderCalendar(); }
+function moveMonth(n){currentMonth.setMonth(currentMonth.getMonth()+n);renderCalendar();}
+function goToday(){currentMonth=new Date();renderCalendar();}
+function getDates(s,e){const d=[],cur=new Date(s),end=new Date(e||s);while(cur<=end){d.push(cur.toISOString().slice(0,10));cur.setDate(cur.getDate()+1);}return d;}
+function daysBetween(s,e){return getDates(s,e).length;}
+function rangesOverlap(aS,aE,bS,bE){aE=aE||aS;bE=bE||bS;return aS<=bE&&bS<=aE;}
 
-// ════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════
+// HISTORY
+// ════════════════════════════════════════════════
+function renderHistory(){
+  const r=getRecords();
+  document.getElementById('history-list').innerHTML=r.length?r.map(x=>requestCard(x,'history')).join(''):'<div class="alert info">ยังไม่มีรายการ</div>';
+}
+function clearAllLocal(){
+  if(!confirm('ล้างข้อมูลทั้งหมดในเครื่องนี้?')) return;
+  localStorage.removeItem('university_equipment_requests');
+  localStorage.removeItem('university_equipment_seeded');
+  setRecords([]);renderAll();showToast('ล้างข้อมูลแล้ว');
+}
+
+// ════════════════════════════════════════════════
+// SYNC + POST
+// ════════════════════════════════════════════════
+async function syncFromGoogle(){
+  const url=localStorage.getItem('script_url');if(!url){showToast('⚠️ ยังไม่ได้ตั้งค่า URL');return;}
+  showToast('⏳ กำลังซิงก์...');
+  try{
+    const res=await fetch(url+'?action=requests');
+    const json=await res.json();
+    if(json.success&&Array.isArray(json.items)){
+      setRecords(json.items);renderAll();showToast('✅ ซิงก์สำเร็จ '+json.items.length+' รายการ');
+    }else{showToast('⚠️ '+(json.error||'ไม่พบข้อมูล'));}
+  }catch(e){showToast('⚠️ ซิงก์ไม่สำเร็จ: '+e.message);}
+}
+async function postToGoogle(payload){
+  const url=localStorage.getItem('script_url');if(!url) return;
+  try{await fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});}catch(_){}
+}
+
+// ════════════════════════════════════════════════
 // PRINT
-// ════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════
 function printRequest(id){
-  const r=getRecords().find(x=>x.id===id); if(!r) return;
+  const r=getRecords().find(x=>x.id===id);if(!r) return;
   const sl=STATUS_LABEL[r.status]||['',''];
-  const html=`<div style="font-family:Sarabun,sans-serif">
+  const checkRows=Object.entries(r.checkResults||{}).map(([name,v])=>
+    `<tr><td>${escHtml(name)}</td><td style="text-align:center">${v.status==='ok'?'✅ ปกติ':v.status==='notok'?'❌ ไม่พร้อม':'–'}</td><td>${escHtml(v.note||'–')}</td></tr>`
+  ).join('');
+  const html=`<div style="font-family:Sarabun,sans-serif;max-width:750px;margin:0 auto">
     <h2 style="text-align:center;margin-bottom:4px">ใบคำขอยืมอุปกรณ์</h2>
-    <div style="text-align:center;color:#666;margin-bottom:18px">University Equipment Booking System</div>
+    <div style="text-align:center;color:#666;font-size:13px;margin-bottom:18px">University Equipment Booking · ฝ่ายเทคโนโลยีการศึกษา มก.</div>
     <table style="width:100%;border-collapse:collapse;margin-bottom:14px">
-      <tr><td style="border:1px solid #ddd;padding:8px"><strong>ผู้ขอยืม</strong><br>${escapeHtml(r.user)}</td><td style="border:1px solid #ddd;padding:8px"><strong>งาน/กิจกรรม</strong><br>${escapeHtml(r.event)}</td></tr>
+      <tr><td style="border:1px solid #ddd;padding:8px"><strong>ผู้ขอยืม</strong><br>${escHtml(r.user)}</td><td style="border:1px solid #ddd;padding:8px"><strong>งาน/กิจกรรม</strong><br>${escHtml(r.event)}</td></tr>
       <tr><td style="border:1px solid #ddd;padding:8px"><strong>วันที่ใช้</strong><br>${r.date}</td><td style="border:1px solid #ddd;padding:8px"><strong>วันที่คืน</strong><br>${r.returnDate||r.date}</td></tr>
-      <tr><td colspan="2" style="border:1px solid #ddd;padding:8px"><strong>สถานะ</strong><br>${sl[0]}</td></tr>
+      <tr><td colspan="2" style="border:1px solid #ddd;padding:8px"><strong>สถานะ</strong> ${sl[0]} &nbsp;&nbsp; <strong>ส่งเมื่อ</strong> ${formatDT(r.savedAt)}</td></tr>
     </table>
-    <table style="width:100%;border-collapse:collapse">
-      <thead><tr style="background:#073b5c;color:#fff"><th style="padding:8px;border:1px solid #ddd">#</th><th style="padding:8px;border:1px solid #ddd">หมวดหมู่</th><th style="padding:8px;border:1px solid #ddd">อุปกรณ์</th><th style="padding:8px;border:1px solid #ddd">จำนวน</th></tr></thead>
-      <tbody>${r.items.map((it,i)=>`<tr><td style="padding:8px;border:1px solid #ddd;text-align:center">${i+1}</td><td style="padding:8px;border:1px solid #ddd">${escapeHtml(it.cat)}</td><td style="padding:8px;border:1px solid #ddd">${escapeHtml(it.name)}</td><td style="padding:8px;border:1px solid #ddd;text-align:center">${it.qty}</td></tr>`).join('')}</tbody>
+    <h4 style="margin-bottom:6px">รายการอุปกรณ์</h4>
+    <table style="width:100%;border-collapse:collapse;margin-bottom:14px">
+      <thead><tr style="background:#073b5c;color:#fff"><th style="padding:8px;border:1px solid #ddd">#</th><th style="padding:8px;border:1px solid #ddd">หมวดหมู่</th><th style="padding:8px;border:1px solid #ddd">อุปกรณ์</th><th style="padding:8px;border:1px solid #ddd;text-align:center">จำนวน</th></tr></thead>
+      <tbody>${(r.items||[]).map((it,i)=>`<tr><td style="padding:8px;border:1px solid #ddd;text-align:center">${i+1}</td><td style="padding:8px;border:1px solid #ddd">${escHtml(it.cat)}</td><td style="padding:8px;border:1px solid #ddd">${escHtml(it.name)}</td><td style="padding:8px;border:1px solid #ddd;text-align:center">${it.qty}</td></tr>`).join('')}</tbody>
     </table>
-    <div style="margin-top:34px;display:grid;grid-template-columns:1fr 1fr;gap:40px;text-align:center">
-      <div>ลงชื่อผู้ขอยืม<br><br>........................................</div>
+    ${checkRows?`<h4 style="margin-bottom:6px">ผลการตรวจสอบความพร้อมใช้</h4>
+    <table style="width:100%;border-collapse:collapse;margin-bottom:14px">
+      <thead><tr style="background:#006b3f;color:#fff"><th style="padding:8px;border:1px solid #ddd">อุปกรณ์</th><th style="padding:8px;border:1px solid #ddd;text-align:center">ผลตรวจ</th><th style="padding:8px;border:1px solid #ddd">ข้อเสนอแนะ</th></tr></thead>
+      <tbody>${checkRows}</tbody>
+    </table>`:''}
+    <div style="margin-top:40px;display:grid;grid-template-columns:1fr 1fr;gap:60px;text-align:center;font-size:13px">
+      <div>ลงชื่อผู้ขอยืม<br><br>........................................<br><small>${escHtml(r.user)}</small></div>
       <div>ลงชื่อเจ้าหน้าที่<br><br>........................................</div>
-    </div></div>`;
-  const pa=document.getElementById('print-area'); pa.innerHTML=html; window.print();
+    </div>
+  </div>`;
+  document.getElementById('print-area').innerHTML=html;window.print();
 }
 
-// ════════════════════════════════════════════════════════════
-// TABS / UTILS
-// ════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════
+// TABS
+// ════════════════════════════════════════════════
 function showTab(name){
-  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('panel-'+name).classList.add('active');
-  const idx=['request','calendar','approval','return','history','guide'].indexOf(name);
-  document.querySelectorAll('.tab-btn')[idx]?.classList.add('active');
-  if(name==='calendar') renderCalendar();
-  if(name==='approval') renderApproval();
-  if(name==='return')   renderReturnList();
-  if(name==='history')  renderHistory();
+  const panels=['step1','step2','step3','step4','step5','history','settings'];
+  const tabs=['stab-1','stab-2','stab-3','stab-4','stab-5','stab-hist','stab-set'];
+  panels.forEach((p,i)=>{
+    const el=document.getElementById('panel-'+p);
+    const btn=document.getElementById(tabs[i]);
+    if(el) el.classList.toggle('active',p===name);
+    if(btn) btn.classList.toggle('active',p===name);
+  });
+  if(name==='step4'){renderApproval();renderAdminStatus();}
+  if(name==='step5') renderReturnList();
+  if(name==='history') renderHistory();
+  window.scrollTo({top:0,behavior:'smooth'});
 }
+function renderAll(){renderApproval();renderReturnList();renderHistory();renderCalendar();updateHeaderStats();renderAdminStatus();}
+
+// ════════════════════════════════════════════════
+// SETTINGS
+// ════════════════════════════════════════════════
 function saveScriptUrl(){
-  const val=document.getElementById('scriptUrl').value.trim();
-  localStorage.setItem('script_url',val);
+  const v=document.getElementById('scriptUrl').value.trim();
+  localStorage.setItem('script_url',v);
   const st=document.getElementById('url-status');
-  if(val.startsWith('https://script.google.com')){st.textContent='✅ URL ถูกต้อง — บันทึกแล้ว';st.style.color='var(--green)';}
-  else if(val){st.textContent='⚠️ URL ควรขึ้นต้นด้วย https://script.google.com';st.style.color='var(--red)';}
+  if(v.startsWith('https://script.google.com')){st.textContent='✅ URL ถูกต้อง';st.style.color='var(--green)';}
+  else if(v){st.textContent='⚠️ URL ควรขึ้นต้นด้วย https://script.google.com';st.style.color='var(--red)';}
   else{st.textContent='ยังไม่ได้ตั้งค่า';st.style.color='var(--muted)';}
 }
-function renderAll(){ renderCalendar();renderApproval();renderReturnList();renderHistory();updateHeaderStats();renderAdminStatus(); }
-function showToast(msg){ const t=document.getElementById('toast');t.textContent=msg;t.style.display='block';clearTimeout(window._toast);window._toast=setTimeout(()=>t.style.display='none',3500); }
-function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m])); }
-function formatDateTime(s){ if(!s) return '-'; try{return new Date(s).toLocaleString('th-TH');}catch(e){return s;} }
-
-// ════════════════════════════════════════════════════════════
-// INIT
-// ════════════════════════════════════════════════════════════
-buildSections();
-renderAll();
-
-// FIX 1: ใช้ URL ที่ถูกต้อง (deploy ปัจจุบัน)
-const CORRECT_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwSG-01VDFYl9qU0NlVdJYG6O0WQx4f6xdsOiUeNRdlOgdRvl12jJRbMIqHue8RUmnukQ/exec';
-if(!localStorage.getItem('script_url') || localStorage.getItem('script_url').includes('AKfycbzjqab')) {
-  // override URL เก่าที่ผิดด้วย URL ปัจจุบัน
-  localStorage.setItem('script_url', CORRECT_SCRIPT_URL);
+function clearForm(){
+  ['userName','eventName','useDate','returnDate','note'].forEach(id=>document.getElementById(id).value='');
+  EQUIPMENT.forEach(cat=>cat.items.forEach(item=>{
+    state[item.id]={checked:false,qty:1};
+    const chk=document.getElementById('chk-'+item.id);if(chk){chk.checked=false;chk.disabled=false;}
+    const qty=document.getElementById('qty-'+item.id);if(qty){qty.value=1;qty.disabled=true;}
+    document.getElementById('row-'+item.id)?.classList.remove('checked');
+    updateBadge(cat.id);
+  }));
+  checkResults={};updateStats1();
+  document.getElementById('step1-alert').className='alert info';
+  document.getElementById('step1-alert').textContent='เลือกอุปกรณ์ที่ต้องการทางขวามือ จากนั้นกด "ไปขั้นที่ 2" เพื่อตรวจสอบความพร้อมใช้งาน';
 }
-document.getElementById('scriptUrl').value = localStorage.getItem('script_url');
-saveScriptUrl();
+
+// ════════════════════════════════════════════════
+// UTILS
+// ════════════════════════════════════════════════
+let _toast;
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.style.display='block';clearTimeout(_toast);_toast=setTimeout(()=>t.style.display='none',3500);}
+function escHtml(s){return String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));}
+function formatDT(s){try{return new Date(s).toLocaleString('th-TH');}catch(e){return s||'–';}}
+
+// ════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════
+buildSections();
+updateStats1();
+renderCalendar();
+updateHeaderStats();
 renderAdminStatus();
-const adminInput = document.getElementById('adminKeySetting');
-if(adminInput) adminInput.value = localStorage.getItem('equipment_admin_key') || DEFAULT_ADMIN_KEY;
+
+// Set script URL
+const SCRIPT_URL='https://script.google.com/macros/s/AKfycbwSG-01VDFYl9qU0NlVdJYG6O0WQx4f6xdsOiUeNRdlOgdRvl12jJRbMIqHue8RUmnukQ/exec';
+if(!localStorage.getItem('script_url')||localStorage.getItem('script_url').includes('AKfycbzjqab')){
+  localStorage.setItem('script_url',SCRIPT_URL);
+}
+document.getElementById('scriptUrl').value=localStorage.getItem('script_url');
+saveScriptUrl();
+const adminInput=document.getElementById('adminKeySetting');
+if(adminInput) adminInput.value=localStorage.getItem('equipment_admin_key')||DEF_KEY;
 </script>
 </body>
 </html>
