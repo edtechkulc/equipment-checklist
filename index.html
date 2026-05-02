@@ -8,55 +8,37 @@
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
-  --ku-green:#006b3f;
-  --ku-green-2:#0b8a55;
-  --ku-light:#e9f7ef;
-  --blue:#1a6fb5;
-  --blue-light:#e8f0f9;
-  --navy:#073b5c;
-  --yellow:#f59e0b;
-  --yellow-light:#fff7df;
-  --red:#c0392b;
-  --red-light:#fdecea;
-  --green:#1a7a4a;
-  --green-light:#e6f4ed;
-  --gray:#f5f7f9;
-  --gray-2:#e5e7eb;
-  --gray-3:#6b7280;
-  --text:#111827;
-  --muted:#6b7280;
-  --radius:14px;
-  --shadow:0 8px 24px rgba(15,23,42,.08);
-  --shadow-soft:0 2px 8px rgba(15,23,42,.06);
+  --ku-green:#006b3f;--ku-green-2:#0b8a55;--ku-light:#e9f7ef;
+  --blue:#1a6fb5;--blue-light:#e8f0f9;--navy:#073b5c;
+  --yellow:#f59e0b;--yellow-light:#fff7df;
+  --red:#c0392b;--red-light:#fdecea;
+  --green:#1a7a4a;--green-light:#e6f4ed;
+  --gray:#f5f7f9;--gray-2:#e5e7eb;--gray-3:#6b7280;
+  --text:#111827;--muted:#6b7280;--radius:14px;
+  --shadow:0 8px 24px rgba(15,23,42,.08);--shadow-soft:0 2px 8px rgba(15,23,42,.06);
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Sarabun','Segoe UI',sans-serif;background:linear-gradient(180deg,#f4faf7 0%,#f4f6f9 45%,#eef2f6 100%);color:var(--text);font-size:15px}
-.header{
-  background:linear-gradient(135deg,var(--ku-green),var(--navy));
-  color:#fff;padding:18px 22px;position:sticky;top:0;z-index:1000;
-  box-shadow:0 6px 20px rgba(0,0,0,.18)
-}
+.header{background:linear-gradient(135deg,var(--ku-green),var(--navy));color:#fff;padding:18px 22px;position:sticky;top:0;z-index:1000;box-shadow:0 6px 20px rgba(0,0,0,.18)}
 .header-inner{max-width:1180px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px}
 .brand{display:flex;align-items:center;gap:14px}
 .logo{width:48px;height:48px;border-radius:16px;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;font-weight:800;letter-spacing:-1px;border:1px solid rgba(255,255,255,.22)}
-.title{font-size:18px;font-weight:800}
-.sub{font-size:12px;opacity:.82;margin-top:2px}
+.title{font-size:18px;font-weight:800}.sub{font-size:12px;opacity:.82;margin-top:2px}
 .header-status{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
-.pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:6px 10px;font-size:12px;font-weight:700;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.18)}
+/* ── FIX 2: pill IDs สำหรับ updateHeaderStats ── */
+.pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:6px 10px;font-size:12px;font-weight:700;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.18);transition:.2s}
 .tabs{position:sticky;top:84px;z-index:999;background:rgba(255,255,255,.93);backdrop-filter:blur(10px);border-bottom:1px solid var(--gray-2)}
 .tabs-inner{max-width:1180px;margin:0 auto;display:flex;overflow-x:auto}
 .tab-btn{border:0;background:transparent;padding:14px 13px;cursor:pointer;font:inherit;font-size:13px;font-weight:700;color:var(--muted);border-bottom:3px solid transparent;white-space:nowrap;transition:.18s}
-.tab-btn:hover{background:var(--gray)}
-.tab-btn.active{color:var(--ku-green);border-bottom-color:var(--ku-green);background:var(--ku-light)}
+.tab-btn:hover{background:var(--gray)}.tab-btn.active{color:var(--ku-green);border-bottom-color:var(--ku-green);background:var(--ku-light)}
 .container{max-width:1180px;margin:0 auto;padding:18px}
 .grid-main{display:grid;grid-template-columns:360px 1fr;gap:16px;align-items:start}
-@media(max-width:900px){.grid-main{grid-template-columns:1fr}.tabs{top:84px}}
+@media(max-width:900px){.grid-main{grid-template-columns:1fr}}
 .card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow-soft);border:1px solid rgba(15,23,42,.06);overflow:hidden;margin-bottom:14px}
 .card-header{padding:13px 16px;background:linear-gradient(180deg,#fff,#f8fafc);border-bottom:1px solid var(--gray-2);font-weight:800;color:var(--navy);display:flex;justify-content:space-between;align-items:center;gap:10px}
 .card-body{padding:16px}
 .section-title{font-size:14px;font-weight:800;color:var(--navy);margin-bottom:10px}
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.span2{grid-column:1/-1}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.span2{grid-column:1/-1}
 .form-group{display:flex;flex-direction:column;gap:5px}
 label.form-label{font-size:12px;font-weight:800;color:var(--muted)}
 .form-control{width:100%;padding:10px 11px;border:1px solid var(--gray-2);border-radius:10px;font:inherit;background:#fff}
@@ -72,22 +54,18 @@ label.form-label{font-size:12px;font-weight:800;color:var(--muted)}
 .btn:disabled{opacity:.55;cursor:not-allowed;transform:none;box-shadow:none}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
 .stat{background:#fff;border:1px solid var(--gray-2);border-radius:14px;padding:12px;text-align:center;box-shadow:var(--shadow-soft)}
-.stat .n{font-size:25px;font-weight:800;color:var(--ku-green)}
-.stat .l{font-size:11px;color:var(--muted);font-weight:700}
+.stat .n{font-size:25px;font-weight:800;color:var(--ku-green)}.stat .l{font-size:11px;color:var(--muted);font-weight:700}
 @media(max-width:700px){.stats{grid-template-columns:repeat(2,1fr)}.form-grid{grid-template-columns:1fr}.span2{grid-column:auto}}
-.tab-panel{display:none}
-.tab-panel.active{display:block}
+.tab-panel{display:none}.tab-panel.active{display:block}
 .eq-section{background:#fff;border:1px solid var(--gray-2);border-radius:14px;overflow:hidden;margin-bottom:9px}
 .eq-header{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;background:#fff}
 .eq-header.open{background:var(--ku-light);border-bottom:1px solid var(--gray-2)}
 .eq-title{font-weight:800;color:var(--navy);font-size:14px;display:flex;gap:8px;align-items:center}
 .eq-badge{font-size:11px;padding:3px 8px;border-radius:999px;background:var(--gray-2);color:var(--muted);font-weight:800}
 .eq-badge.has{background:var(--green-light);color:var(--green)}
-.eq-body{display:none}
-.eq-body.open{display:block}
+.eq-body{display:none}.eq-body.open{display:block}
 .item-row{position:relative;display:grid;grid-template-columns:22px 1fr auto auto;gap:10px;align-items:center;padding:10px 14px;border-top:1px solid #f1f3f5}
-.item-row:hover{background:#fafafa}
-.item-row.checked{background:#f0faf4}
+.item-row:hover{background:#fafafa}.item-row.checked{background:#f0faf4}
 .item-row.conflict{background:#fff7f7;border-left:4px solid var(--red)}
 .item-row.pending-row{background:#fffaf0;border-left:4px solid var(--yellow)}
 .item-check{width:17px;height:17px;accent-color:var(--ku-green)}
@@ -101,12 +79,15 @@ label.form-label{font-size:12px;font-weight:800;color:var(--muted)}
 .badge.idle{background:#edf2f7;color:#64748b;border-color:#dbe3ea}
 .badge.approved{background:#dbeafe;color:#1d4ed8;border-color:#bfdbfe}
 .badge.returned{background:#ecfdf5;color:#047857;border-color:#bbf7d0}
+.badge.maint{background:#fff3e0;color:#e65100;border-color:#ffcc80}
+.badge.lost{background:var(--gray-2);color:var(--muted);border-color:#d1d5db}
 .tooltip{display:none;position:absolute;right:12px;top:38px;background:#111827;color:#fff;padding:9px 11px;border-radius:10px;font-size:12px;line-height:1.7;z-index:20;box-shadow:var(--shadow);max-width:280px}
 .item-row:hover .tooltip{display:block}
 .alert{border-radius:14px;padding:12px 14px;margin-bottom:12px;font-size:13px;font-weight:700;line-height:1.6}
 .alert.info{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe}
 .alert.warn{background:var(--yellow-light);color:#92400e;border:1px solid #f7c948}
 .alert.danger{background:var(--red-light);color:var(--red);border:1px solid #f3b6b0}
+.alert.success{background:var(--green-light);color:var(--green);border:1px solid #b8dfc9}
 .calendar-card{padding:14px}
 .calendar-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:8px}
 .month-title{font-size:17px;font-weight:800;color:var(--navy)}
@@ -132,161 +113,38 @@ label.form-label{font-size:12px;font-weight:800;color:var(--muted)}
 .flow-step{background:#fff;border:1px solid var(--gray-2);border-radius:14px;padding:12px;text-align:center;font-size:12px;font-weight:800;color:var(--muted)}
 .flow-step.active{background:var(--ku-light);color:var(--ku-green);border-color:#b7e4ca}
 .flow-step .icon{display:block;font-size:20px;margin-bottom:4px}
+/* Google Calendar Styles */
+.calendar-grid.google-style{gap:0;border:1px solid var(--gray-2);border-radius:14px;overflow:hidden;background:var(--gray-2)}
+.calendar-grid.google-style .day-name{background:#fff;border-right:1px solid var(--gray-2);border-bottom:1px solid var(--gray-2);border-radius:0;padding:9px 6px}
+.calendar-grid.google-style .day-name:nth-child(7){border-right:none}
+.calendar-grid.google-style .day{min-height:128px;border:0;border-right:1px solid var(--gray-2);border-bottom:1px solid var(--gray-2);border-radius:0;padding:7px 5px 6px;background:#fff}
+.calendar-grid.google-style .day:nth-child(7n){border-right:none}
+.calendar-grid.google-style .day:hover{z-index:2;box-shadow:inset 0 0 0 2px rgba(0,107,63,.25)}
+.calendar-grid.google-style .day.today{background:#f8fffb}
+.calendar-grid.google-style .day.today .day-num{background:var(--ku-green);color:#fff;width:24px;height:24px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center}
+.calendar-grid.google-style .day.selected{outline:none;box-shadow:inset 0 0 0 3px rgba(0,107,63,.22)}
+.day-top{display:flex;align-items:center;justify-content:space-between;gap:6px;min-height:25px}
+.day-count{font-size:10px;font-weight:800;color:#64748b;background:#f1f5f9;border-radius:999px;padding:2px 6px}
+.day-events{margin-top:3px;display:flex;flex-direction:column;gap:3px}
+.gcal-event{min-height:19px;border-radius:5px;padding:2px 6px;font-size:10px;font-weight:800;line-height:1.45;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;border-left:4px solid transparent}
+.gcal-event:hover{filter:brightness(.96);transform:translateX(1px)}
+.gcal-event.pending{background:#fff3cd;color:#8a5a00;border-left-color:#f59e0b}
+.gcal-event.approved,.gcal-event.borrowed{background:#dbeafe;color:#1d4ed8;border-left-color:#3b82f6}
+.gcal-event.borrowed{background:#fdecea;color:#c0392b;border-left-color:#c0392b}
+.gcal-more{font-size:10px;color:#475569;font-weight:800;padding:2px 5px;cursor:pointer}
+.gcal-more:hover{text-decoration:underline}
+.calendar-legend{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.legend-dot{width:10px;height:10px;border-radius:3px;display:inline-block}
+.legend-pending{background:#f59e0b}.legend-approved{background:#3b82f6}.legend-borrowed{background:#c0392b}
+.day.pending-day{background:#fffdf3}
+/* Availability check loading */
+.avail-loading{display:inline-block;width:12px;height:12px;border:2px solid rgba(0,107,63,.3);border-top-color:var(--ku-green);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:4px}
 #toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);background:#111827;color:#fff;border-radius:999px;padding:11px 18px;font-size:13px;font-weight:700;box-shadow:var(--shadow);display:none;z-index:9999;max-width:calc(100vw - 24px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .75s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .print-area{display:none}
 @media print{body>*:not(.print-area){display:none!important}.print-area{display:block!important;padding:24px;background:#fff}}
-
-/* ── GOOGLE CALENDAR STYLE ENHANCEMENT ── */
-.calendar-grid.google-style {
-  gap: 0;
-  border: 1px solid var(--gray-2);
-  border-radius: 14px;
-  overflow: hidden;
-  background: var(--gray-2);
-}
-.calendar-grid.google-style .day-name {
-  background: #fff;
-  border-right: 1px solid var(--gray-2);
-  border-bottom: 1px solid var(--gray-2);
-  border-radius: 0;
-  padding: 9px 6px;
-}
-.calendar-grid.google-style .day-name:nth-child(7) {
-  border-right: none;
-}
-.calendar-grid.google-style .day {
-  min-height: 128px;
-  border: 0;
-  border-right: 1px solid var(--gray-2);
-  border-bottom: 1px solid var(--gray-2);
-  border-radius: 0;
-  padding: 7px 5px 6px;
-  background: #fff;
-}
-.calendar-grid.google-style .day:nth-child(7n) {
-  border-right: none;
-}
-.calendar-grid.google-style .day:hover {
-  z-index: 2;
-  box-shadow: inset 0 0 0 2px rgba(0,107,63,.25);
-}
-.calendar-grid.google-style .day.today {
-  background: #f8fffb;
-}
-.calendar-grid.google-style .day.today .day-num {
-  background: var(--ku-green);
-  color: #fff;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-.calendar-grid.google-style .day.selected {
-  outline: none;
-  box-shadow: inset 0 0 0 3px rgba(0,107,63,.22);
-}
-.day-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 6px;
-  min-height: 25px;
-}
-.day-count {
-  font-size: 10px;
-  font-weight: 800;
-  color: #64748b;
-  background: #f1f5f9;
-  border-radius: 999px;
-  padding: 2px 6px;
-}
-.day-events {
-  margin-top: 3px;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-.gcal-event {
-  min-height: 19px;
-  border-radius: 5px;
-  padding: 2px 6px;
-  font-size: 10px;
-  font-weight: 800;
-  line-height: 1.45;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  cursor: pointer;
-  border-left: 4px solid transparent;
-}
-.gcal-event:hover {
-  filter: brightness(.96);
-  transform: translateX(1px);
-}
-.gcal-event.pending {
-  background: #fff3cd;
-  color: #8a5a00;
-  border-left-color: #f59e0b;
-}
-.gcal-event.approved,
-.gcal-event.borrowed {
-  background: #dbeafe;
-  color: #1d4ed8;
-  border-left-color: #3b82f6;
-}
-.gcal-event.borrowed {
-  background: #fdecea;
-  color: #c0392b;
-  border-left-color: #c0392b;
-}
-.gcal-more {
-  font-size: 10px;
-  color: #475569;
-  font-weight: 800;
-  padding: 2px 5px;
-  cursor: pointer;
-}
-.gcal-more:hover {
-  text-decoration: underline;
-}
-.calendar-legend {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  align-items: center;
-}
-.legend-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 3px;
-  display: inline-block;
-}
-.legend-pending { background: #f59e0b; }
-.legend-approved { background: #3b82f6; }
-.legend-borrowed { background: #c0392b; }
-@media(max-width:700px) {
-  .calendar-grid.google-style .day {
-    min-height: 96px;
-    padding: 5px 3px;
-  }
-  .gcal-event {
-    font-size: 9px;
-    padding: 2px 4px;
-  }
-  .day-count {
-    display: none;
-  }
-}
-
-
-.day.pending-day {
-  background: #fffdf3;
-}
-
+@media(max-width:700px){.calendar-grid.google-style .day{min-height:96px;padding:5px 3px}.gcal-event{font-size:9px;padding:2px 4px}.day-count{display:none}}
 </style>
 </head>
 <body>
@@ -295,14 +153,15 @@ label.form-label{font-size:12px;font-weight:800;color:var(--muted)}
     <div class="brand">
       <div class="logo">KU</div>
       <div>
-        <div class="title">ระบบจองและยืมอุปกรณ์แบบมืออาชีพ</div>
+        <div class="title">ระบบจองและยืมอุปกรณ์</div>
         <div class="sub">University Equipment Booking · Request · Approval · Calendar Conflict Check</div>
       </div>
     </div>
+    <!-- FIX 2: เพิ่ม id ให้ pill เพื่อให้ updateHeaderStats() แก้ค่าได้ -->
     <div class="header-status">
-      <span class="pill">🟢 พร้อมใช้</span>
-      <span class="pill">🟡 รออนุมัติ</span>
-      <span class="pill">🔴 ถูกยืม/ชนคิว</span>
+      <span class="pill" id="pill-available">🟢 พร้อมใช้ <span id="pill-n-available">–</span></span>
+      <span class="pill" id="pill-pending">🟡 รออนุมัติ <span id="pill-n-pending">0</span></span>
+      <span class="pill" id="pill-borrowed">🔴 ถูกยืม <span id="pill-n-borrowed">0</span></span>
     </div>
   </div>
 </header>
@@ -318,6 +177,7 @@ label.form-label{font-size:12px;font-weight:800;color:var(--muted)}
   </div>
 </nav>
 
+<!-- ════ TAB: ส่งคำขอยืม ════ -->
 <div id="panel-request" class="tab-panel active">
   <div class="container">
     <div class="status-flow">
@@ -326,7 +186,6 @@ label.form-label{font-size:12px;font-weight:800;color:var(--muted)}
       <div class="flow-step"><span class="icon">3</span>เจ้าหน้าที่อนุมัติ</div>
       <div class="flow-step"><span class="icon">4</span>ยืม/คืน</div>
     </div>
-
     <div class="grid-main">
       <div>
         <div class="card">
@@ -355,13 +214,13 @@ label.form-label{font-size:12px;font-weight:800;color:var(--muted)}
               </div>
             </div>
             <div class="btn-row">
-              <button class="btn warn" onclick="checkAvailabilitySmart()">🔍 ตรวจสอบความพร้อมใช้</button>
+              <!-- FIX 3: ปุ่มตรวจสอบดึงข้อมูลจาก Sheets + localStorage พร้อมกัน -->
+              <button class="btn warn" id="checkBtn" onclick="checkAvailabilitySmart()">🔍 ตรวจสอบความพร้อมใช้</button>
               <button class="btn primary" id="submitBtn" onclick="submitRequest()">📤 ส่งคำขอยืม</button>
               <button class="btn" onclick="clearForm()">🔄 ล้างข้อมูล</button>
             </div>
           </div>
         </div>
-
         <div class="card">
           <div class="card-header">📊 สรุปคำขอ</div>
           <div class="card-body">
@@ -371,11 +230,10 @@ label.form-label{font-size:12px;font-weight:800;color:var(--muted)}
               <div class="stat"><div class="n" id="s-conflict">0</div><div class="l">ชนคิว</div></div>
               <div class="stat"><div class="n" id="s-pending">0</div><div class="l">รออนุมัติ</div></div>
             </div>
-            <div id="request-alert" class="alert info">เลือกวันที่ใช้งานและวันที่คืน จากนั้นกด “ตรวจสอบความพร้อมใช้” เพื่อกันชนคิวก่อนส่งคำขอ</div>
+            <div id="request-alert" class="alert info">เลือกวันที่ใช้งานและวันที่คืน จากนั้นกด "ตรวจสอบความพร้อมใช้" เพื่อกันชนคิวก่อนส่งคำขอ</div>
           </div>
         </div>
       </div>
-
       <div>
         <div class="toolbar">
           <div class="section-title">📦 เลือกอุปกรณ์</div>
@@ -387,6 +245,7 @@ label.form-label{font-size:12px;font-weight:800;color:var(--muted)}
   </div>
 </div>
 
+<!-- ════ TAB: Calendar ════ -->
 <div id="panel-calendar" class="tab-panel">
   <div class="container">
     <div class="card">
@@ -410,7 +269,6 @@ label.form-label{font-size:12px;font-weight:800;color:var(--muted)}
         <div class="calendar-grid google-style" id="calendar-grid"></div>
       </div>
     </div>
-
     <div class="card">
       <div class="card-header">รายการในวันที่เลือก <span id="selected-date-label" class="badge idle">ยังไม่เลือกวัน</span></div>
       <div class="card-body" id="day-detail">
@@ -420,28 +278,29 @@ label.form-label{font-size:12px;font-weight:800;color:var(--muted)}
   </div>
 </div>
 
+<!-- ════ TAB: อนุมัติ ════ -->
 <div id="panel-approval" class="tab-panel">
   <div class="container">
     <div class="toolbar">
       <div>
         <div class="section-title">✅ หน้าตรวจสอบคำขอสำหรับเจ้าหน้าที่</div>
-        <div style="font-size:12px;color:var(--muted)">ใช้อนุมัติ แก้ไขสถานะ หรือไม่อนุมัติคำขอยืมก่อนตัดสถานะเป็น “ถูกยืม”</div>
+        <div style="font-size:12px;color:var(--muted)">ใช้อนุมัติ แก้ไขสถานะ หรือไม่อนุมัติคำขอยืมก่อนตัดสถานะเป็น "ถูกยืม"</div>
       </div>
-      <button class="btn warn" onclick="syncFromGoogle()">🔄 ซิงก์จาก Google Sheets</button>
+      <!-- FIX 4: syncFromGoogle ใช้ action=requests ซึ่งมีใน Code.gs แล้ว -->
+      <button class="btn warn" onclick="syncFromGoogle()">🔄 โหลด/ซิงก์จาก Sheets</button>
     </div>
     <div class="card">
       <div class="card-header">🔐 สิทธิ์เจ้าหน้าที่</div>
       <div class="card-body">
         <div id="admin-status"></div>
-        <div class="alert warn" style="margin-top:12px">
-          การอนุมัติ / ไม่อนุมัติ / ยืนยันคืน ต้องกรอก Admin key ก่อน เหมาะสำหรับการใช้งานภายในหน่วยงาน
-        </div>
+        <div class="alert warn" style="margin-top:12px">การอนุมัติ / ไม่อนุมัติ / ยืนยันคืน ต้องกรอก Admin key ก่อน เหมาะสำหรับการใช้งานภายในหน่วยงาน</div>
       </div>
     </div>
     <div id="approval-list"></div>
   </div>
 </div>
 
+<!-- ════ TAB: คืนอุปกรณ์ ════ -->
 <div id="panel-return" class="tab-panel">
   <div class="container">
     <div class="toolbar">
@@ -455,19 +314,21 @@ label.form-label{font-size:12px;font-weight:800;color:var(--muted)}
   </div>
 </div>
 
+<!-- ════ TAB: ประวัติ ════ -->
 <div id="panel-history" class="tab-panel">
   <div class="container">
     <div class="toolbar">
       <div>
         <div class="section-title">🗂 ประวัติและรายการทั้งหมด</div>
-        <div style="font-size:12px;color:var(--muted)">เก็บในเครื่อง และสามารถเชื่อม Google Apps Script เดิมเพื่อส่งข้อมูลได้</div>
+        <div style="font-size:12px;color:var(--muted)">ข้อมูลในเครื่อง — ซิงก์จาก Google Sheets ได้จากหน้าอนุมัติคำขอ</div>
       </div>
-      <button class="btn danger" onclick="clearDemoData()">ล้างข้อมูลตัวอย่าง</button>
+      <button class="btn danger" onclick="clearDemoData()">🗑 ล้างข้อมูลตัวอย่าง</button>
     </div>
     <div id="history-list"></div>
   </div>
 </div>
 
+<!-- ════ TAB: ตั้งค่า ════ -->
 <div id="panel-guide" class="tab-panel">
   <div class="container">
     <div class="card">
@@ -478,12 +339,7 @@ label.form-label{font-size:12px;font-weight:800;color:var(--muted)}
           <input class="form-control" id="scriptUrl" oninput="saveScriptUrl()" placeholder="https://script.google.com/macros/s/.../exec">
         </div>
         <div id="url-status" style="font-size:12px;color:var(--muted);margin-top:8px">ยังไม่ได้ตั้งค่า</div>
-        <div class="alert info" style="margin-top:12px">
-          ไฟล์นี้ออกแบบให้ทำงานได้ทันทีด้วย localStorage และยังคงรองรับการส่งข้อมูลไปยัง Google Sheets ผ่าน Apps Script URL โดย workflow ใหม่เพิ่มสถานะ pending / approved / rejected / returned และสามารถซิงก์ข้อมูลย้อนกลับจาก Sheet ได้ผ่านปุ่ม "ซิงก์จาก Google Sheets"
-        </div>
-
         <hr style="border:0;border-top:1px solid var(--gray-2);margin:16px 0">
-
         <div class="form-group">
           <label class="form-label">Admin key สำหรับเจ้าหน้าที่</label>
           <input class="form-control" id="adminKeySetting" placeholder="เช่น KU-ADMIN-2569">
@@ -491,22 +347,18 @@ label.form-label{font-size:12px;font-weight:800;color:var(--muted)}
         <div class="btn-row">
           <button class="btn primary" onclick="saveAdminKey()">💾 บันทึก Admin key</button>
         </div>
-        <div class="alert warn" style="margin-top:12px">
-          ค่าเริ่มต้นคือ <strong>KU-ADMIN-2569</strong> ควรเปลี่ยนก่อนใช้งานจริงภายในหน่วยงาน
-        </div>
+        <div class="alert warn" style="margin-top:12px">ค่าเริ่มต้นคือ <strong>KU-ADMIN-2569</strong> ควรเปลี่ยนก่อนใช้งานจริงภายในหน่วยงาน</div>
       </div>
     </div>
-
     <div class="card">
       <div class="card-header">🧭 Flow การใช้งานที่แนะนำ</div>
       <div class="card-body" style="line-height:1.9">
         <ol style="margin-left:20px">
           <li>ผู้ขอยืมกรอกข้อมูลและเลือกวันที่ใช้งาน/วันที่คืน</li>
-          <li>ระบบตรวจสอบจาก Calendar ว่าอุปกรณ์ชนกับรายการที่รออนุมัติหรืออนุมัติแล้วหรือไม่</li>
-          <li>ผู้ขอยืมส่งคำขอ สถานะเริ่มต้นคือ <strong>รออนุมัติ</strong></li>
-          <li>เจ้าหน้าที่เปิดหน้า <strong>อนุมัติคำขอ</strong> เพื่อตรวจสอบและอนุมัติ/ไม่อนุมัติ</li>
-          <li>เมื่ออนุมัติแล้ว รายการจะไปปรากฏในหน้า <strong>คืนอุปกรณ์</strong></li>
-          <li>เมื่อคืนแล้ว สถานะเปลี่ยนเป็น <strong>คืนแล้ว</strong> และ Calendar จะไม่กันชนต่อ</li>
+          <li>กด <strong>"ตรวจสอบความพร้อมใช้"</strong> — ระบบดึงข้อมูลจาก Google Sheets + เครื่องพร้อมกัน</li>
+          <li>ส่งคำขอ → สถานะ <strong>🟡 รออนุมัติ</strong> (อุปกรณ์ยังไม่ถูก lock)</li>
+          <li>เจ้าหน้าที่เปิดหน้า <strong>อนุมัติคำขอ</strong> → กดอนุมัติ → สถานะเปลี่ยนเป็น <strong>🔴 ถูกยืม</strong></li>
+          <li>เมื่อคืนอุปกรณ์ → กด <strong>ยืนยันคืน</strong> → สถานะกลับเป็น <strong>🟢 พร้อมใช้</strong></li>
         </ol>
       </div>
     </div>
@@ -517,6 +369,9 @@ label.form-label{font-size:12px;font-weight:800;color:var(--muted)}
 <div id="toast"></div>
 
 <script>
+// ════════════════════════════════════════════════════════════
+// EQUIPMENT DATA
+// ════════════════════════════════════════════════════════════
 const EQUIPMENT = [
   {id:'cam', label:'กล้องถ่ายทำ', items:[
     {id:'xf705',name:'Canon XF705'},{id:'xf605',name:'Canon XF605'},
@@ -527,16 +382,11 @@ const EQUIPMENT = [
     {id:'i360',name:'Insta360 1-inch Edition'},{id:'i360t',name:'Insta360 Twin Edition'}
   ]},
   {id:'lens', label:'เลนส์', items:[
-    {id:'rf1020',name:'Canon RF 10-20 mm (Fisheye)'},
-    {id:'ep1635',name:'Canon EP 16-35 mm (Wide)'},
-    {id:'rf24usm',name:'Canon RF 24-105 mm USM (Normal)'},
-    {id:'rf24',name:'Canon RF 24-105 mm (Normal)'},
-    {id:'rf24ii',name:'Canon RF 24-105 mm II (Normal)'},
-    {id:'nk18',name:'Nikon DX 18-105 mm (Normal)'},
-    {id:'c1845',name:'Canon 18-45 mm (Normal)'},
-    {id:'c70l',name:'Canon 70-200 mm (Tele)'},
-    {id:'c50',name:'Canon 50 mm (Fix)'},
-    {id:'mount',name:'เม้าท์เลนส์ Canon'}
+    {id:'rf1020',name:'Canon RF 10-20 mm (Fisheye)'},{id:'ep1635',name:'Canon EP 16-35 mm (Wide)'},
+    {id:'rf24usm',name:'Canon RF 24-105 mm USM (Normal)'},{id:'rf24',name:'Canon RF 24-105 mm (Normal)'},
+    {id:'rf24ii',name:'Canon RF 24-105 mm II (Normal)'},{id:'nk18',name:'Nikon DX 18-105 mm (Normal)'},
+    {id:'c1845',name:'Canon 18-45 mm (Normal)'},{id:'c70l',name:'Canon 70-200 mm (Tele)'},
+    {id:'c50',name:'Canon 50 mm (Fix)'},{id:'mount',name:'เม้าท์เลนส์ Canon'}
   ]},
   {id:'batt', label:'แบตเตอรี่', qty:true, maxQty:7, items:[
     {id:'lpe6p',name:'Canon LP-E6P'},{id:'lpe17',name:'Canon LP-E17'},
@@ -544,57 +394,36 @@ const EQUIPMENT = [
     {id:'ledB',name:'ไฟ LED สตูดิโอ NP-F960'},{id:'niken',name:'Nikon EN-EL15'}
   ]},
   {id:'flash', label:'แฟลช', items:[
-    {id:'f600',name:'Canon SPEEDLITE 600EX-RT'},
-    {id:'f600ii',name:'Canon SPEEDLITE 600EX II RT'},
-    {id:'fel10',name:'Canon SPEEDLITE EL-10'},
-    {id:'nsb900',name:'Nikon SPEEDLITE SB-900'},
+    {id:'f600',name:'Canon SPEEDLITE 600EX-RT'},{id:'f600ii',name:'Canon SPEEDLITE 600EX II RT'},
+    {id:'fel10',name:'Canon SPEEDLITE EL-10'},{id:'nsb900',name:'Nikon SPEEDLITE SB-900'},
     {id:'nsb910',name:'Nikon SPEEDLITE SB-910'}
   ]},
   {id:'mem', label:'Memory Card', qty:true, maxQty:5, items:[
     {id:'m8',name:'8GB'},{id:'m32',name:'32GB'},{id:'m64',name:'64GB'},
     {id:'m128',name:'128GB'},{id:'m1t',name:'1TB'}
   ]},
-  {id:'ledl', label:'ไฟ LED', qty:true, maxQty:3, items:[
-    {id:'ledset',name:'ชุดไฟ LED'}
-  ]},
-  {id:'lstand', label:'ขาตั้งไฟสตูดิโอ', qty:true, maxQty:3, items:[
-    {id:'lstd',name:'ขาตั้งไฟสตูดิโอ'}
-  ]},
-  {id:'tripod', label:'ขาตั้งกล้อง SACHTLER', qty:true, maxQty:3, items:[
-    {id:'sach',name:'ขาตั้งกล้อง SACHTLER'}
-  ]},
+  {id:'ledl', label:'ไฟ LED', qty:true, maxQty:3, items:[{id:'ledset',name:'ชุดไฟ LED'}]},
+  {id:'lstand', label:'ขาตั้งไฟสตูดิโอ', qty:true, maxQty:3, items:[{id:'lstd',name:'ขาตั้งไฟสตูดิโอ'}]},
+  {id:'tripod', label:'ขาตั้งกล้อง SACHTLER', qty:true, maxQty:3, items:[{id:'sach',name:'ขาตั้งกล้อง SACHTLER'}]},
   {id:'wmic', label:'ไวเลสไมโครโฟน', qty:true, maxQty:3, items:[
-    {id:'blink',name:'Saramonic Blink500'},
-    {id:'tx10',name:'Saramonic TX-10'},
+    {id:'blink',name:'Saramonic Blink500'},{id:'tx10',name:'Saramonic TX-10'},
     {id:'senn',name:'Sennheiser ew-112p G3'}
   ]},
-  {id:'shure', label:'ไมโครโฟน SHURE Dynamic', qty:true, maxQty:4, items:[
-    {id:'shured',name:'SHURE Dynamic'}
-  ]},
-  {id:'shures', label:'ไมโครโฟนสตูดิโอ SHURE ตั้งโต๊ะ', qty:true, maxQty:2, items:[
-    {id:'shurest',name:'SHURE Studio ตั้งโต๊ะ'}
-  ]},
+  {id:'shure', label:'ไมโครโฟน SHURE Dynamic', qty:true, maxQty:4, items:[{id:'shured',name:'SHURE Dynamic'}]},
+  {id:'shures', label:'ไมโครโฟนสตูดิโอ SHURE ตั้งโต๊ะ', qty:true, maxQty:2, items:[{id:'shurest',name:'SHURE Studio ตั้งโต๊ะ'}]},
   {id:'mixer', label:'Mixer', items:[
-    {id:'toa',name:'TOA Power Mixer'},
-    {id:'emx7',name:'Yamaha EMX7'},
-    {id:'mg10',name:'Yamaha MG10XU'}
+    {id:'toa',name:'TOA Power Mixer'},{id:'emx7',name:'Yamaha EMX7'},{id:'mg10',name:'Yamaha MG10XU'}
   ]},
   {id:'wireless', label:'ชุดส่งสัญญาณภาพและเสียงไร้สาย', qty:true, maxQty:3, items:[
-    {id:'snap',name:'Dongle Snapshow'},
-    {id:'holly',name:'Monitor Wireless Hollyland'}
+    {id:'snap',name:'Dongle Snapshow'},{id:'holly',name:'Monitor Wireless Hollyland'}
   ]},
   {id:'speaker', label:'ลำโพง', qty:true, maxQty:7, items:[
-    {id:'toabs',name:'TOA BS-1030W 30W สีขาว'},
-    {id:'jbl',name:'JBL EON ONE COMPACT'},
-    {id:'yamaha500',name:'YAMAHA 500S'}
+    {id:'toabs',name:'TOA BS-1030W 30W สีขาว'},{id:'jbl',name:'JBL EON ONE COMPACT'},{id:'yamaha500',name:'YAMAHA 500S'}
   ]},
   {id:'switcher', label:'Switcher / Splitter', qty:true, maxQty:4, items:[
-    {id:'aten1',name:'Splitter ATEN VS0110HA'},
-    {id:'aten10',name:'Splitter ATEN 10-Port'},
-    {id:'hdmi4',name:'HDMI Splitter 1 Input 4 Output'},
-    {id:'hdmi2',name:'HDMI Splitter 1 Input 2 Output'},
-    {id:'hdmisw',name:'HDMI Switcher'},
-    {id:'devwell',name:'Switcher DeviceWell'}
+    {id:'aten1',name:'Splitter ATEN VS0110HA'},{id:'aten10',name:'Splitter ATEN 10-Port'},
+    {id:'hdmi4',name:'HDMI Splitter 1 Input 4 Output'},{id:'hdmi2',name:'HDMI Splitter 1 Input 2 Output'},
+    {id:'hdmisw',name:'HDMI Switcher'},{id:'devwell',name:'Switcher DeviceWell'}
   ]},
   {id:'tv', label:'TV', qty:true, maxQty:10, items:[
     {id:'tv32',name:'32"'},{id:'tv42',name:'42"'},{id:'tv55',name:'55"'}
@@ -610,65 +439,54 @@ const EQUIPMENT = [
 ];
 
 const STATUS_LABEL = {
-  pending: ['🟡 รออนุมัติ','pending'],
+  pending:  ['🟡 รออนุมัติ','pending'],
   approved: ['🔵 อนุมัติแล้ว','approved'],
   borrowed: ['🔴 ถูกยืมอยู่','busy'],
   rejected: ['⚫ ไม่อนุมัติ','idle'],
   returned: ['🟢 คืนแล้ว','returned']
 };
 
-// ══════════════════════════════════════════════
-// INTERNAL ADMIN CONFIG
-// เปลี่ยนรหัสนี้ให้เหมาะกับหน่วยงานของคุณ
-// หมายเหตุ: วิธีนี้เหมาะกับการใช้งานภายในแบบง่าย ไม่ใช่ระบบความปลอดภัยระดับสูง
-// ══════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════
+// ADMIN
+// ════════════════════════════════════════════════════════════
 const ADMIN_KEY_STORAGE = 'equipment_admin_verified';
-const DEFAULT_ADMIN_KEY = localStorage.getItem('equipment_admin_key') || 'KU-ADMIN-2569';
+const DEFAULT_ADMIN_KEY = 'KU-ADMIN-2569';
 
 function requireAdmin(actionText='ดำเนินการสำหรับเจ้าหน้าที่') {
-  if (sessionStorage.getItem(ADMIN_KEY_STORAGE) === '1') return true;
+  if (sessionStorage.getItem(ADMIN_KEY_STORAGE)==='1') return true;
   const key = prompt(`กรอกรหัสเจ้าหน้าที่เพื่อ${actionText}`);
   const adminKey = localStorage.getItem('equipment_admin_key') || DEFAULT_ADMIN_KEY;
-  if (key === adminKey) {
-    sessionStorage.setItem(ADMIN_KEY_STORAGE, '1');
-    showToast('✅ ยืนยันสิทธิ์เจ้าหน้าที่แล้ว');
-    renderAdminStatus();
-    return true;
+  if (key===adminKey) {
+    sessionStorage.setItem(ADMIN_KEY_STORAGE,'1');
+    showToast('✅ ยืนยันสิทธิ์เจ้าหน้าที่แล้ว'); renderAdminStatus(); return true;
   }
-  showToast('❌ รหัสเจ้าหน้าที่ไม่ถูกต้อง');
-  return false;
+  showToast('❌ รหัสเจ้าหน้าที่ไม่ถูกต้อง'); return false;
 }
-
 function logoutAdmin() {
-  sessionStorage.removeItem(ADMIN_KEY_STORAGE);
-  renderAdminStatus();
-  showToast('ออกจากโหมดเจ้าหน้าที่แล้ว');
+  sessionStorage.removeItem(ADMIN_KEY_STORAGE); renderAdminStatus(); showToast('ออกจากโหมดเจ้าหน้าที่แล้ว');
 }
-
 function renderAdminStatus() {
-  const el = document.getElementById('admin-status');
-  if (!el) return;
-  const ok = sessionStorage.getItem(ADMIN_KEY_STORAGE) === '1';
+  const el = document.getElementById('admin-status'); if (!el) return;
+  const ok = sessionStorage.getItem(ADMIN_KEY_STORAGE)==='1';
   el.innerHTML = ok
     ? '<span class="badge ok">🔐 โหมดเจ้าหน้าที่</span> <button class="btn danger" onclick="logoutAdmin()">ออกจากโหมดเจ้าหน้าที่</button>'
     : '<span class="badge idle">🔒 ยังไม่ได้ยืนยันสิทธิ์เจ้าหน้าที่</span> <button class="btn primary" onclick="requireAdmin(\'เข้าสู่โหมดเจ้าหน้าที่\')">เข้าสู่โหมดเจ้าหน้าที่</button>';
 }
-
 function saveAdminKey() {
   const val = document.getElementById('adminKeySetting')?.value.trim();
-  if (!val) {
-    showToast('⚠️ กรุณากรอกรหัส Admin key');
-    return;
-  }
+  if (!val) { showToast('⚠️ กรุณากรอกรหัส Admin key'); return; }
   localStorage.setItem('equipment_admin_key', val);
   sessionStorage.removeItem(ADMIN_KEY_STORAGE);
-  renderAdminStatus();
-  showToast('✅ บันทึก Admin key แล้ว');
+  renderAdminStatus(); showToast('✅ บันทึก Admin key แล้ว');
 }
 
+// ════════════════════════════════════════════════════════════
+// RECORDS (localStorage)
+// ════════════════════════════════════════════════════════════
 let state = {};
 let openSecs = {};
-let availability = {};
+let availability = {};   // ผลตรวจสอบ: { itemName: { type:'busy'|'pending', records:[] } }
+let sheetsStatuses = {}; // FIX 3: cache จาก Google Sheets
 let currentMonth = new Date();
 let selectedCalendarDate = null;
 
@@ -679,30 +497,49 @@ function initState(){
 }
 initState();
 
-function getRecords(){
-  return JSON.parse(localStorage.getItem('university_equipment_requests') || '[]');
-}
-function setRecords(records){
-  localStorage.setItem('university_equipment_requests', JSON.stringify(records));
-  updateHeaderStats();
-}
+function getRecords(){ return JSON.parse(localStorage.getItem('university_equipment_requests') || '[]'); }
+function setRecords(records){ localStorage.setItem('university_equipment_requests', JSON.stringify(records)); updateHeaderStats(); }
+
 function seedDemo(){
-  if(localStorage.getItem('university_equipment_seeded')) return;
+  if (localStorage.getItem('university_equipment_seeded')) return;
   const today = new Date();
   const iso = d => d.toISOString().slice(0,10);
   const d1 = new Date(today); d1.setDate(today.getDate()+2);
   const d2 = new Date(today); d2.setDate(today.getDate()+4);
   const d3 = new Date(today); d3.setDate(today.getDate()+7);
   const d4 = new Date(today); d4.setDate(today.getDate()+8);
-  const demo = [
+  setRecords([
     {id:'rq-demo-1',user:'เจ้าหน้าที่โสตฯ',event:'ถ่ายทำวิดีโอประชาสัมพันธ์',date:iso(d1),returnDate:iso(d2),note:'ข้อมูลตัวอย่าง',status:'approved',savedAt:new Date().toISOString(),items:[{cat:'กล้องถ่ายทำ',name:'Canon XF705',qty:1},{cat:'ไวเลสไมโครโฟน',name:'Saramonic Blink500',qty:1}]},
     {id:'rq-demo-2',user:'ฝ่ายประชาสัมพันธ์',event:'บันทึกภาพกิจกรรมอบรม',date:iso(d3),returnDate:iso(d4),note:'รออนุมัติ',status:'pending',savedAt:new Date().toISOString(),items:[{cat:'กล้องถ่ายทำ',name:'Canon R6 Mark II',qty:1},{cat:'เลนส์',name:'Canon RF 24-105 mm USM (Normal)',qty:1}]}
-  ];
-  setRecords(demo);
+  ]);
   localStorage.setItem('university_equipment_seeded','1');
 }
 seedDemo();
 
+// ════════════════════════════════════════════════════════════
+// FIX 2: updateHeaderStats — อัปเดต pill ใน header จริง
+// ════════════════════════════════════════════════════════════
+function updateHeaderStats(){
+  const records  = getRecords();
+  const pending  = records.filter(x => x.status==='pending').length;
+  const borrowed = records.filter(x => ['approved','borrowed'].includes(x.status)).length;
+  // นับ available จาก sheetsStatuses ถ้ามี ไม่งั้นแสดง –
+  const totalEquip  = EQUIPMENT.reduce((s,c) => s+c.items.length, 0);
+  const notAvail    = Object.values(sheetsStatuses).filter(v => v.status!=='available').length;
+  const availableN  = Object.keys(sheetsStatuses).length
+    ? (totalEquip - notAvail)
+    : '–';
+  const pN = document.getElementById('pill-n-pending');
+  const bN = document.getElementById('pill-n-borrowed');
+  const aN = document.getElementById('pill-n-available');
+  if (pN) pN.textContent = pending;
+  if (bN) bN.textContent = borrowed;
+  if (aN) aN.textContent = availableN;
+}
+
+// ════════════════════════════════════════════════════════════
+// BUILD UI
+// ════════════════════════════════════════════════════════════
 function buildSections(){
   const container = document.getElementById('equipment-sections');
   container.innerHTML = '';
@@ -738,141 +575,135 @@ function toggleItem(itemId, catId){
   const chk = document.getElementById('chk-'+itemId);
   state[itemId].checked = chk.checked;
   document.getElementById('row-'+itemId).classList.toggle('checked', chk.checked);
-  const qty = document.getElementById('qty-'+itemId);
-  if(qty) qty.disabled = !chk.checked;
+  const qty = document.getElementById('qty-'+itemId); if(qty) qty.disabled = !chk.checked;
   updateBadge(catId); updateStats();
 }
 function changeQty(itemId){
-  const qty = document.getElementById('qty-'+itemId);
-  if(qty) state[itemId].qty = parseInt(qty.value||'1',10);
-  updateStats();
+  const qty = document.getElementById('qty-'+itemId); if(qty) state[itemId].qty = parseInt(qty.value||'1',10); updateStats();
 }
 function updateBadge(catId){
   const cat = EQUIPMENT.find(c=>c.id===catId);
   const n = cat.items.filter(i=>state[i.id]?.checked).length;
-  const bdg = document.getElementById('bdg-'+catId);
-  bdg.textContent = `${n}/${cat.items.length}`;
-  bdg.classList.toggle('has', n>0);
+  const bdg = document.getElementById('bdg-'+catId); if(!bdg) return;
+  bdg.textContent = `${n}/${cat.items.length}`; bdg.classList.toggle('has', n>0);
 }
 function updateStats(){
   let checked=0,total=0,conflict=0,pending=0;
   EQUIPMENT.forEach(cat=>cat.items.forEach(item=>{
     if(state[item.id]?.checked){checked++;total += state[item.id].qty||1;}
-    if(availability[item.name]?.type === 'busy') conflict++;
-    if(availability[item.name]?.type === 'pending') pending++;
+    if(availability[item.name]?.type==='busy') conflict++;
+    if(availability[item.name]?.type==='pending') pending++;
   }));
   document.getElementById('s-checked').textContent = checked;
   document.getElementById('s-total').textContent = total;
   document.getElementById('s-conflict').textContent = conflict;
   document.getElementById('s-pending').textContent = pending;
 }
-function dateRangeOK(){
-  const start = document.getElementById('useDate').value;
-  const end = document.getElementById('returnDate').value || start;
-  if(!start) return false;
-  if(end < start) return false;
-  return true;
-}
-function rangesOverlap(aStart,aEnd,bStart,bEnd){
-  aEnd = aEnd || aStart; bEnd = bEnd || bStart;
-  return aStart <= bEnd && bStart <= aEnd;
-}
-function computeAvailability(){
-  const start = document.getElementById('useDate').value;
-  const end = document.getElementById('returnDate').value || start;
-  const records = getRecords().filter(r => ['pending','approved','borrowed'].includes(r.status));
-  const map = {};
-  if(!start) return map;
-  records.forEach(r=>{
-    if(!rangesOverlap(start,end,r.date,r.returnDate || r.date)) return;
-    r.items.forEach(it=>{
-      const type = (r.status === 'pending') ? 'pending' : 'busy';
-      if(!map[it.name] || map[it.name].type !== 'busy') {
-        map[it.name] = {type, records:[r]};
-      } else {
-        map[it.name].records.push(r);
-      }
-    });
-  });
-  return map;
-}
-async function checkAvailabilitySmart(){
-  if(!dateRangeOK()) {
-    setAlert('กรุณาเลือกวันที่ใช้งานและวันที่คืนให้ถูกต้องก่อนตรวจสอบ', 'danger');
-    showToast('⚠️ กรุณาเลือกวันที่ให้ถูกต้อง');
-    return;
-  }
-  // 1. คำนวณจาก localStorage ก่อน
-  availability = computeAvailability();
 
-  // 2. ดึงข้อมูลจาก Google Sheet (real-time) แล้ว merge — สำคัญสำหรับ multi-device
+// ════════════════════════════════════════════════════════════
+// FIX 3: checkAvailabilitySmart — ดึงข้อมูลจาก Sheets + localStorage
+// ════════════════════════════════════════════════════════════
+async function checkAvailabilitySmart(){
+  if(!dateRangeOK()){
+    setAlert('กรุณาเลือกวันที่ใช้งานและวันที่คืนให้ถูกต้องก่อนตรวจสอบ','danger');
+    showToast('⚠️ กรุณาเลือกวันที่ให้ถูกต้อง'); return;
+  }
+  const btn = document.getElementById('checkBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner" style="border-top-color:#9a5b00"></span> กำลังตรวจสอบ...';
+
+  // ดึง Sheets status ก่อน (ถ้ามี URL)
   const scriptUrl = localStorage.getItem('script_url');
-  if(scriptUrl) {
+  if(scriptUrl){
     try {
       const res  = await fetch(scriptUrl + '?action=availability');
       const json = await res.json();
-      if(json.success && json.borrowed) {
-        // merge: Sheet เป็น source of truth สำหรับ status 'borrowed'
-        Object.entries(json.borrowed).forEach(([name, info]) => {
-          const sheetType = (info.status === 'borrowed') ? 'busy' : 'pending';
-          if(!availability[name] || availability[name].type !== 'busy') {
-            availability[name] = {
-              type: sheetType,
-              records: [{
-                user:       info.borrowedBy || 'ไม่ระบุ',
-                event:      info.event      || 'ไม่ระบุงาน',
-                date:       '—',
-                returnDate: info.returnDate || 'ไม่ระบุ',
-                status:     info.status     || 'borrowed'
-              }]
-            };
-          }
-        });
+      if(json.success && json.statuses) {
+        sheetsStatuses = json.statuses;
+        updateHeaderStats();
       }
-    } catch(e) { /* ไม่มีเน็ตหรือ Script ยัง deploy ไม่เสร็จ → ใช้ localStorage อย่างเดียว */ }
+    } catch(_) { /* ใช้ localStorage แทน */ }
   }
 
+  // merge: Sheets ที่ถูกยืม/pending + localStorage records
+  availability = computeAvailability();
   renderAvailability();
+
   const busy    = Object.values(availability).filter(x=>x.type==='busy').length;
   const pending = Object.values(availability).filter(x=>x.type==='pending').length;
-  if(busy>0)       setAlert(`พบอุปกรณ์ชนคิว/ถูกยืมอยู่ ${busy} รายการ ระบบปิดการเลือกให้อัตโนมัติ`, 'danger');
-  else if(pending>0) setAlert(`มีอุปกรณ์ ${pending} รายการที่อยู่ระหว่างรออนุมัติ เจ้าหน้าที่ควรตรวจสอบก่อนอนุมัติ`, 'warn');
-  else               setAlert('ไม่พบรายการชนคิวในช่วงวันที่เลือก สามารถส่งคำขอยืมได้', 'info');
+  if(busy>0)         setAlert(`พบอุปกรณ์ชนคิว/ถูกยืมอยู่ ${busy} รายการ ระบบปิดการเลือกให้อัตโนมัติ`,'danger');
+  else if(pending>0) setAlert(`มีอุปกรณ์ ${pending} รายการที่อยู่ระหว่างรออนุมัติ`,'warn');
+  else               setAlert('ไม่พบรายการชนคิวในช่วงวันที่เลือก สามารถส่งคำขอยืมได้','info');
+
   updateStats();
+  btn.disabled = false;
+  btn.innerHTML = '🔍 ตรวจสอบความพร้อมใช้';
   showToast('✅ ตรวจสอบความพร้อมใช้แล้ว');
 }
-async function autoCheckByDate(){
-  if(document.getElementById('useDate').value) await checkAvailabilitySmart();
+
+function autoCheckByDate(){
+  if(document.getElementById('useDate').value) checkAvailabilitySmart();
 }
+
+function computeAvailability(){
+  const start   = document.getElementById('useDate').value;
+  const end     = document.getElementById('returnDate').value || start;
+  const map     = {};
+  if(!start) return map;
+
+  // 1. ตรวจจาก localStorage records
+  const records = getRecords().filter(r => ['pending','approved','borrowed'].includes(r.status));
+  records.forEach(r=>{
+    if(!rangesOverlap(start,end,r.date,r.returnDate||r.date)) return;
+    r.items.forEach(it=>{
+      const type = (r.status==='pending') ? 'pending' : 'busy';
+      if(!map[it.name] || map[it.name].type!=='busy') {
+        map[it.name] = {type, records:[r]};
+      } else { map[it.name].records.push(r); }
+    });
+  });
+
+  // 2. merge จาก Sheets statuses (FIX 3)
+  Object.entries(sheetsStatuses).forEach(([name, info])=>{
+    if(['borrowed','maintenance','lost'].includes(info.status)){
+      if(!map[name] || map[name].type!=='busy') {
+        map[name] = {type:'busy', records:[{
+          user: info.borrowedBy || 'เจ้าหน้าที่',
+          event: info.event || info.note || info.status,
+          date: '', returnDate: info.returnDate || '',
+          status: info.status
+        }]};
+      }
+    }
+  });
+  return map;
+}
+
 function renderAvailability(){
   EQUIPMENT.forEach(cat=>cat.items.forEach(item=>{
-    const row = document.getElementById('row-'+item.id);
+    const row   = document.getElementById('row-'+item.id);
     const badge = document.getElementById('av-'+item.id);
-    const tip = document.getElementById('tip-'+item.id);
-    const chk = document.getElementById('chk-'+item.id);
-    const qty = document.getElementById('qty-'+item.id);
+    const tip   = document.getElementById('tip-'+item.id);
+    const chk   = document.getElementById('chk-'+item.id);
+    const qty   = document.getElementById('qty-'+item.id);
     row.classList.remove('conflict','pending-row');
     chk.disabled = false;
     if(qty && !state[item.id].checked) qty.disabled = true;
 
     const av = availability[item.name];
     if(!av){
-      badge.className = 'badge ok';
-      badge.textContent = '🟢 พร้อมใช้';
+      badge.className='badge ok'; badge.textContent='🟢 พร้อมใช้';
       tip.innerHTML = 'ไม่พบรายการจอง/ยืมในช่วงวันที่เลือก';
     } else {
-      const lines = av.records.map(r => `👤 ${escapeHtml(r.user)}<br>📌 ${escapeHtml(r.event)}<br>📅 ${r.date} → ${r.returnDate || r.date}<br>สถานะ: ${STATUS_LABEL[r.status]?.[0] || r.status}`).join('<hr style="border:0;border-top:1px solid #374151;margin:6px 0">');
+      const lines = av.records.map(r => `👤 ${escapeHtml(r.user||'–')}<br>📌 ${escapeHtml(r.event||'–')}<br>📅 ${r.date||'–'} → ${r.returnDate||r.date||'–'}<br>สถานะ: ${STATUS_LABEL[r.status]?.[0] || r.status||'–'}`).join('<hr style="border:0;border-top:1px solid #374151;margin:6px 0">');
       tip.innerHTML = lines;
-      if(av.type === 'busy'){
-        badge.className = 'badge busy';
-        badge.textContent = '🔴 ไม่พร้อมใช้';
+      if(av.type==='busy'){
+        badge.className='badge busy'; badge.textContent='🔴 ไม่พร้อมใช้';
         row.classList.add('conflict');
-        chk.checked = false; chk.disabled = true;
-        state[item.id].checked = false;
-        if(qty) qty.disabled = true;
+        chk.checked=false; chk.disabled=true; state[item.id].checked=false;
+        if(qty) qty.disabled=true;
       } else {
-        badge.className = 'badge pending';
-        badge.textContent = '🟡 รออนุมัติ';
+        badge.className='badge pending'; badge.textContent='🟡 รออนุมัติ';
         row.classList.add('pending-row');
       }
     }
@@ -880,62 +711,76 @@ function renderAvailability(){
   }));
   updateStats();
 }
-function setAlert(msg,type){
-  const el = document.getElementById('request-alert');
-  el.className = 'alert ' + type;
-  el.textContent = msg;
-}
+
+function setAlert(msg,type){ const el=document.getElementById('request-alert'); el.className='alert '+type; el.textContent=msg; }
 function selectedItems(){
-  const items = [];
-  EQUIPMENT.forEach(cat=>cat.items.forEach(item=>{
-    if(state[item.id]?.checked) items.push({cat:cat.label,name:item.name,qty:state[item.id].qty||1});
-  }));
-  return items;
+  const items=[]; EQUIPMENT.forEach(cat=>cat.items.forEach(item=>{if(state[item.id]?.checked) items.push({cat:cat.label,name:item.name,qty:state[item.id].qty||1});})); return items;
 }
+function dateRangeOK(){ const s=document.getElementById('useDate').value,e=document.getElementById('returnDate').value||s; if(!s) return false; if(e<s) return false; return true; }
+function rangesOverlap(aS,aE,bS,bE){ aE=aE||aS; bE=bE||bS; return aS<=bE && bS<=aE; }
+
+// ════════════════════════════════════════════════════════════
+// FIX 1: submitRequest — ตั้งสถานะเป็น 'pending' เท่านั้น
+//         ไม่เปลี่ยน Status Sheet อุปกรณ์ (รอเจ้าหน้าที่อนุมัติก่อน)
+// ════════════════════════════════════════════════════════════
 async function submitRequest(){
-  const user = document.getElementById('userName').value.trim();
-  const event = document.getElementById('eventName').value.trim();
-  const date = document.getElementById('useDate').value;
+  const user       = document.getElementById('userName').value.trim();
+  const event      = document.getElementById('eventName').value.trim();
+  const date       = document.getElementById('useDate').value;
   const returnDate = document.getElementById('returnDate').value || date;
-  const note = document.getElementById('note').value.trim();
-  if(!user || !event || !date || !returnDate) {showToast('⚠️ กรุณากรอกข้อมูลคำขอให้ครบ');return;}
+  const note       = document.getElementById('note').value.trim();
+  if(!user||!event||!date||!returnDate){showToast('⚠️ กรุณากรอกข้อมูลคำขอให้ครบ');return;}
+
   await checkAvailabilitySmart();
   const items = selectedItems();
-  if(items.length===0) {showToast('⚠️ กรุณาเลือกอุปกรณ์อย่างน้อย 1 รายการ');return;}
-  const conflictNames = items.filter(it => availability[it.name]?.type === 'busy').map(it=>it.name);
-  if(conflictNames.length) {
+  if(items.length===0){showToast('⚠️ กรุณาเลือกอุปกรณ์อย่างน้อย 1 รายการ');return;}
+  const conflictNames = items.filter(it=>availability[it.name]?.type==='busy').map(it=>it.name);
+  if(conflictNames.length){
     showToast('❌ มีอุปกรณ์ไม่พร้อมใช้ กรุณาแก้ไขรายการ');
-    setAlert('ไม่สามารถส่งคำขอได้ เพราะมีอุปกรณ์ไม่พร้อมใช้: ' + conflictNames.join(', '), 'danger');
+    setAlert('ไม่สามารถส่งคำขอได้ เพราะมีอุปกรณ์ไม่พร้อมใช้: '+conflictNames.join(', '),'danger');
     return;
   }
-  const record = {action:'request', id:'rq-'+Date.now(), user, event, date, returnDate, note, items, status:'pending', savedAt:new Date().toISOString()};
+
+  const record = {
+    id:'rq-'+Date.now(), user, event, date, returnDate, note, items,
+    status:'pending',   // FIX 1: เริ่มต้นเป็น pending เสมอ
+    savedAt: new Date().toISOString()
+  };
   const records = getRecords(); records.unshift(record); setRecords(records);
+
+  // ส่งไป Sheets โดยระบุ action:'request' (ไม่ใช่ 'borrow')
   await postToGoogle({...record, action:'request'});
-  clearForm(false);
-  renderAll();
-  showToast('✅ ส่งคำขอยืมแล้ว รอเจ้าหน้าที่อนุมัติ');
+
+  clearForm(false); renderAll();
+  showToast('✅ ส่งคำขอยืมแล้ว — รอเจ้าหน้าที่อนุมัติ');
   showTab('approval');
 }
+
+// ════════════════════════════════════════════════════════════
+// POST to Google — ส่งข้อมูลไป Apps Script
+// ════════════════════════════════════════════════════════════
 async function postToGoogle(payload){
-  const scriptUrl = localStorage.getItem('script_url');
-  if(!scriptUrl) return;
+  const scriptUrl = localStorage.getItem('script_url'); if(!scriptUrl) return;
   try {
-    await fetch(scriptUrl, {method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
-  } catch(e) {}
+    await fetch(scriptUrl, {method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)});
+  } catch(_){}
 }
-async function selectAvailableOnly(){
-  if(!dateRangeOK()) {showToast('⚠️ กรุณาเลือกวันที่ก่อน');return;}
-  await checkAvailabilitySmart();
-  EQUIPMENT.forEach(cat=>cat.items.forEach(item=>{
-    const chk = document.getElementById('chk-'+item.id);
-    if(!availability[item.name] && chk && !chk.disabled && !chk.checked) {
-      chk.checked = true; toggleItem(item.id, cat.id);
-    }
-  }));
+
+function selectAvailableOnly(){
+  if(!dateRangeOK()){showToast('⚠️ กรุณาเลือกวันที่ก่อน');return;}
+  checkAvailabilitySmart().then(()=>{
+    EQUIPMENT.forEach(cat=>cat.items.forEach(item=>{
+      const chk=document.getElementById('chk-'+item.id);
+      if(!availability[item.name] && chk && !chk.disabled && !chk.checked){
+        chk.checked=true; toggleItem(item.id, cat.id);
+      }
+    }));
+  });
 }
+
 function clearForm(resetDates=true){
   ['userName','eventName','note'].forEach(id=>document.getElementById(id).value='');
-  if(resetDates) ['useDate','returnDate'].forEach(id=>document.getElementById(id).value='');
+  if(resetDates)['useDate','returnDate'].forEach(id=>document.getElementById(id).value='');
   EQUIPMENT.forEach(cat=>cat.items.forEach(item=>{
     state[item.id]={checked:false,qty:1};
     const chk=document.getElementById('chk-'+item.id); if(chk){chk.checked=false;chk.disabled=false;}
@@ -944,167 +789,79 @@ function clearForm(resetDates=true){
     const badge=document.getElementById('av-'+item.id); if(badge){badge.className='badge idle';badge.textContent='⚪ ยังไม่ตรวจ';}
     updateBadge(cat.id);
   }));
-  availability={}; updateStats(); setAlert('เลือกวันที่ใช้งานและวันที่คืน จากนั้นกด “ตรวจสอบความพร้อมใช้” เพื่อกันชนคิวก่อนส่งคำขอ','info');
+  availability={}; updateStats(); setAlert('เลือกวันที่ใช้งานและวันที่คืน จากนั้นกด "ตรวจสอบความพร้อมใช้" เพื่อกันชนคิวก่อนส่งคำขอ','info');
 }
 
-function renderCalendar(){
-  const grid = document.getElementById('calendar-grid');
-  const title = document.getElementById('month-title');
-  const y = currentMonth.getFullYear(), m = currentMonth.getMonth();
-  title.textContent = currentMonth.toLocaleDateString('th-TH', {month:'long', year:'numeric'});
-
-  const first = new Date(y,m,1);
-  const start = new Date(first);
-  start.setDate(1 - first.getDay());
-
-  const names = ['อา','จ','อ','พ','พฤ','ศ','ส'];
-  let html = names.map(n=>`<div class="day-name">${n}</div>`).join('');
-
-  const records = getCalendarRecords_();
-  const todayIso = new Date().toISOString().slice(0,10);
-
-  for(let i=0;i<42;i++){
-    const d = new Date(start);
-    d.setDate(start.getDate()+i);
-    const iso = d.toISOString().slice(0,10);
-    const dayRecords = records.filter(r=>rangesOverlap(iso, iso, r.date, r.returnDate || r.date));
-
-    const cls = ['day'];
-    if(d.getMonth()!==m) cls.push('muted');
-    if(selectedCalendarDate===iso) cls.push('selected');
-    if(todayIso===iso) cls.push('today');
-    if(dayRecords.some(r=>['approved','borrowed'].includes(r.status))) cls.push('conflict-day');
-    else if(dayRecords.some(r=>r.status==='pending')) cls.push('pending-day');
-
-    html += `<div class="${cls.join(' ')}" onclick="selectCalendarDate('${iso}')" title="${escapeHtml(dayRecords.map(r=>r.event).join(' | '))}">
-      <div class="day-top">
-        <div class="day-num">${d.getDate()}</div>
-        ${dayRecords.length ? `<div class="day-count">📦 ${dayRecords.length}</div>` : ''}
-      </div>
-      <div class="day-events" id="day-events-${iso}"></div>
-    </div>`;
-  }
-
-  grid.innerHTML = html;
-  renderGoogleCalendarEventBars_(records, start);
+// ════════════════════════════════════════════════════════════
+// APPROVAL
+// ════════════════════════════════════════════════════════════
+function renderApproval(){
+  const records = getRecords().filter(r=>r.status==='pending');
+  document.getElementById('approval-list').innerHTML = records.length ? records.map(r=>requestCard(r,'approval')).join('') : '<div class="alert info">ไม่มีคำขอที่รออนุมัติ</div>';
 }
-function getCalendarRecords_(){
-  return getRecords().filter(r=>['pending','approved','borrowed'].includes(r.status));
+function approveRequest(id){
+  if(!requireAdmin('อนุมัติคำขอ')) return;
+  const records=getRecords(); const r=records.find(x=>x.id===id); if(!r) return;
+  // ตรวจชนคิวซ้ำก่อนอนุมัติ
+  const conflicts=[];
+  records.filter(x=>x.id!==id&&['approved','borrowed'].includes(x.status)&&rangesOverlap(r.date,r.returnDate||r.date,x.date,x.returnDate||x.date))
+    .forEach(x=>{ x.items.forEach(xi=>{ if(r.items.some(ri=>ri.name===xi.name)) conflicts.push(xi.name); }); });
+  if(conflicts.length&&!confirm('พบรายการชนคิว: '+[...new Set(conflicts)].join(', ')+'\nต้องการอนุมัติต่อหรือไม่?')) return;
+  r.status='approved'; r.approvedAt=new Date().toISOString();
+  setRecords(records);
+  // FIX 1: เปลี่ยน status อุปกรณ์ใน Sheets เป็น 'borrowed' เฉพาะตอนอนุมัติ
+  postToGoogle({...r, action:'approve'});
+  renderAll(); showToast('✅ อนุมัติคำขอแล้ว — อุปกรณ์ถูกล็อกใน Sheets');
 }
-function renderGoogleCalendarEventBars_(records, calendarStartDate){
-  const maxPerDay = 4;
-  const visibleCountByDay = {};
-  const hiddenCountByDay = {};
-
-  records
-    .slice()
-    .sort((a,b)=>{
-      const aDays = daysBetween_(a.date, a.returnDate || a.date);
-      const bDays = daysBetween_(b.date, b.returnDate || b.date);
-      return bDays - aDays || String(a.event).localeCompare(String(b.event),'th');
-    })
-    .forEach(r=>{
-      const dates = getDatesBetween_(r.date, r.returnDate || r.date);
-      dates.forEach((iso, idx)=>{
-        const container = document.getElementById('day-events-' + iso);
-        if(!container) return;
-
-        visibleCountByDay[iso] = visibleCountByDay[iso] || 0;
-        hiddenCountByDay[iso] = hiddenCountByDay[iso] || 0;
-
-        if(visibleCountByDay[iso] >= maxPerDay) {
-          hiddenCountByDay[iso]++;
-          return;
-        }
-
-        const bar = document.createElement('div');
-        bar.className = 'gcal-event ' + (r.status === 'pending' ? 'pending' : (r.status === 'borrowed' ? 'borrowed' : 'approved'));
-
-        const isFirst = idx === 0;
-        const isMulti = dates.length > 1;
-        const prefix = r.status === 'pending' ? '🟡' : (r.status === 'borrowed' ? '🔴' : '🔵');
-        bar.textContent = isFirst
-          ? `${prefix} ${r.event || 'ไม่ระบุงาน'}${isMulti ? ` (${dates.length} วัน)` : ''}`
-          : `↳ ${r.event || 'ไม่ระบุงาน'}`;
-
-        bar.title = `${r.event || '-'}
-ผู้ขอยืม: ${r.user || '-'}
-วันที่: ${r.date} - ${r.returnDate || r.date}
-สถานะ: ${(STATUS_LABEL[r.status] || [''])[0]}`;
-        bar.onclick = (ev) => {
-          ev.stopPropagation();
-          selectCalendarDate(iso);
-          focusRequestInDayDetail_(r.id);
-        };
-        container.appendChild(bar);
-        visibleCountByDay[iso]++;
-      });
-    });
-
-  Object.keys(hiddenCountByDay).forEach(iso=>{
-    const container = document.getElementById('day-events-' + iso);
-    if(!container || !hiddenCountByDay[iso]) return;
-    const more = document.createElement('div');
-    more.className = 'gcal-more';
-    more.textContent = `+${hiddenCountByDay[iso]} more`;
-    more.onclick = (ev) => {
-      ev.stopPropagation();
-      selectCalendarDate(iso);
-    };
-    container.appendChild(more);
-  });
+function rejectRequest(id){
+  if(!requireAdmin('ไม่อนุมัติคำขอ')) return;
+  const reason=prompt('ระบุเหตุผลที่ไม่อนุมัติ (ถ้ามี)','อุปกรณ์ไม่พร้อมใช้งาน / ชนคิว');
+  const records=getRecords(); const r=records.find(x=>x.id===id); if(!r) return;
+  r.status='rejected'; r.rejectedAt=new Date().toISOString(); r.rejectReason=reason||'';
+  setRecords(records); postToGoogle({...r, action:'reject'});
+  renderAll(); showToast('❌ ไม่อนุมัติคำขอแล้ว');
 }
-function getDatesBetween_(startIso, endIso){
-  const dates = [];
-  const d = new Date(startIso);
-  const end = new Date(endIso || startIso);
-  while(d <= end){
-    dates.push(d.toISOString().slice(0,10));
-    d.setDate(d.getDate()+1);
-  }
-  return dates;
-}
-function daysBetween_(startIso, endIso){
-  return getDatesBetween_(startIso, endIso).length;
-}
-function focusRequestInDayDetail_(id){
-  setTimeout(()=>{
-    const el = document.getElementById('req-' + id);
-    if(el) {
-      el.scrollIntoView({behavior:'smooth', block:'center'});
-      el.style.boxShadow = '0 0 0 3px rgba(0,107,63,.25), var(--shadow-soft)';
-      setTimeout(()=>{ el.style.boxShadow = 'var(--shadow-soft)'; }, 1600);
-    }
-  }, 80);
-}
-function selectCalendarDate(iso){
-  selectedCalendarDate = iso; renderCalendar(); renderDayDetail(iso);
-}
-function renderDayDetail(iso){
-  document.getElementById('selected-date-label').textContent = new Date(iso).toLocaleDateString('th-TH');
-  const records = getRecords().filter(r=>['pending','approved','borrowed'].includes(r.status) && rangesOverlap(iso, iso, r.date, r.returnDate || r.date));
-  const box = document.getElementById('day-detail');
-  if(records.length===0) {box.innerHTML = '<div class="alert info">วันนี้ยังไม่มีรายการจองหรือยืมอุปกรณ์</div>';return;}
-  box.innerHTML = records.map(requestCard).join('');
-}
-function moveMonth(n){currentMonth.setMonth(currentMonth.getMonth()+n);renderCalendar();}
-function goToday(){currentMonth = new Date(); selectedCalendarDate = new Date().toISOString().slice(0,10); renderCalendar(); renderDayDetail(selectedCalendarDate);}
 
-function requestCard(r, mode='view'){
-  const sl = STATUS_LABEL[r.status] || ['ไม่ทราบสถานะ','idle'];
-  const actions = mode==='approval' && r.status==='pending' ? `
-    <div class="btn-row">
-      <button class="btn success" onclick="approveRequest('${r.id}')">✅ อนุมัติ</button>
-      <button class="btn danger" onclick="rejectRequest('${r.id}')">❌ ไม่อนุมัติ</button>
-      <button class="btn" onclick="printRequest('${r.id}')">🖨️ พิมพ์ใบยืม</button>
-    </div>` : mode==='return' ? `
-    <div class="btn-row"><button class="btn success" onclick="markReturned('${r.id}')">↩️ ยืนยันคืนอุปกรณ์</button><button class="btn" onclick="printRequest('${r.id}')">🖨️ พิมพ์</button></div>` : `
-    <div class="btn-row"><button class="btn" onclick="printRequest('${r.id}')">🖨️ พิมพ์</button></div>`;
+// ════════════════════════════════════════════════════════════
+// RETURN
+// ════════════════════════════════════════════════════════════
+function renderReturnList(){
+  const records=getRecords().filter(r=>['approved','borrowed'].includes(r.status));
+  document.getElementById('return-list').innerHTML = records.length ? records.map(r=>requestCard(r,'return')).join('') : '<div class="alert info">ไม่มีรายการที่รอคืนอุปกรณ์</div>';
+}
+function markReturned(id){
+  if(!requireAdmin('ยืนยันคืนอุปกรณ์')) return;
+  const returnedBy=prompt('ชื่อผู้คืน / ผู้รับคืน','เจ้าหน้าที่'); if(returnedBy===null) return;
+  const records=getRecords(); const r=records.find(x=>x.id===id); if(!r) return;
+  r.status='returned'; r.returnedAt=new Date().toISOString(); r.returnedBy=returnedBy||'';
+  setRecords(records);
+  postToGoogle({...r, action:'return', returnedBy:r.returnedBy, items:r.items.map(i=>i.name)});
+  renderAll(); showToast('✅ บันทึกการคืนอุปกรณ์แล้ว — สถานะใน Sheets กลับเป็น available');
+}
+
+// ════════════════════════════════════════════════════════════
+// HISTORY + REQUEST CARD
+// ════════════════════════════════════════════════════════════
+function renderHistory(){
+  const records=getRecords();
+  document.getElementById('history-list').innerHTML = records.length ? records.map(r=>requestCard(r,'history')).join('') : '<div class="alert info">ยังไม่มีรายการ</div>';
+}
+function requestCard(r, mode=''){
+  const sl = STATUS_LABEL[r.status] || ['',''];
+  const actions = mode==='approval'
+    ? `<div class="btn-row">
+         <button class="btn success" onclick="approveRequest('${r.id}')">✅ อนุมัติ</button>
+         <button class="btn danger"  onclick="rejectRequest('${r.id}')">❌ ไม่อนุมัติ</button>
+         <button class="btn"         onclick="printRequest('${r.id}')">🖨️ พิมพ์ใบยืม</button>
+       </div>`
+    : mode==='return'
+    ? `<div class="btn-row"><button class="btn success" onclick="markReturned('${r.id}')">↩️ ยืนยันคืนอุปกรณ์</button><button class="btn" onclick="printRequest('${r.id}')">🖨️ พิมพ์</button></div>`
+    : `<div class="btn-row"><button class="btn" onclick="printRequest('${r.id}')">🖨️ พิมพ์</button></div>`;
   return `<div class="request-card" id="req-${r.id}">
     <div class="request-top">
       <div>
         <div class="request-title">${escapeHtml(r.event)}</div>
-        <div class="request-meta">👤 ${escapeHtml(r.user)} · 📅 ${r.date} → ${r.returnDate || r.date}<br>🕒 ส่งคำขอ: ${formatDateTime(r.savedAt)} ${r.note?` · 📝 ${escapeHtml(r.note)}`:''}</div>
+        <div class="request-meta">👤 ${escapeHtml(r.user)} · 📅 ${r.date} → ${r.returnDate||r.date}<br>🕒 ส่งคำขอ: ${formatDateTime(r.savedAt)} ${r.note?` · 📝 ${escapeHtml(r.note)}`:''}</div>
       </div>
       <span class="badge ${sl[1]}">${sl[0]}</span>
     </div>
@@ -1112,138 +869,119 @@ function requestCard(r, mode='view'){
     ${actions}
   </div>`;
 }
-function renderApproval(){
-  const records = getRecords().filter(r=>r.status==='pending');
-  document.getElementById('approval-list').innerHTML = records.length ? records.map(r=>requestCard(r,'approval')).join('') : '<div class="alert info">ไม่มีคำขอที่รออนุมัติ</div>';
-}
-function approveRequest(id){
-  if(!requireAdmin('อนุมัติคำขอ')) return;
-  const records = getRecords();
-  const r = records.find(x=>x.id===id); if(!r) return;
-  // Final conflict check: approved/borrowed records only, excluding this record
-  const conflicts = [];
-  records.filter(x=>x.id!==id && ['approved','borrowed'].includes(x.status) && rangesOverlap(r.date,r.returnDate||r.date,x.date,x.returnDate||x.date)).forEach(x=>{
-    x.items.forEach(xi=>{ if(r.items.some(ri=>ri.name===xi.name)) conflicts.push(xi.name); });
-  });
-  if(conflicts.length && !confirm('พบรายการชนคิว: '+[...new Set(conflicts)].join(', ')+'\nต้องการอนุมัติต่อหรือไม่?')) return;
-  r.status = 'approved';
-  r.approvedAt = new Date().toISOString();
-  setRecords(records); postToGoogle({...r,action:'approve'});
-  renderAll(); showToast('✅ อนุมัติคำขอแล้ว');
-}
-function rejectRequest(id){
-  if(!requireAdmin('ไม่อนุมัติคำขอ')) return;
-  const reason = prompt('ระบุเหตุผลที่ไม่อนุมัติ (ถ้ามี)','อุปกรณ์ไม่พร้อมใช้งาน / ชนคิว');
-  const records = getRecords(); const r = records.find(x=>x.id===id); if(!r) return;
-  r.status='rejected'; r.rejectedAt=new Date().toISOString(); r.rejectReason=reason||'';
-  setRecords(records); postToGoogle({...r,action:'reject'});
-  renderAll(); showToast('❌ ไม่อนุมัติคำขอแล้ว');
-}
-async function renderReturnList(){
-  const records = getRecords().filter(r=>['approved','borrowed'].includes(r.status));
-  const el = document.getElementById('return-list');
-  el.innerHTML = records.length ? records.map(r=>requestCard(r,'return')).join('') : '<div class="alert info">ไม่มีรายการที่รอคืนอุปกรณ์</div>';
 
-  // ถ้ามี Apps Script URL → ลองดึงข้อมูล borrowed_list จาก Sheet เพิ่มเติม
-  const scriptUrl = localStorage.getItem('script_url');
-  if(!scriptUrl) return;
-  try {
-    const res  = await fetch(scriptUrl + '?action=borrowed_list');
-    const json = await res.json();
-    if(json.success && json.items && json.items.length > 0) {
-      const pill = document.createElement('div');
-      pill.className = 'alert info';
-      pill.style.marginBottom = '10px';
-      pill.innerHTML = `📊 <strong>ข้อมูลจาก Google Sheet:</strong> พบอุปกรณ์ที่ถูกยืมอยู่ ${json.items.length} รายการใน Sheet สถานะอุปกรณ์`;
-      el.insertBefore(pill, el.firstChild);
-    }
-  } catch(e) { /* ไม่มี internet หรือ Script ยังไม่ deploy → ข้ามไป */ }
-}
-function markReturned(id){
-  if(!requireAdmin('ยืนยันคืนอุปกรณ์')) return;
-  const returnedBy = prompt('ชื่อผู้คืน / ผู้รับคืน','เจ้าหน้าที่');
-  if(returnedBy===null) return;
-  const records = getRecords(); const r = records.find(x=>x.id===id); if(!r) return;
-  r.status='returned'; r.returnedAt=new Date().toISOString(); r.returnedBy=returnedBy||'';
-  setRecords(records); postToGoogle({...r, action:'return', returnedBy:r.returnedBy, items:r.items.map(i=>i.name)});
-  renderAll(); showToast('✅ บันทึกการคืนอุปกรณ์แล้ว');
-}
-function renderHistory(){
-  const records = getRecords();
-  document.getElementById('history-list').innerHTML = records.length ? records.map(r=>requestCard(r,'history')).join('') : '<div class="alert info">ยังไม่มีรายการ</div>';
-}
 function clearDemoData(){
   if(!confirm('ต้องการล้างข้อมูลทั้งหมดในเครื่องนี้หรือไม่?')) return;
   localStorage.removeItem('university_equipment_requests');
   localStorage.removeItem('university_equipment_seeded');
-  setRecords([]);
-  renderAll(); showToast('ล้างข้อมูลแล้ว');
+  setRecords([]); renderAll(); showToast('ล้างข้อมูลแล้ว');
 }
+
+// ════════════════════════════════════════════════════════════
+// FIX 4: syncFromGoogle — ใช้ action=requests ที่มีใน Code.gs แล้ว
+// ════════════════════════════════════════════════════════════
 async function syncFromGoogle(){
   const scriptUrl = localStorage.getItem('script_url');
-  if(!scriptUrl) {showToast('⚠️ ยังไม่ได้ตั้งค่า Apps Script URL');return;}
-  showToast('กำลังโหลดข้อมูลจาก Google Sheets...');
+  if(!scriptUrl){showToast('⚠️ ยังไม่ได้ตั้งค่า Apps Script URL');return;}
+  showToast('⏳ กำลังซิงก์จาก Google Sheets...');
   try {
     const res  = await fetch(scriptUrl + '?action=requests');
     const json = await res.json();
-    if(json.success && Array.isArray(json.items)) {
-      // map Sheet columns → HTML record format
-      const mapped = json.items.map(row => {
-        // ถ้า Apps Script คืนมาเป็น object ที่มี key ชื่อ header ภาษาไทย → แปลง
-        if(row['รหัสรายการ'] !== undefined) {
-          return {
-            id:         row['รหัสรายการ']       || '',
-            savedAt:    row['วันที่บันทึก']      || new Date().toISOString(),
-            user:       row['ชื่อผู้ยืม']        || '',
-            event:      row['ชื่องาน / กิจกรรม'] || '',
-            date:       row['วันที่ใช้งาน']      || '',
-            returnDate: row['วันที่คืน']         || '',
-            note:       row['หมายเหตุ']          || '',
-            status:     row['สถานะ']             || 'pending',
-            items:[{
-              cat:  row['หมวดหมู่']    || '',
-              name: row['ชื่ออุปกรณ์'] || '',
-              qty:  Number(row['จำนวน (ชิ้น)']) || 1
-            }]
-          };
-        }
-        // ถ้าเป็น format ใหม่ (Apps Script คืน object ตรง) → ใช้ได้เลย
-        return row;
-      });
-      // รวมแถวที่มี id เดียวกันให้เป็น record เดียว (items[])
-      const byId = {};
-      mapped.forEach(r => {
-        if(!r.id) return;
-        if(!byId[r.id]) {
-          byId[r.id] = {...r, items: [...(r.items||[])]};
-        } else {
-          byId[r.id].items.push(...(r.items||[]));
-        }
-      });
-      const merged = Object.values(byId);
-      if(merged.length) {
-        setRecords(merged);
-        renderAll();
-        showToast(`✅ ซิงก์สำเร็จ ${merged.length} รายการ`);
-      } else {
-        showToast('⚠️ ไม่พบข้อมูลใน Google Sheets');
-      }
+    if(json.success && Array.isArray(json.items)){
+      setRecords(json.items); renderAll();
+      showToast('✅ ซิงก์สำเร็จ — โหลด '+json.items.length+' รายการ');
     } else {
-      showToast('⚠️ Apps Script ยังไม่รองรับ action=requests — ดู README ใน .gs');
+      showToast('⚠️ ไม่พบข้อมูลจาก Sheets: ' + (json.error || 'ไม่ทราบสาเหตุ'));
     }
-  } catch(e) {
-    showToast('⚠️ ไม่สามารถซิงก์ได้: ' + e.message);
-  }
+  } catch(e){ showToast('⚠️ ไม่สามารถซิงก์ได้: ' + e.message); }
 }
+
+// ════════════════════════════════════════════════════════════
+// CALENDAR
+// ════════════════════════════════════════════════════════════
+function renderCalendar(){
+  const grid=document.getElementById('calendar-grid');
+  const title=document.getElementById('month-title');
+  const y=currentMonth.getFullYear(), m=currentMonth.getMonth();
+  title.textContent = currentMonth.toLocaleDateString('th-TH',{month:'long',year:'numeric'});
+  const first=new Date(y,m,1);
+  const start=new Date(first); start.setDate(1-first.getDay());
+  const names=['อา','จ','อ','พ','พฤ','ศ','ส'];
+  let html=names.map(n=>`<div class="day-name">${n}</div>`).join('');
+  const records=getCalendarRecords_();
+  const todayIso=new Date().toISOString().slice(0,10);
+  for(let i=0;i<42;i++){
+    const d=new Date(start); d.setDate(start.getDate()+i);
+    const iso=d.toISOString().slice(0,10);
+    const dayRecs=records.filter(r=>rangesOverlap(iso,iso,r.date,r.returnDate||r.date));
+    const cls=['day'];
+    if(d.getMonth()!==m) cls.push('muted');
+    if(selectedCalendarDate===iso) cls.push('selected');
+    if(todayIso===iso) cls.push('today');
+    if(dayRecs.some(r=>['approved','borrowed'].includes(r.status))) cls.push('conflict-day');
+    else if(dayRecs.some(r=>r.status==='pending')) cls.push('pending-day');
+    html+=`<div class="${cls.join(' ')}" onclick="selectCalendarDate('${iso}')" title="${escapeHtml(dayRecs.map(r=>r.event).join(' | '))}">
+      <div class="day-top"><div class="day-num">${d.getDate()}</div>${dayRecs.length?`<div class="day-count">📦 ${dayRecs.length}</div>`:''}</div>
+      <div class="day-events" id="day-events-${iso}"></div></div>`;
+  }
+  grid.innerHTML=html;
+  renderGoogleCalendarEventBars_(records, start);
+}
+function getCalendarRecords_(){ return getRecords().filter(r=>['pending','approved','borrowed'].includes(r.status)); }
+function renderGoogleCalendarEventBars_(records, calendarStartDate){
+  const maxPerDay=4; const vis={}, hid={};
+  records.slice().sort((a,b)=>{
+    const ad=daysBetween_(a.date,a.returnDate||a.date), bd=daysBetween_(b.date,b.returnDate||b.date);
+    return bd-ad||String(a.event).localeCompare(String(b.event),'th');
+  }).forEach(r=>{
+    getDatesBetween_(r.date,r.returnDate||r.date).forEach((iso,idx)=>{
+      const container=document.getElementById('day-events-'+iso); if(!container) return;
+      vis[iso]=vis[iso]||0; hid[iso]=hid[iso]||0;
+      if(vis[iso]>=maxPerDay){hid[iso]++;return;}
+      const bar=document.createElement('div');
+      bar.className='gcal-event '+(r.status==='pending'?'pending':(r.status==='borrowed'?'borrowed':'approved'));
+      const isFirst=idx===0, isMulti=getDatesBetween_(r.date,r.returnDate||r.date).length>1;
+      const pfx=r.status==='pending'?'🟡':(r.status==='borrowed'?'🔴':'🔵');
+      bar.textContent=isFirst?`${pfx} ${r.event||'ไม่ระบุงาน'}${isMulti?` (${daysBetween_(r.date,r.returnDate||r.date)} วัน)`:''}`:`↳ ${r.event||'ไม่ระบุงาน'}`;
+      bar.title=`${r.event||'-'}\nผู้ขอยืม: ${r.user||'-'}\nวันที่: ${r.date} - ${r.returnDate||r.date}\nสถานะ: ${(STATUS_LABEL[r.status]||[''])[0]}`;
+      bar.onclick=ev=>{ev.stopPropagation();selectCalendarDate(iso);focusRequestInDayDetail_(r.id);};
+      container.appendChild(bar); vis[iso]++;
+    });
+  });
+  Object.keys(hid).forEach(iso=>{
+    const container=document.getElementById('day-events-'+iso); if(!container||!hid[iso]) return;
+    const more=document.createElement('div'); more.className='gcal-more'; more.textContent=`+${hid[iso]} more`;
+    more.onclick=ev=>{ev.stopPropagation();selectCalendarDate(iso);}; container.appendChild(more);
+  });
+}
+function getDatesBetween_(startIso,endIso){ const dates=[],d=new Date(startIso),end=new Date(endIso||startIso); while(d<=end){dates.push(d.toISOString().slice(0,10));d.setDate(d.getDate()+1);} return dates; }
+function daysBetween_(startIso,endIso){ return getDatesBetween_(startIso,endIso).length; }
+function focusRequestInDayDetail_(id){
+  setTimeout(()=>{const el=document.getElementById('req-'+id); if(el){el.scrollIntoView({behavior:'smooth',block:'center'});el.style.boxShadow='0 0 0 3px rgba(0,107,63,.25), var(--shadow-soft)';setTimeout(()=>{el.style.boxShadow='var(--shadow-soft)';},1600);}},80);
+}
+function selectCalendarDate(iso){ selectedCalendarDate=iso; renderCalendar(); renderDayDetail(iso); }
+function renderDayDetail(iso){
+  document.getElementById('selected-date-label').textContent=new Date(iso).toLocaleDateString('th-TH');
+  const records=getRecords().filter(r=>['pending','approved','borrowed'].includes(r.status)&&rangesOverlap(iso,iso,r.date,r.returnDate||r.date));
+  const box=document.getElementById('day-detail');
+  if(records.length===0){box.innerHTML='<div class="alert info">วันนี้ยังไม่มีรายการจองหรือยืมอุปกรณ์</div>';return;}
+  box.innerHTML=records.map(requestCard).join('');
+}
+function moveMonth(n){ currentMonth.setMonth(currentMonth.getMonth()+n); renderCalendar(); }
+function goToday(){ currentMonth=new Date(); renderCalendar(); }
+
+// ════════════════════════════════════════════════════════════
+// PRINT
+// ════════════════════════════════════════════════════════════
 function printRequest(id){
-  const r = getRecords().find(x=>x.id===id); if(!r) return;
-  const sl = STATUS_LABEL[r.status] || ['',''];
-  const html = `<div style="font-family:Sarabun,sans-serif">
+  const r=getRecords().find(x=>x.id===id); if(!r) return;
+  const sl=STATUS_LABEL[r.status]||['',''];
+  const html=`<div style="font-family:Sarabun,sans-serif">
     <h2 style="text-align:center;margin-bottom:4px">ใบคำขอยืมอุปกรณ์</h2>
     <div style="text-align:center;color:#666;margin-bottom:18px">University Equipment Booking System</div>
     <table style="width:100%;border-collapse:collapse;margin-bottom:14px">
       <tr><td style="border:1px solid #ddd;padding:8px"><strong>ผู้ขอยืม</strong><br>${escapeHtml(r.user)}</td><td style="border:1px solid #ddd;padding:8px"><strong>งาน/กิจกรรม</strong><br>${escapeHtml(r.event)}</td></tr>
-      <tr><td style="border:1px solid #ddd;padding:8px"><strong>วันที่ใช้</strong><br>${r.date}</td><td style="border:1px solid #ddd;padding:8px"><strong>วันที่คืน</strong><br>${r.returnDate || r.date}</td></tr>
+      <tr><td style="border:1px solid #ddd;padding:8px"><strong>วันที่ใช้</strong><br>${r.date}</td><td style="border:1px solid #ddd;padding:8px"><strong>วันที่คืน</strong><br>${r.returnDate||r.date}</td></tr>
       <tr><td colspan="2" style="border:1px solid #ddd;padding:8px"><strong>สถานะ</strong><br>${sl[0]}</td></tr>
     </table>
     <table style="width:100%;border-collapse:collapse">
@@ -1253,20 +991,23 @@ function printRequest(id){
     <div style="margin-top:34px;display:grid;grid-template-columns:1fr 1fr;gap:40px;text-align:center">
       <div>ลงชื่อผู้ขอยืม<br><br>........................................</div>
       <div>ลงชื่อเจ้าหน้าที่<br><br>........................................</div>
-    </div>
-  </div>`;
-  const pa = document.getElementById('print-area'); pa.innerHTML = html; window.print();
+    </div></div>`;
+  const pa=document.getElementById('print-area'); pa.innerHTML=html; window.print();
 }
+
+// ════════════════════════════════════════════════════════════
+// TABS / UTILS
+// ════════════════════════════════════════════════════════════
 function showTab(name){
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('panel-'+name).classList.add('active');
-  const idx = ['request','calendar','approval','return','history','guide'].indexOf(name);
+  const idx=['request','calendar','approval','return','history','guide'].indexOf(name);
   document.querySelectorAll('.tab-btn')[idx]?.classList.add('active');
   if(name==='calendar') renderCalendar();
   if(name==='approval') renderApproval();
-  if(name==='return') renderReturnList();
-  if(name==='history') renderHistory();
+  if(name==='return')   renderReturnList();
+  if(name==='history')  renderHistory();
 }
 function saveScriptUrl(){
   const val=document.getElementById('scriptUrl').value.trim();
@@ -1276,35 +1017,24 @@ function saveScriptUrl(){
   else if(val){st.textContent='⚠️ URL ควรขึ้นต้นด้วย https://script.google.com';st.style.color='var(--red)';}
   else{st.textContent='ยังไม่ได้ตั้งค่า';st.style.color='var(--muted)';}
 }
-function renderAll(){
-  renderCalendar(); renderApproval(); renderReturnList(); renderHistory(); updateHeaderStats(); renderAdminStatus();
-}
-function updateHeaderStats(){
-  const r=getRecords();
-  const pending=r.filter(x=>x.status==='pending').length;
-  const approved=r.filter(x=>['approved','borrowed'].includes(x.status)).length;
-}
-function showToast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.style.display='block';
-  clearTimeout(window.toastTimer);
-  window.toastTimer=setTimeout(()=>t.style.display='none',3500);
-}
-function escapeHtml(s){
-  return String(s||'').replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
-}
-function formatDateTime(s){
-  if(!s) return '-';
-  try{return new Date(s).toLocaleString('th-TH');}catch(e){return s;}
-}
+function renderAll(){ renderCalendar();renderApproval();renderReturnList();renderHistory();updateHeaderStats();renderAdminStatus(); }
+function showToast(msg){ const t=document.getElementById('toast');t.textContent=msg;t.style.display='block';clearTimeout(window._toast);window._toast=setTimeout(()=>t.style.display='none',3500); }
+function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m])); }
+function formatDateTime(s){ if(!s) return '-'; try{return new Date(s).toLocaleString('th-TH');}catch(e){return s;} }
 
+// ════════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════════
 buildSections();
 renderAll();
 
-// Keep original hardcoded Apps Script URL if available
-const DEFAULT_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzjqableak_Hil82kQbUA2uwsBJLJb2kkumlnL3JE6GFPtSqeBXoL0lDQ9PY5XlW6FiCw/exec';
-if(!localStorage.getItem('script_url')) localStorage.setItem('script_url', DEFAULT_SCRIPT_URL);
-document.getElementById('scriptUrl').value = localStorage.getItem('script_url') || '';
+// FIX 1: ใช้ URL ที่ถูกต้อง (deploy ปัจจุบัน)
+const CORRECT_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwSG-01VDFYl9qU0NlVdJYG6O0WQx4f6xdsOiUeNRdlOgdRvl12jJRbMIqHue8RUmnukQ/exec';
+if(!localStorage.getItem('script_url') || localStorage.getItem('script_url').includes('AKfycbzjqab')) {
+  // override URL เก่าที่ผิดด้วย URL ปัจจุบัน
+  localStorage.setItem('script_url', CORRECT_SCRIPT_URL);
+}
+document.getElementById('scriptUrl').value = localStorage.getItem('script_url');
 saveScriptUrl();
 renderAdminStatus();
 const adminInput = document.getElementById('adminKeySetting');
