@@ -484,6 +484,22 @@ body{font-family:'Sarabun','Segoe UI',sans-serif;background:linear-gradient(180d
       <div class="alert warn" style="margin-top:12px">ค่าเริ่มต้น Admin key: <strong>KU-ADMIN-2569</strong></div>
     </div>
   </div>
+  <!-- ล้างข้อมูลในเครื่อง -->
+  <div class="card" style="border:2px solid #fca5a5">
+    <div class="card-header" style="background:#fef2f2;color:#b91c1c">🗑 ล้างข้อมูลในเครื่อง (localStorage)</div>
+    <div class="card-body">
+      <div class="alert danger">
+        ข้อมูลรายการคำขอทั้งหมดในเบราว์เซอร์นี้จะถูกลบ<br>
+        <strong>ข้อมูลใน Google Sheets จะไม่ถูกกระทบ</strong>
+      </div>
+      <div class="btn-row" style="margin-top:8px">
+        <button class="btn danger lg full" onclick="hardClearAll()" style="font-size:15px;padding:14px">
+          🗑 ล้างข้อมูลในเครื่องทั้งหมด
+        </button>
+      </div>
+    </div>
+  </div>
+
   <div class="card">
     <div class="card-header">🧭 Flow การทำงานของระบบ</div>
     <div class="card-body">
@@ -1099,7 +1115,25 @@ function renderHistory(){
   const r=getRecords();
   document.getElementById('history-list').innerHTML=r.length?r.map(x=>requestCard(x,'history')).join(''):'<div class="alert info">ยังไม่มีรายการ</div>';
 }
-function clearAllLocal(){
+function hardClearAll(){
+  // แสดง dialog ยืนยัน
+  const ok = confirm('⚠️ ยืนยันการล้างข้อมูลทั้งหมดในเบราว์เซอร์นี้?\n\nรายการคำขอยืมทั้งหมดในเครื่องจะถูกลบ\n(ข้อมูลใน Google Sheets จะไม่ถูกกระทบ)');
+  if(!ok) return;
+  // ล้าง keys ที่เกี่ยวข้องทั้งหมด
+  const keys = Object.keys(localStorage).filter(k =>
+    k.startsWith('university_equipment') || k === 'script_url'
+  );
+  // เก็บ script_url และ admin_key ไว้
+  const savedUrl      = localStorage.getItem('script_url');
+  const savedAdminKey = localStorage.getItem('equipment_admin_key');
+  localStorage.clear();
+  if(savedUrl)      localStorage.setItem('script_url', savedUrl);
+  if(savedAdminKey) localStorage.setItem('equipment_admin_key', savedAdminKey);
+  sessionStorage.clear();
+  showToast('✅ ล้างข้อมูลในเครื่องเรียบร้อยแล้ว — กำลัง reload...');
+  setTimeout(() => location.reload(), 1200);
+}
+
   if(!confirm('ล้างข้อมูลทั้งหมดในเครื่องนี้?')) return;
   localStorage.removeItem('university_equipment_requests');
   localStorage.removeItem('university_equipment_seeded');
