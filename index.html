@@ -771,40 +771,48 @@ function selectedItems(){
 // ════════════════════════════════════════════════
 // STEP 2: ตรวจสอบความพร้อมใช้
 // ════════════════════════════════════════════════
+// เก็บ items ปัจจุบันใน global เพื่อหลีกเลี่ยงปัญหา escaping ใน onclick
+let _checkItems = [];
+
 function buildCheckTable(items){
-  checkResults={};
-  items.forEach(it=>{
-    if(!checkResults[it.name]) checkResults[it.name]={status:'',note:''};
-  });
+  _checkItems = items;
+  checkResults = {};
+  items.forEach(it => { checkResults[it.name] = {status:'', note:''}; });
 
-  const wrap=document.getElementById('check-table-wrap');
-  if(!items.length){wrap.innerHTML='<div class="alert info" style="margin:16px">กลับไปขั้นที่ 1 เพื่อเลือกอุปกรณ์</div>';return;}
+  const wrap = document.getElementById('check-table-wrap');
+  if(!items.length){
+    wrap.innerHTML = '<div class="alert info" style="margin:16px">กลับไปขั้นที่ 1 เพื่อเลือกอุปกรณ์</div>';
+    return;
+  }
 
-  let rows=items.map((it,i)=>{
-    const catColor=getCatColor(it.cat);
-    const conflictTag=calendarAvailability[it.name]?`<span class="check-calendar-conflict">⚠️ ชนคิว</span>`:'';
-    return `<tr id="chkrow-${i}" class="">
+  // ใช้ data-idx แทนการส่งชื่อโดยตรงใน onclick (หลีกเลี่ยง escaping issues)
+  const rows = items.map((it, i) => {
+    const catColor   = getCatColor(it.cat);
+    const conflictTag = calendarAvailability[it.name]
+      ? '<span class="check-calendar-conflict">⚠️ ชนคิว</span>' : '';
+    return `<tr id="chkrow-${i}">
       <td>${i+1}</td>
       <td>
-        <div class="check-item-name">${escHtml(it.name)}${conflictTag}</div>
+        <div class="check-item-name">${escHtml(it.name)} ${conflictTag}</div>
         <div class="check-item-cat" style="background:${catColor};display:inline-block;padding:1px 7px;border-radius:5px;color:#fff;margin-top:3px">${escHtml(it.cat)}</div>
         <span style="font-size:12px;color:var(--muted);margin-left:8px">จำนวน: ${it.qty} ชิ้น</span>
       </td>
       <td>
         <div class="check-radio-group">
-          <div class="radio-btn" id="rbOk-${i}" onclick="setCheckStatus(${i},'ok','${escHtml(it.name).replace(/'/g,"\\'")}')">✅ ปกติ</div>
-          <div class="radio-btn" id="rbNotok-${i}" onclick="setCheckStatus(${i},'notok','${escHtml(it.name).replace(/'/g,"\\'")}')">❌ ไม่พร้อม</div>
+          <div class="radio-btn" id="rbOk-${i}"   data-idx="${i}" data-status="ok"    onclick="handleCheck(this)">✅ ปกติ</div>
+          <div class="radio-btn" id="rbNotok-${i}" data-idx="${i}" data-status="notok" onclick="handleCheck(this)">❌ ไม่พร้อม</div>
         </div>
       </td>
-      <td><input class="check-note-input" id="cknote-${i}" placeholder="ข้อเสนอแนะ / แก้ไข..." onchange="setCheckNote(${i},'${escHtml(it.name).replace(/'/g,"\\'")}',this.value)"></td>
+      <td><input class="check-note-input" id="cknote-${i}" data-idx="${i}"
+        placeholder="ข้อเสนอแนะ / แก้ไข..." oninput="handleCheckNote(this)"></td>
     </tr>`;
   }).join('');
 
-  wrap.innerHTML=`<table class="check-table">
+  wrap.innerHTML = `<table class="check-table">
     <thead><tr>
       <th style="width:40px">#</th>
       <th>อุปกรณ์</th>
-      <th style="width:200px;text-align:center">ผลตรวจสอบ</th>
+      <th style="width:210px;text-align:center">ผลตรวจสอบ</th>
       <th style="width:240px">ข้อเสนอแนะ / แก้ไข</th>
     </tr></thead>
     <tbody>${rows}</tbody>
@@ -812,26 +820,39 @@ function buildCheckTable(items){
   updateCheckSummary();
 }
 
-function setCheckStatus(rowIdx,status,itemName){
-  checkResults[itemName]=checkResults[itemName]||{status:'',note:''};
-  checkResults[itemName].status=status;
-  // อัปเดต UI
-  const ok=document.getElementById('rbOk-'+rowIdx);
-  const no=document.getElementById('rbNotok-'+rowIdx);
-  const row=document.getElementById('chkrow-'+rowIdx);
-  if(status==='ok'){
-    ok.className='radio-btn selected-ok';no.className='radio-btn';
-    row.className='ready-row';
+// Handler: ปุ่ม ปกติ / ไม่พร้อม
+function handleCheck(el){
+  const i      = parseInt(el.dataset.idx);
+  const status = el.dataset.status;
+  const name   = _checkItems[i]?.name;
+  if(!name) return;
+  checkResults[name] = checkResults[name] || {status:'', note:''};
+  checkResults[name].status = status;
+
+  const okBtn  = document.getElementById('rbOk-'+i);
+  const noBtn  = document.getElementById('rbNotok-'+i);
+  const row    = document.getElementById('chkrow-'+i);
+  if(status === 'ok'){
+    okBtn.className = 'radio-btn selected-ok';
+    noBtn.className = 'radio-btn';
+    row.className   = 'ready-row';
   } else {
-    no.className='radio-btn selected-notok';ok.className='radio-btn';
-    row.className='notready-row';
+    noBtn.className = 'radio-btn selected-notok';
+    okBtn.className = 'radio-btn';
+    row.className   = 'notready-row';
   }
   updateCheckSummary();
 }
-function setCheckNote(rowIdx,itemName,val){
-  checkResults[itemName]=checkResults[itemName]||{status:'',note:''};
-  checkResults[itemName].note=val;
+
+// Handler: ช่องหมายเหตุ
+function handleCheckNote(el){
+  const i    = parseInt(el.dataset.idx);
+  const name = _checkItems[i]?.name;
+  if(!name) return;
+  checkResults[name] = checkResults[name] || {status:'', note:''};
+  checkResults[name].note = el.value;
 }
+
 function updateCheckSummary(){
   const vals=Object.values(checkResults);
   const total=vals.length;
