@@ -1177,6 +1177,7 @@ function hardClearAll(){
   setTimeout(() => location.reload(), 1200);
 }
 
+function clearAllLocal(){
   if(!confirm('ล้างข้อมูลทั้งหมดในเครื่องนี้?')) return;
   localStorage.removeItem('university_equipment_requests');
   localStorage.removeItem('university_equipment_seeded');
