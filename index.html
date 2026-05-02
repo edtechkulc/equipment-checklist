@@ -279,7 +279,7 @@ body{font-family:'Sarabun','Segoe UI',sans-serif;background:linear-gradient(180d
               <input class="form-control" type="date" id="useDate">
             </div>
             <div class="form-group">
-              <label class="form-label">วันที่คืนอุปกรณ์ *</label>
+              <label class="form-label">วันที่คืนอุปกรณ์ (ถ้าไม่ระบุใช้วันเดียวกับวันใช้งาน)</label>
               <input class="form-control" type="date" id="returnDate">
             </div>
             <div class="form-group span2">
@@ -736,28 +736,50 @@ function selectAllVisible(){
 // STEP 1 → STEP 2
 // ════════════════════════════════════════════════
 function goToStep2(){
-  const user=document.getElementById('userName').value.trim();
-  const event=document.getElementById('eventName').value.trim();
-  const date=document.getElementById('useDate').value;
-  const rdate=document.getElementById('returnDate').value;
-  if(!user||!event||!date){
-    document.getElementById('step1-alert').className='alert danger';
-    document.getElementById('step1-alert').textContent='⚠️ กรุณากรอกชื่อผู้ขอยืม ชื่องาน และวันที่ใช้งานให้ครบ';
-    return;
+  try {
+    const user  = document.getElementById('userName').value.trim();
+    const event = document.getElementById('eventName').value.trim();
+    const date  = document.getElementById('useDate').value;
+    let   rdate = document.getElementById('returnDate').value;
+
+    // ── validation ──────────────────────────────
+    function fail(msg){
+      const el = document.getElementById('step1-alert');
+      el.className   = 'alert danger';
+      el.textContent = msg;
+      el.scrollIntoView({behavior:'smooth', block:'center'});
+      showToast(msg);
+    }
+
+    if(!user){    fail('⚠️ กรุณากรอกชื่อผู้ขอยืม'); return; }
+    if(!event){   fail('⚠️ กรุณากรอกชื่องาน / กิจกรรม'); return; }
+    if(!date){    fail('⚠️ กรุณาเลือกวันที่ใช้งาน'); return; }
+
+    // ถ้าไม่ได้กรอกวันคืน ให้ใช้วันเดียวกับวันใช้งาน
+    if(!rdate) {
+      rdate = date;
+      document.getElementById('returnDate').value = date;
+    }
+    if(rdate < date){ fail('⚠️ วันที่คืนต้องไม่ก่อนวันที่ใช้งาน'); return; }
+
+    const items = selectedItems();
+    if(items.length === 0){
+      fail('⚠️ กรุณาเลือกอุปกรณ์อย่างน้อย 1 รายการ (กดหัวข้อเพื่อเปิดแต่ละหมวดแล้วติ๊กถูก)');
+      return;
+    }
+
+    // ── ผ่านทุก validation ──────────────────────
+    const el = document.getElementById('step1-alert');
+    el.className   = 'alert success';
+    el.textContent = `✅ ข้อมูลครบ — ${items.length} รายการ กำลังไปขั้นที่ 2...`;
+
+    buildCheckTable(items);
+    showTab('step2');
+
+  } catch(err) {
+    showToast('❌ เกิดข้อผิดพลาด: ' + err.message);
+    console.error('goToStep2 error:', err);
   }
-  if(rdate&&rdate<date){
-    document.getElementById('step1-alert').className='alert danger';
-    document.getElementById('step1-alert').textContent='⚠️ วันที่คืนต้องไม่ก่อนวันที่ใช้งาน';
-    return;
-  }
-  const items=selectedItems();
-  if(items.length===0){
-    document.getElementById('step1-alert').className='alert danger';
-    document.getElementById('step1-alert').textContent='⚠️ กรุณาเลือกอุปกรณ์อย่างน้อย 1 รายการ';
-    return;
-  }
-  buildCheckTable(items);
-  showTab('step2');
 }
 
 function selectedItems(){
