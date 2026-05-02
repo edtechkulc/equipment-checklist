@@ -1162,16 +1162,15 @@ function hardClearAll(){
   // แสดง dialog ยืนยัน
   const ok = confirm('⚠️ ยืนยันการล้างข้อมูลทั้งหมดในเบราว์เซอร์นี้?\n\nรายการคำขอยืมทั้งหมดในเครื่องจะถูกลบ\n(ข้อมูลใน Google Sheets จะไม่ถูกกระทบ)');
   if(!ok) return;
-  // ล้าง keys ที่เกี่ยวข้องทั้งหมด
-  const keys = Object.keys(localStorage).filter(k =>
-    k.startsWith('university_equipment') || k === 'script_url'
-  );
-  // เก็บ script_url และ admin_key ไว้
+  // เก็บ settings ไว้ก่อนล้าง
   const savedUrl      = localStorage.getItem('script_url');
   const savedAdminKey = localStorage.getItem('equipment_admin_key');
   localStorage.clear();
+  // คืน settings
   if(savedUrl)      localStorage.setItem('script_url', savedUrl);
   if(savedAdminKey) localStorage.setItem('equipment_admin_key', savedAdminKey);
+  // ✅ สำคัญ: set ค่านี้ไว้เพื่อไม่ให้ seedDemo() สร้างข้อมูลตัวอย่างกลับมาอีก
+  localStorage.setItem('university_equipment_seeded', '1');
   sessionStorage.clear();
   showToast('✅ ล้างข้อมูลในเครื่องเรียบร้อยแล้ว — กำลัง reload...');
   setTimeout(() => location.reload(), 1200);
