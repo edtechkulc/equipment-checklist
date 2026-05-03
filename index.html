@@ -495,13 +495,13 @@ body{font-family:'Sarabun','Segoe UI',sans-serif;background:linear-gradient(180d
         </div>
         <div class="form-group span2">
           <label class="form-label">Admin key สำหรับเจ้าหน้าที่</label>
-          <input class="form-control" id="adminKeySetting" placeholder="เช่น 1234">
+          <input class="form-control" id="adminKeySetting" placeholder="เช่น KU-ADMIN-2569">
         </div>
       </div>
       <div class="btn-row">
         <button class="btn primary" onclick="saveAdminKey()">💾 บันทึก Admin key</button>
       </div>
-      <div class="alert warn" style="margin-top:12px">ค่าเริ่มต้น Admin key: <strong>1234</strong></div>
+      <div class="alert warn" style="margin-top:12px">ค่าเริ่มต้น Admin key: <strong>KU-ADMIN-2569</strong></div>
     </div>
   </div>
   <!-- ล้างข้อมูลในเครื่อง -->
@@ -1018,7 +1018,7 @@ async function goToStep4(){
     savedAt:new Date().toISOString()
   };
   const records=getRecords();records.unshift(record);setRecords(records);
-  await postToGoogle({...record,action:'request'});
+  postToGoogle({...record,action:'request'}); // fire-and-forget ไม่รอ
 
   showTab('step4');
   renderApproval();
@@ -1039,7 +1039,7 @@ function approveRequest(id){
   const records=getRecords();const r=records.find(x=>x.id===id);if(!r) return;
   r.status='approved';r.approvedAt=new Date().toISOString();
   setRecords(records);
-  postToGoogle({...r,action:'approve'});
+  postToGoogle({...r,action:'approve'}); // fire-and-forget
   sendEmailNotification(r,'approved');
   renderAll();showToast('✅ อนุมัติแล้ว — ส่งอีเมลแจ้งไปที่ '+NOTIFY_EMAIL);
 }
@@ -1048,7 +1048,7 @@ function rejectRequest(id){
   const records=getRecords();const r=records.find(x=>x.id===id);if(!r) return;
   r.status='rejected';r.rejectedAt=new Date().toISOString();r.rejectReason=reason||'';
   setRecords(records);
-  postToGoogle({...r,action:'reject'});
+  postToGoogle({...r,action:'reject'}); // fire-and-forget
   sendEmailNotification(r,'rejected');
   renderAll();showToast('❌ ไม่อนุมัติ — ส่งอีเมลแจ้งแล้ว');
 }
@@ -1086,7 +1086,7 @@ function markReturned(id){
   const records=getRecords();const r=records.find(x=>x.id===id);if(!r) return;
   r.status='returned';r.returnedAt=new Date().toISOString();r.returnedBy=by||'';
   setRecords(records);
-  postToGoogle({...r,action:'return',returnedBy:r.returnedBy,items:r.items.map(i=>i.name)});
+  postToGoogle({...r,action:'return',returnedBy:r.returnedBy,items:r.items.map(i=>i.name)}); // fire-and-forget
   renderAll();showToast('✅ บันทึกการคืนแล้ว');
 }
 
@@ -1323,25 +1323,15 @@ async function reportIssuesToSheets(notokItems){
   });
   setIssues(issues);
 
-  // ส่งไป Sheets — อัปเดต status เป็น maintenance พร้อมเหตุผล
+  // ส่งไป Sheets แบบ fire-and-forget ทั้งหมดพร้อมกัน (ไม่ block UI)
   const url = localStorage.getItem('script_url');
   if(url){
-    for(const it of notokItems){
-      await postToGoogle({
-        action:   'updateStatus',
-        itemName: it.name,
-        status:   'maintenance',
-        note:     it.note || 'ไม่พร้อมใช้งาน — ตรวจพบจากการตรวจสอบ'
-      });
-      // บันทึกลง Sheet แจ้งปัญหาอุปกรณ์
-      await postToGoogle({
-        action:     'reportIssue',
-        itemName:   it.name,
-        cat:        it.cat || '',
-        note:       it.note || 'ไม่ระบุเหตุผล',
-        reportedBy: reporter
-      });
-    }
+    const calls = [];
+    notokItems.forEach(it=>{
+      calls.push(postToGoogle({action:'updateStatus',itemName:it.name,status:'maintenance',note:it.note||'ไม่พร้อมใช้งาน'}));
+      calls.push(postToGoogle({action:'reportIssue',itemName:it.name,cat:it.cat||'',note:it.note||'ไม่ระบุเหตุผล',reportedBy:reporter}));
+    });
+    Promise.all(calls).catch(()=>{}); // ไม่รอ
   }
   applyIssueBadgesOnEquipment();
   renderIssueBanners();
@@ -1366,8 +1356,10 @@ async function resolveIssue(itemName){
   // อัปเดต Sheets
   const url = localStorage.getItem('script_url');
   if(url){
-    await postToGoogle({action:'updateStatus', itemName, status:'available', note:''});
-    await postToGoogle({action:'resolveIssue', itemName, resolvedBy: resolver||'เจ้าหน้าที่'});
+    Promise.all([
+      postToGoogle({action:'updateStatus', itemName, status:'available', note:''}),
+      postToGoogle({action:'resolveIssue', itemName, resolvedBy: resolver||'เจ้าหน้าที่'})
+    ]).catch(()=>{}); // fire-and-forget
   }
 
   // ลบ badge ออกจากรายการอุปกรณ์
