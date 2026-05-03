@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>จัดการรายการอุปกรณ์ — Admin Tool</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ku:#006b3f;--ku-light:#e9f7ef;--navy:#073b5c;
+  --blue:#1a6fb5;--blue-light:#e8f0f9;
+  --red:#c0392b;--red-light:#fdecea;
+  --green:#1a7a4a;--green-light:#e6f4ed;
+  --yellow:#f59e0b;--yellow-light:#fff7df;
+  --gray:#f5f7f9;--gray-2:#e5e7eb;--muted:#6b7280;--text:#111827;
+  --radius:12px;--shadow:0 2px 8px rgba(15,23,42,.08);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Sarabun','Segoe UI',sans-serif;background:#f0f4f9;color:var(--text);font-size:14px}
+.header{background:linear-gradient(135deg,var(--ku),var(--navy));color:#fff;padding:16px 22px;display:flex;align-items:center;gap:14px}
+.logo{width:42px;height:42px;border-radius:12px;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;font-weight:800;letter-spacing:-1px;flex-shrink:0}
+.h-title{font-size:16px;font-weight:800}.h-sub{font-size:11px;opacity:.8;margin-top:2px}
+.container{max-width:1100px;margin:0 auto;padding:18px}
+.grid{display:grid;grid-template-columns:300px 1fr;gap:16px;align-items:start}
+@media(max-width:800px){.grid{grid-template-columns:1fr}}
+.card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid rgba(15,23,42,.06);margin-bottom:14px;overflow:hidden}
+.card-header{padding:11px 14px;background:linear-gradient(180deg,#fff,#f8fafc);border-bottom:1px solid var(--gray-2);font-weight:800;color:var(--navy);font-size:13px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.card-body{padding:14px}
+.form-group{display:flex;flex-direction:column;gap:5px;margin-bottom:10px}
+.form-label{font-size:11px;font-weight:800;color:var(--muted)}
+.form-control{padding:9px 11px;border:1px solid var(--gray-2);border-radius:9px;font:inherit;font-size:13px;width:100%;background:#fff}
+.form-control:focus{outline:2px solid rgba(0,107,63,.15);border-color:var(--ku)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--gray-2);border-radius:9px;background:#fff;padding:8px 14px;font:inherit;font-size:12px;font-weight:800;cursor:pointer;transition:.15s;color:var(--text);white-space:nowrap}
+.btn:hover{transform:translateY(-1px);box-shadow:var(--shadow)}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.btn.primary{background:var(--ku);color:#fff;border-color:var(--ku)}
+.btn.primary:hover{background:#005530}
+.btn.blue{background:var(--blue);color:#fff;border-color:var(--blue)}
+.btn.danger{background:var(--red-light);color:var(--red);border-color:#f3b6b0}
+.btn.success{background:var(--green-light);color:var(--green);border-color:#c3e6cb}
+.btn.warn{background:var(--yellow-light);color:#92400e;border-color:#f7c948}
+.btn.sm{padding:5px 10px;font-size:11px}
+.btn-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+
+/* Category list */
+.cat-list{display:flex;flex-direction:column;gap:4px;max-height:420px;overflow-y:auto}
+.cat-item{display:flex;align-items:center;gap:8px;padding:9px 12px;border:1px solid var(--gray-2);border-radius:9px;cursor:pointer;transition:.12s;background:#fff;user-select:none}
+.cat-item:hover{background:var(--gray)}
+.cat-item.active{background:var(--ku-light);border-color:var(--ku);color:var(--ku)}
+.cat-name{flex:1;font-weight:700;font-size:13px}
+.cat-count{font-size:11px;font-weight:700;background:var(--gray-2);color:var(--muted);border-radius:999px;padding:2px 7px}
+.cat-item.active .cat-count{background:var(--ku);color:#fff}
+.drag-handle{cursor:grab;color:var(--muted);font-size:14px;flex-shrink:0}
+.drag-handle:active{cursor:grabbing}
+
+/* Item list */
+.item-list{display:flex;flex-direction:column;gap:5px;margin-top:8px;max-height:480px;overflow-y:auto}
+.item-row{display:flex;align-items:center;gap:8px;padding:9px 12px;border:1px solid var(--gray-2);border-radius:9px;background:#fff;transition:.12s}
+.item-row:hover{background:var(--gray)}
+.item-row.dragging{opacity:.4;background:#f0faf4}
+.item-name{flex:1;font-size:13px;font-weight:600}
+.item-qty{font-size:11px;color:var(--muted);background:var(--gray-2);padding:2px 7px;border-radius:999px}
+.item-acts{display:flex;gap:4px;flex-shrink:0}
+
+/* Alert */
+.alert{border-radius:10px;padding:11px 14px;margin-bottom:12px;font-size:13px;font-weight:700;border:1px solid transparent}
+.alert.info{background:var(--blue-light);color:var(--blue);border-color:#bfdbfe}
+.alert.success{background:var(--green-light);color:var(--green);border-color:#c3e6cb}
+.alert.warn{background:var(--yellow-light);color:#92400e;border-color:#f7c948}
+.alert.danger{background:var(--red-light);color:var(--red);border-color:#f3b6b0}
+
+/* Output */
+.output-wrap{position:relative}
+.output-textarea{width:100%;min-height:220px;padding:12px;border:1px solid var(--gray-2);border-radius:9px;font-family:monospace;font-size:11px;background:#1e1e2e;color:#cdd6f4;resize:vertical;line-height:1.6}
+.copy-btn{position:absolute;top:8px;right:8px}
+
+/* Toast */
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#111827;color:#fff;border-radius:999px;padding:9px 16px;font-size:12px;font-weight:700;display:none;z-index:999;white-space:nowrap;box-shadow:0 4px 12px rgba(0,0,0,.25)}
+
+.badge{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:800;padding:3px 7px;border-radius:999px}
+.badge.qty{background:#eff6ff;color:var(--blue);border:1px solid #bfdbfe}
+.badge.noqty{background:var(--gray);color:var(--muted);border:1px solid var(--gray-2)}
+.section-desc{font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.6}
+.divider{border:0;border-top:1px solid var(--gray-2);margin:14px 0}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">⚙️</div>
+  <div>
+    <div class="h-title">จัดการรายการอุปกรณ์</div>
+    <div class="h-sub">Equipment Admin Tool · เพิ่ม / แก้ไข / ลบ / จัดลำดับอุปกรณ์</div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="alert info">
+    📋 แก้ไขรายการอุปกรณ์ที่นี่ จากนั้นกด <strong>"สร้าง Code สำหรับนำไปใช้"</strong>
+    แล้วคัดลอกไปแทนที่ส่วน <code>const EQUIPMENT=[...]</code> ในไฟล์ <code>equipment_booking_v2.html</code>
+  </div>
+
+  <div class="grid">
+    <!-- ซ้าย: จัดการหมวดหมู่ -->
+    <div>
+      <div class="card">
+        <div class="card-header">
+          📁 หมวดหมู่อุปกรณ์
+          <span id="cat-count-badge" class="badge qty">0 หมวด</span>
+        </div>
+        <div class="card-body">
+          <div class="cat-list" id="cat-list"></div>
+          <hr class="divider">
+          <div class="section-desc">เพิ่มหมวดหมู่ใหม่</div>
+          <div class="form-group">
+            <label class="form-label">ชื่อหมวดหมู่</label>
+            <input class="form-control" id="new-cat-name" placeholder="เช่น ไมโครโฟนตั้งโต๊ะ">
+          </div>
+          <div class="form-group">
+            <label class="form-label" style="display:flex;align-items:center;gap:8px">
+              <input type="checkbox" id="new-cat-qty" style="accent-color:var(--ku)"> มีตัวเลือกจำนวน (qty)
+            </label>
+          </div>
+          <div class="form-group" id="max-qty-group" style="display:none">
+            <label class="form-label">จำนวนสูงสุดที่เลือกได้</label>
+            <input class="form-control" id="new-cat-maxqty" type="number" min="1" max="20" value="5">
+          </div>
+          <button class="btn primary full" style="width:100%" onclick="addCategory()">➕ เพิ่มหมวดหมู่</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ขวา: จัดการอุปกรณ์ในหมวด -->
+    <div>
+      <div class="card">
+        <div class="card-header">
+          <span id="item-panel-title">📦 เลือกหมวดหมู่ทางซ้ายก่อน</span>
+          <div style="display:flex;gap:6px;flex-wrap:wrap" id="cat-actions" style="display:none"></div>
+        </div>
+        <div class="card-body">
+          <div id="item-panel">
+            <div class="alert info">กดเลือกหมวดหมู่ทางซ้ายเพื่อดูและแก้ไขอุปกรณ์</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Output -->
+      <div class="card">
+        <div class="card-header">
+          📤 Code สำหรับนำไปใช้
+          <div style="display:flex;gap:6px">
+            <button class="btn warn" onclick="generateCode()">🔄 สร้าง Code</button>
+            <button class="btn success" onclick="copyCode()">📋 คัดลอก</button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="section-desc">
+            คัดลอก code ด้านล่างแล้วแทนที่ส่วน <code style="background:var(--gray);padding:1px 5px;border-radius:4px">const EQUIPMENT=[...];</code>
+            ในไฟล์ <strong>equipment_booking_v2.html</strong>
+          </div>
+          <div class="output-wrap">
+            <textarea class="output-textarea" id="code-output" readonly placeholder="กด 'สร้าง Code' เพื่อสร้าง code ที่จะนำไปใช้..."></textarea>
+          </div>
+          <div class="btn-row" style="margin-top:10px">
+            <button class="btn" onclick="exportJSON()">💾 Export JSON</button>
+            <button class="btn" onclick="importJSON()">📂 Import JSON</button>
+            <button class="btn danger" onclick="resetToDefault()">↩️ Reset เป็นค่าเริ่มต้น</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ════════════════════════════════════════════════
+// DEFAULT EQUIPMENT DATA (same as booking system)
+// ════════════════════════════════════════════════
+const DEFAULT_EQUIPMENT = [
+  {id:'cam',label:'กล้องถ่ายทำ',items:[
+    {id:'xf705',name:'Canon XF705'},{id:'xf605',name:'Canon XF605'},
+    {id:'xf405',name:'Canon XF405'},{id:'xf305',name:'Canon XF305'},
+    {id:'c70',name:'Canon Cinema C70'},{id:'r6',name:'Canon R6 Mark II'},
+    {id:'eosr',name:'Canon EOS R'},{id:'6d',name:'Canon 6D'},
+    {id:'m50',name:'Canon M50'},{id:'d7k',name:'Nikon D7000'},
+    {id:'i360',name:'Insta360 1-inch Edition'},{id:'i360t',name:'Insta360 Twin Edition'}
+  ]},
+  {id:'lens',label:'เลนส์',items:[
+    {id:'rf1020',name:'Canon RF 10-20 mm (Fisheye)'},{id:'ep1635',name:'Canon EP 16-35 mm (Wide)'},
+    {id:'rf24usm',name:'Canon RF 24-105 mm USM (Normal)'},{id:'rf24',name:'Canon RF 24-105 mm (Normal)'},
+    {id:'rf24ii',name:'Canon RF 24-105 mm II (Normal)'},{id:'nk18',name:'Nikon DX 18-105 mm (Normal)'},
+    {id:'c1845',name:'Canon 18-45 mm (Normal)'},{id:'c70l',name:'Canon 70-200 mm (Tele)'},
+    {id:'c50',name:'Canon 50 mm (Fix)'},{id:'mount',name:'เม้าท์เลนส์ Canon'}
+  ]},
+  {id:'batt',label:'แบตเตอรี่',qty:true,maxQty:7,items:[
+    {id:'lpe6p',name:'Canon LP-E6P'},{id:'lpe17',name:'Canon LP-E17'},
+    {id:'pana',name:'Panasonic AG-VBR59'},{id:'sony',name:'Sony NP-FV100A'},
+    {id:'ledB',name:'ไฟ LED สตูดิโอ NP-F960'},{id:'niken',name:'Nikon EN-EL15'}
+  ]},
+  {id:'flash',label:'แฟลช',items:[
+    {id:'f600',name:'Canon SPEEDLITE 600EX-RT'},{id:'f600ii',name:'Canon SPEEDLITE 600EX II RT'},
+    {id:'fel10',name:'Canon SPEEDLITE EL-10'},{id:'nsb900',name:'Nikon SPEEDLITE SB-900'},
+    {id:'nsb910',name:'Nikon SPEEDLITE SB-910'}
+  ]},
+  {id:'mem',label:'Memory Card',qty:true,maxQty:5,items:[
+    {id:'m8',name:'8GB'},{id:'m32',name:'32GB'},{id:'m64',name:'64GB'},
+    {id:'m128',name:'128GB'},{id:'m1t',name:'1TB'}
+  ]},
+  {id:'ledl',label:'ไฟ LED',qty:true,maxQty:3,items:[{id:'ledset',name:'ชุดไฟ LED'}]},
+  {id:'lstand',label:'ขาตั้งไฟสตูดิโอ',qty:true,maxQty:3,items:[{id:'lstd',name:'ขาตั้งไฟสตูดิโอ'}]},
+  {id:'tripod',label:'ขาตั้งกล้อง SACHTLER',qty:true,maxQty:3,items:[{id:'sach',name:'ขาตั้งกล้อง SACHTLER'}]},
+  {id:'wmic',label:'ไวเลสไมโครโฟน',qty:true,maxQty:3,items:[
+    {id:'blink',name:'Saramonic Blink500'},{id:'tx10',name:'Saramonic TX-10'},
+    {id:'senn',name:'Sennheiser ew-112p G3'}
+  ]},
+  {id:'shure',label:'ไมโครโฟน SHURE Dynamic',qty:true,maxQty:4,items:[{id:'shured',name:'SHURE Dynamic'}]},
+  {id:'shures',label:'ไมโครโฟนสตูดิโอ SHURE ตั้งโต๊ะ',qty:true,maxQty:2,items:[{id:'shurest',name:'SHURE Studio ตั้งโต๊ะ'}]},
+  {id:'mixer',label:'Mixer',items:[
+    {id:'toa',name:'TOA Power Mixer'},{id:'emx7',name:'Yamaha EMX7'},{id:'mg10',name:'Yamaha MG10XU'}
+  ]},
+  {id:'wireless',label:'ชุดส่งสัญญาณภาพและเสียงไร้สาย',qty:true,maxQty:3,items:[
+    {id:'snap',name:'Dongle Snapshow'},{id:'holly',name:'Monitor Wireless Hollyland'}
+  ]},
+  {id:'speaker',label:'ลำโพง',qty:true,maxQty:7,items:[
+    {id:'toabs',name:'TOA BS-1030W 30W สีขาว'},{id:'jbl',name:'JBL EON ONE COMPACT'},{id:'yamaha500',name:'YAMAHA 500S'}
+  ]},
+  {id:'switcher',label:'Switcher / Splitter',qty:true,maxQty:4,items:[
+    {id:'aten1',name:'Splitter ATEN VS0110HA'},{id:'aten10',name:'Splitter ATEN 10-Port'},
+    {id:'hdmi4',name:'HDMI Splitter 1 Input 4 Output'},{id:'hdmi2',name:'HDMI Splitter 1 Input 2 Output'},
+    {id:'hdmisw',name:'HDMI Switcher'},{id:'devwell',name:'Switcher DeviceWell'}
+  ]},
+  {id:'tv',label:'TV',qty:true,maxQty:10,items:[
+    {id:'tv32',name:'32"'},{id:'tv42',name:'42"'},{id:'tv55',name:'55"'}
+  ]},
+  {id:'laptop',label:'Laptop',items:[
+    {id:'msi1',name:'MSI AX201 I'},{id:'msi2',name:'MSI AX201 II'},
+    {id:'rog',name:'ASUS ROG Strix G531G'},{id:'f17',name:'ASUS F17 FX707Z'},
+    {id:'dell',name:'DELL'},{id:'aio',name:'All-in-One Lenovo'}
+  ]},
+  {id:'backdrop',label:'Backdrop',items:[
+    {id:'bd1',name:'2.30 × 3 เมตร'},{id:'bd2',name:'2.30 × 5 เมตร'}
+  ]}
+];
+
+// ════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════
+const EQ_KEY = 'admin_equipment_data';
+let equipment = [];
+let selectedCatIdx = -1;
+let dragSrcCat = null;
+let dragSrcItem = null;
+
+function load(){
+  const saved = localStorage.getItem(EQ_KEY);
+  equipment = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(DEFAULT_EQUIPMENT));
+}
+function save(){ localStorage.setItem(EQ_KEY, JSON.stringify(equipment)); }
+function genId(prefix){ return prefix+'-'+Date.now()+'-'+Math.random().toString(36).slice(2,6); }
+
+// ════════════════════════════════════════════════
+// RENDER CATEGORY LIST
+// ════════════════════════════════════════════════
+function renderCats(){
+  const list = document.getElementById('cat-list');
+  const badge = document.getElementById('cat-count-badge');
+  badge.textContent = equipment.length + ' หมวด';
+
+  list.innerHTML = equipment.map((cat,i)=>`
+    <div class="cat-item ${i===selectedCatIdx?'active':''}"
+      draggable="true"
+      ondragstart="onDragCatStart(event,${i})"
+      ondragover="onDragCatOver(event)"
+      ondrop="onDropCat(event,${i})"
+      onclick="selectCat(${i})">
+      <span class="drag-handle" title="ลากเพื่อจัดลำดับ">⠿</span>
+      <span class="cat-name">${escH(cat.label)}</span>
+      <span class="cat-count">${cat.items.length}</span>
+      ${cat.qty?`<span class="badge qty">qty ${cat.maxQty||5}</span>`:`<span class="badge noqty">–</span>`}
+    </div>`).join('');
+}
+
+function selectCat(i){
+  selectedCatIdx = i;
+  renderCats();
+  renderItems();
+}
+
+// ════════════════════════════════════════════════
+// RENDER ITEM LIST for selected category
+// ════════════════════════════════════════════════
+function renderItems(){
+  const panel = document.getElementById('item-panel');
+  const title = document.getElementById('item-panel-title');
+  const acts  = document.getElementById('cat-actions');
+  if(selectedCatIdx < 0){
+    title.textContent = '📦 เลือกหมวดหมู่ทางซ้ายก่อน';
+    acts.innerHTML = '';
+    panel.innerHTML = '<div class="alert info">กดเลือกหมวดหมู่ทางซ้ายเพื่อดูและแก้ไขอุปกรณ์</div>';
+    return;
+  }
+  const cat = equipment[selectedCatIdx];
+  title.innerHTML = `📦 ${escH(cat.label)} <span class="badge qty">${cat.items.length} รายการ</span>`;
+  acts.innerHTML = `
+    <button class="btn warn sm" onclick="editCat(${selectedCatIdx})">✏️ แก้ไขหมวด</button>
+    <button class="btn danger sm" onclick="deleteCat(${selectedCatIdx})">🗑 ลบหมวด</button>`;
+
+  panel.innerHTML = `
+    <!-- เพิ่มอุปกรณ์ใหม่ -->
+    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+      <input class="form-control" id="new-item-name" placeholder="ชื่ออุปกรณ์ใหม่..." style="flex:1;min-width:180px" onkeydown="if(event.key==='Enter') addItem()">
+      <button class="btn primary" onclick="addItem()">➕ เพิ่มอุปกรณ์</button>
+    </div>
+    <!-- รายการอุปกรณ์ -->
+    <div class="item-list" id="item-list">
+      ${cat.items.map((item,j)=>`
+        <div class="item-row" draggable="true"
+          ondragstart="onDragItemStart(event,${j})"
+          ondragover="onDragItemOver(event)"
+          ondrop="onDropItem(event,${j})">
+          <span class="drag-handle" title="ลากจัดลำดับ">⠿</span>
+          <span class="item-name" id="iname-${j}">${escH(item.name)}</span>
+          <div class="item-acts">
+            <button class="btn sm" onclick="editItem(${j})" title="แก้ไข">✏️</button>
+            <button class="btn danger sm" onclick="deleteItem(${j})" title="ลบ">🗑</button>
+          </div>
+        </div>`).join('')}
+      ${cat.items.length===0?'<div class="alert warn" style="margin:0">ยังไม่มีอุปกรณ์ในหมวดนี้</div>':''}
+    </div>`;
+}
+
+// ════════════════════════════════════════════════
+// ADD / EDIT / DELETE CATEGORY
+// ════════════════════════════════════════════════
+function addCategory(){
+  const name   = document.getElementById('new-cat-name').value.trim();
+  const hasQty = document.getElementById('new-cat-qty').checked;
+  const maxQty = parseInt(document.getElementById('new-cat-maxqty').value)||5;
+  if(!name){ showToast('⚠️ กรุณากรอกชื่อหมวดหมู่'); return; }
+  const cat = { id: genId('cat'), label: name, items: [] };
+  if(hasQty){ cat.qty = true; cat.maxQty = maxQty; }
+  equipment.push(cat);
+  save(); renderCats();
+  selectedCatIdx = equipment.length-1;
+  renderItems();
+  document.getElementById('new-cat-name').value = '';
+  showToast(`✅ เพิ่มหมวด "${name}" แล้ว`);
+}
+
+function editCat(i){
+  const cat    = equipment[i];
+  const name   = prompt('ชื่อหมวดหมู่:', cat.label);
+  if(name===null) return;
+  if(!name.trim()){ showToast('⚠️ ชื่อต้องไม่ว่าง'); return; }
+  const maxQty = cat.qty ? (parseInt(prompt('จำนวนสูงสุด (qty):', cat.maxQty||5))||cat.maxQty||5) : null;
+  cat.label = name.trim();
+  if(cat.qty && maxQty) cat.maxQty = maxQty;
+  save(); renderCats(); renderItems();
+  showToast('✅ แก้ไขหมวดหมู่แล้ว');
+}
+
+function deleteCat(i){
+  const cat = equipment[i];
+  if(!confirm(`ลบหมวดหมู่ "${cat.label}" และอุปกรณ์ทั้ง ${cat.items.length} รายการ?`)) return;
+  equipment.splice(i,1);
+  selectedCatIdx = Math.min(selectedCatIdx, equipment.length-1);
+  if(equipment.length===0) selectedCatIdx=-1;
+  save(); renderCats(); renderItems();
+  showToast('🗑 ลบหมวดหมู่แล้ว');
+}
+
+// ════════════════════════════════════════════════
+// ADD / EDIT / DELETE ITEM
+// ════════════════════════════════════════════════
+function addItem(){
+  const name = document.getElementById('new-item-name')?.value.trim();
+  if(!name){ showToast('⚠️ กรุณากรอกชื่ออุปกรณ์'); return; }
+  const cat = equipment[selectedCatIdx];
+  if(cat.items.some(i=>i.name===name)){ showToast('⚠️ มีอุปกรณ์ชื่อนี้แล้ว'); return; }
+  cat.items.push({ id: genId('item'), name });
+  save(); renderItems();
+  document.getElementById('new-item-name').value='';
+  showToast(`✅ เพิ่ม "${name}" ใน ${cat.label}`);
+}
+
+function editItem(j){
+  const cat  = equipment[selectedCatIdx];
+  const item = cat.items[j];
+  const name = prompt('ชื่ออุปกรณ์:', item.name);
+  if(name===null) return;
+  if(!name.trim()){ showToast('⚠️ ชื่อต้องไม่ว่าง'); return; }
+  item.name = name.trim();
+  save(); renderItems();
+  showToast('✅ แก้ไขชื่ออุปกรณ์แล้ว');
+}
+
+function deleteItem(j){
+  const cat  = equipment[selectedCatIdx];
+  const item = cat.items[j];
+  if(!confirm(`ลบอุปกรณ์ "${item.name}"?`)) return;
+  cat.items.splice(j,1);
+  save(); renderItems();
+  showToast('🗑 ลบอุปกรณ์แล้ว');
+}
+
+// ════════════════════════════════════════════════
+// DRAG & DROP — CATEGORY
+// ════════════════════════════════════════════════
+function onDragCatStart(e,i){ dragSrcCat=i; e.dataTransfer.effectAllowed='move'; }
+function onDragCatOver(e){ e.preventDefault(); e.dataTransfer.dropEffect='move'; }
+function onDropCat(e,i){
+  e.preventDefault();
+  if(dragSrcCat===null||dragSrcCat===i) return;
+  const moved = equipment.splice(dragSrcCat,1)[0];
+  equipment.splice(i,0,moved);
+  selectedCatIdx = i;
+  dragSrcCat = null;
+  save(); renderCats(); renderItems();
+}
+
+// ════════════════════════════════════════════════
+// DRAG & DROP — ITEM
+// ════════════════════════════════════════════════
+function onDragItemStart(e,j){ dragSrcItem=j; e.dataTransfer.effectAllowed='move'; }
+function onDragItemOver(e){ e.preventDefault(); e.dataTransfer.dropEffect='move'; }
+function onDropItem(e,j){
+  e.preventDefault();
+  if(dragSrcItem===null||dragSrcItem===j) return;
+  const cat   = equipment[selectedCatIdx];
+  const moved = cat.items.splice(dragSrcItem,1)[0];
+  cat.items.splice(j,0,moved);
+  dragSrcItem = null;
+  save(); renderItems();
+}
+
+// ════════════════════════════════════════════════
+// GENERATE CODE
+// ════════════════════════════════════════════════
+function generateCode(){
+  const lines = equipment.map(cat=>{
+    const itemsStr = cat.items.map(it=>`    {id:'${it.id}',name:'${it.name.replace(/'/g,"\\'")}'}`).join(',\n');
+    const qtyPart  = cat.qty ? `,qty:true,maxQty:${cat.maxQty||5}` : '';
+    return `  {id:'${cat.id}',label:'${cat.label.replace(/'/g,"\\'")}'${qtyPart},items:[\n${itemsStr}\n  ]}`;
+  }).join(',\n');
+  const code = `const EQUIPMENT=[\n${lines}\n];`;
+  document.getElementById('code-output').value = code;
+  showToast('✅ สร้าง Code เรียบร้อย — กด "คัดลอก" เพื่อนำไปใช้');
+}
+
+function copyCode(){
+  const ta = document.getElementById('code-output');
+  if(!ta.value){ showToast('⚠️ กด "สร้าง Code" ก่อน'); return; }
+  navigator.clipboard.writeText(ta.value).then(()=>{
+    showToast('📋 คัดลอกแล้ว — นำไปแทนที่ใน equipment_booking_v2.html');
+  }).catch(()=>{
+    ta.select(); document.execCommand('copy');
+    showToast('📋 คัดลอกแล้ว');
+  });
+}
+
+function exportJSON(){
+  const json = JSON.stringify(equipment, null, 2);
+  const blob = new Blob([json], {type:'application/json'});
+  const a    = document.createElement('a');
+  a.href     = URL.createObjectURL(blob);
+  a.download = 'equipment_list.json';
+  a.click();
+  showToast('💾 Export JSON แล้ว');
+}
+
+function importJSON(){
+  const input = document.createElement('input');
+  input.type = 'file'; input.accept = '.json';
+  input.onchange = e=>{
+    const file = e.target.files[0]; if(!file) return;
+    const reader = new FileReader();
+    reader.onload = ev=>{
+      try{
+        const data = JSON.parse(ev.target.result);
+        if(!Array.isArray(data)) throw new Error('ไม่ใช่ array');
+        equipment = data; save(); renderCats();
+        selectedCatIdx = -1; renderItems();
+        showToast(`✅ Import สำเร็จ — ${data.length} หมวดหมู่`);
+      } catch(err){ showToast('❌ ไฟล์ JSON ไม่ถูกต้อง: '+err.message); }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
+function resetToDefault(){
+  if(!confirm('Reset กลับเป็นรายการอุปกรณ์เริ่มต้น? (ข้อมูลที่แก้ไขจะหาย)')) return;
+  equipment = JSON.parse(JSON.stringify(DEFAULT_EQUIPMENT));
+  save(); selectedCatIdx=-1; renderCats(); renderItems();
+  showToast('↩️ Reset เป็นค่าเริ่มต้นแล้ว');
+}
+
+// ════════════════════════════════════════════════
+// UTILS
+// ════════════════════════════════════════════════
+document.getElementById('new-cat-qty').addEventListener('change', function(){
+  document.getElementById('max-qty-group').style.display = this.checked?'block':'none';
+});
+
+function escH(s){ return String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m])); }
+let _t;
+function showToast(msg){ const t=document.getElementById('toast');t.textContent=msg;t.style.display='block';clearTimeout(_t);_t=setTimeout(()=>t.style.display='none',3200); }
+
+// ════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════
+load();
+renderCats();
+</script>
+</body>
+</html>
