@@ -1349,6 +1349,12 @@ async function reportIssuesToSheets(notokItems){
 }
 
 // เจ้าหน้าที่กด "แก้ไขแล้ว พร้อมใช้"
+// helper: ปุ่มแก้ไขใน banner อ่านชื่อจาก data-itemname แทน inline string
+function resolveIssueByBtn(btn){
+  const name = btn.getAttribute('data-itemname');
+  if(name) resolveIssue(name);
+}
+
 async function resolveIssue(itemName){
   const resolver = prompt('ชื่อผู้แก้ไข / ผู้รับผิดชอบ','เจ้าหน้าที่');
   if(resolver===null) return;
@@ -1408,22 +1414,26 @@ function renderIssueBanners(){
     const el = document.getElementById('issue-banner-'+step);
     if(!el) return;
     if(names.length===0){ el.innerHTML=''; return; }
-    const cards = names.map(name=>{
+    const cards = names.map((name,idx)=>{
       const info = issues[name];
-      return `<div class="issue-item-card">
+      return `<div class="issue-item-card" id="icard-${idx}">
         <div class="issue-icon">🔧</div>
         <div style="flex:1;min-width:0">
           <div class="issue-item-name">${escHtml(name)}</div>
           <div class="issue-item-note">❌ ${escHtml(info.note)}</div>
           <div class="issue-item-meta">แจ้งโดย ${escHtml(info.reportedBy)} · ${escHtml(info.reportedAt)}</div>
         </div>
+        <button class="btn success" style="flex-shrink:0;align-self:center;font-size:12px;padding:7px 12px;line-height:1.6"
+          data-itemname="${escHtml(name)}" onclick="resolveIssueByBtn(this)">
+          ✅ แก้ไขแล้ว<br>พร้อมใช้
+        </button>
       </div>`;
     }).join('');
     el.innerHTML=`<div class="issue-banner">
       <div class="issue-banner-title">⚠️ พบอุปกรณ์ที่รอซ่อมบำรุง / แก้ไข — ${names.length} รายการ</div>
       ${cards}
       <div style="font-size:12px;color:#9a3412;margin-top:8px">
-        อุปกรณ์เหล่านี้ถูกล็อกไม่ให้เลือก — เจ้าหน้าที่สามารถกด "แก้ไขแล้ว พร้อมใช้" ได้ที่ขั้นที่ 4
+        🔒 อุปกรณ์เหล่านี้ถูกล็อกไม่ให้เลือก — กด <strong>"✅ แก้ไขแล้ว พร้อมใช้"</strong> หลังจากซ่อมเสร็จเพื่อปลดล็อก
       </div>
     </div>`;
   });
@@ -1508,7 +1518,7 @@ applyIssueBadgesOnEquipment();
 renderIssueBanners();
 
 // Set script URL
-const SCRIPT_URL='https://script.google.com/macros/s/AKfycbxHWNkRg2d1zbi3AZgQ6c2PamKuYWPjc_QxH2Tfvy-U1ZXX3Jr6yx_wwogQw_y5bfhv0Q/exec';
+const SCRIPT_URL='https://script.google.com/macros/s/AKfycbyKkOWhbGQ2xO-QqIbnFv_D6gjOisbEhiLwL9ZadSIyIqXAKo2asAPv_PXZoWtWrREGUw/exec';
 if(!localStorage.getItem('script_url')||localStorage.getItem('script_url').includes('AKfycbzjqab')){
   localStorage.setItem('script_url',SCRIPT_URL);
 }
