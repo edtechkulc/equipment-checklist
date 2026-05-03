@@ -193,6 +193,20 @@ body{font-family:'Sarabun','Segoe UI',sans-serif;background:linear-gradient(180d
 .print-area{display:none}
 @media print{body>*:not(.print-area){display:none!important}.print-area{display:block!important;padding:24px;background:#fff}}
 
+/* ── ISSUE TRACKER ── */
+.issue-banner{background:linear-gradient(135deg,#fff3e0,#fdecea);border:2px solid #f97316;border-radius:14px;padding:14px 16px;margin-bottom:14px}
+.issue-banner-title{font-size:14px;font-weight:800;color:#c2410c;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.issue-item-card{background:#fff;border:1px solid #fed7aa;border-radius:10px;padding:11px 14px;margin-bottom:8px;display:flex;gap:12px;align-items:flex-start}
+.issue-item-card:last-child{margin-bottom:0}
+.issue-icon{font-size:20px;flex-shrink:0;margin-top:1px}
+.issue-item-name{font-size:13px;font-weight:800;color:var(--text)}
+.issue-item-note{font-size:12px;color:var(--red);margin-top:3px;line-height:1.6}
+.issue-item-meta{font-size:11px;color:var(--muted);margin-top:4px}
+.issue-resolve-btn{margin-left:auto;flex-shrink:0;align-self:center}
+.issue-empty{font-size:13px;color:var(--green);font-weight:700;text-align:center;padding:8px}
+.eq-issue-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--red);margin-left:5px;vertical-align:middle;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.item-row.has-issue{background:#fff8f5;border-left:4px solid #f97316}
 /* ── STEP DIVIDER ── */
 .step-divider{display:flex;align-items:center;gap:12px;margin:20px 0 14px}
 .step-divider-num{width:32px;height:32px;border-radius:50%;background:var(--ku-green);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;flex-shrink:0}
@@ -216,6 +230,7 @@ body{font-family:'Sarabun','Segoe UI',sans-serif;background:linear-gradient(180d
       <span class="pill">🟢 พร้อมใช้ <strong id="pill-n-available">–</strong></span>
       <span class="pill">🟡 รออนุมัติ <strong id="pill-n-pending">0</strong></span>
       <span class="pill">🔴 ถูกยืม <strong id="pill-n-borrowed">0</strong></span>
+      <span class="pill" style="background:rgba(249,115,22,.25);border-color:rgba(249,115,22,.4)">🔧 รอซ่อม <strong id="pill-n-issue">0</strong></span>
     </div>
   </div>
 </header>
@@ -259,6 +274,8 @@ body{font-family:'Sarabun','Segoe UI',sans-serif;background:linear-gradient(180d
 ════════════════════════════════════════════════ -->
 <div class="tab-panel active" id="panel-step1">
 <div class="container">
+  <!-- ⚠️ แบนเนอร์ปัญหาอุปกรณ์ค้าง -->
+  <div id="issue-banner-step1"></div>
   <div class="grid-main">
     <!-- ซ้าย: ฟอร์ม -->
     <div>
@@ -331,6 +348,8 @@ body{font-family:'Sarabun','Segoe UI',sans-serif;background:linear-gradient(180d
     <div class="step-divider-title">ตรวจสอบความพร้อมใช้งานของอุปกรณ์แต่ละรายการ</div>
     <div class="step-divider-line"></div>
   </div>
+  <!-- ⚠️ แบนเนอร์ปัญหาค้าง -->
+  <div id="issue-banner-step2"></div>
   <div class="alert info" id="step2-guide">เจ้าหน้าที่ตรวจสอบสภาพอุปกรณ์จริงแต่ละชิ้น กด <strong>ปกติ</strong> หรือ <strong>ไม่พร้อม</strong> และบันทึกข้อเสนอแนะ (ถ้ามี) จากนั้นกด "บันทึกและไปขั้นที่ 3"</div>
 
   <div class="check-summary" id="check-summary">
@@ -429,6 +448,16 @@ body{font-family:'Sarabun','Segoe UI',sans-serif;background:linear-gradient(180d
     </div>
   </div>
   <div id="approval-list"></div>
+
+  <!-- ⚠️ รายการปัญหาอุปกรณ์รอแก้ไข (เฉพาะ admin) -->
+  <div id="issue-admin-panel" style="display:none">
+    <div class="step-divider" style="margin-top:24px">
+      <div class="step-divider-num" style="background:#f97316">🔧</div>
+      <div class="step-divider-title">รายการอุปกรณ์ที่รอแก้ไข / ซ่อมบำรุง</div>
+      <div class="step-divider-line"></div>
+    </div>
+    <div id="issue-list-admin"></div>
+  </div>
 </div>
 </div>
 
@@ -603,8 +632,10 @@ const NOTIFY_EMAIL = 'nuttawuth.n@ku.th';
 let state={}, openSecs={}, sheetsStatuses={};
 let checkResults={};   // { itemName: { status:'ok'|'notok'|'', note:'' } }
 let calendarAvailability={};
+let openIssues={};     // { itemName: { note, reportedAt, reportedBy } } — ปัญหาที่ยังไม่ได้แก้
 let currentMonth=new Date(), selCalDate=null;
 const ADMIN_KEY='equipment_admin_verified', DEF_KEY='KU-ADMIN-2569';
+const ISSUES_KEY='equipment_open_issues';
 
 function initState(){
   EQUIPMENT.forEach(cat=>cat.items.forEach(item=>{state[item.id]={checked:false,qty:1};}));
@@ -612,6 +643,8 @@ function initState(){
 initState();
 function getRecords(){return JSON.parse(localStorage.getItem('university_equipment_requests')||'[]');}
 function setRecords(r){localStorage.setItem('university_equipment_requests',JSON.stringify(r));updateHeaderStats();}
+function getIssues(){return JSON.parse(localStorage.getItem(ISSUES_KEY)||'{}');}
+function setIssues(obj){localStorage.setItem(ISSUES_KEY,JSON.stringify(obj));openIssues=obj;updateHeaderStats();}
 
 function seedDemo(){
   if(localStorage.getItem('university_equipment_seeded')) return;
@@ -637,9 +670,12 @@ function updateHeaderStats(){
   const total=EQUIPMENT.reduce((s,c)=>s+c.items.length,0);
   const notav=Object.values(sheetsStatuses).filter(v=>v.status!=='available').length;
   const av=Object.keys(sheetsStatuses).length?(total-notav):'–';
+  const issueCount=Object.keys(getIssues()).length;
   document.getElementById('pill-n-available').textContent=av;
   document.getElementById('pill-n-pending').textContent=pen;
   document.getElementById('pill-n-borrowed').textContent=bor;
+  const pIssue=document.getElementById('pill-n-issue');
+  if(pIssue) pIssue.textContent=issueCount;
 }
 
 // ════════════════════════════════════════════════
@@ -676,7 +712,7 @@ function buildSections(){
     const sec=document.createElement('div');sec.className='eq-section';
     sec.innerHTML=`
       <div class="eq-header" id="hdr-${cat.id}" onclick="toggleSec('${cat.id}')">
-        <div class="eq-title">${cat.label} <span class="eq-badge" id="bdg-${cat.id}">0/${cat.items.length}</span></div>
+        <div class="eq-title">${cat.label} <span class="eq-badge" id="bdg-${cat.id}">0/${cat.items.length}</span><span id="issue-dot-${cat.id}" style="display:none" class="eq-issue-dot"></span></div>
         <span style="color:var(--muted)">⌄</span>
       </div>
       <div class="eq-body" id="bdy-${cat.id}">
@@ -687,7 +723,7 @@ function buildSections(){
             ${cat.qty?`<select class="qty-select" id="qty-${item.id}" onchange="changeQty('${item.id}')" disabled>
               ${Array.from({length:cat.maxQty||5},(_,i)=>`<option value="${i+1}">${i+1}</option>`).join('')}
             </select>`:`<span></span>`}
-            <span></span>
+            <span id="issue-tag-${item.id}"></span>
           </div>`).join('')}
       </div>`;
     c.appendChild(sec);
@@ -938,17 +974,37 @@ function goToStep3(){
   if(unchecked>0){
     if(!confirm(`ยังมี ${unchecked} รายการที่ยังไม่ได้ตรวจสอบ ต้องการดำเนินการต่อหรือไม่?`)) return;
   }
-  renderCalendar();showTab('step3');
-  // แสดง conflict warning
+
+  // ✅ รายงานอุปกรณ์ "ไม่พร้อม" เข้าระบบ issue tracker อัตโนมัติ
+  const notokItems = _checkItems.filter(it=>{
+    const cr = checkResults[it.name];
+    return cr && cr.status === 'notok';
+  }).map(it=>({
+    name: it.name, cat: it.cat, qty: it.qty,
+    note: checkResults[it.name]?.note || 'ไม่ระบุเหตุผล'
+  }));
+
+  if(notokItems.length > 0){
+    const names = notokItems.map(x=>x.name).join(', ');
+    if(!confirm(`พบอุปกรณ์ที่ไม่พร้อมใช้ ${notokItems.length} รายการ:\n${names}\n\nระบบจะบันทึกรายการเหล่านี้ไว้รอซ่อมบำรุง และล็อกไม่ให้ยืมจนกว่าเจ้าหน้าที่จะยืนยันว่าแก้ไขแล้ว\n\nดำเนินการต่อหรือไม่?`)) return;
+    reportIssuesToSheets(notokItems);
+    showToast(`🔧 บันทึก ${notokItems.length} รายการรอซ่อมแล้ว`);
+  }
+
+  renderCalendar(); showTab('step3');
   const start=document.getElementById('useDate').value;
   const end=document.getElementById('returnDate').value||start;
   const av=computeCalendarAvailability(start,end);
   const busy=Object.values(av).filter(x=>x.type==='busy').length;
   const pend=Object.values(av).filter(x=>x.type==='pending').length;
   const alertEl=document.getElementById('step3-conflict-alert');
-  if(busy>0)      alertEl.innerHTML=`<div class="alert danger">⚠️ พบอุปกรณ์ชนคิว ${busy} รายการในช่วงวันที่เลือก กรุณาตรวจสอบในปฏิทิน</div>`;
-  else if(pend>0) alertEl.innerHTML=`<div class="alert warn">🟡 มีอุปกรณ์ ${pend} รายการรออนุมัติในช่วงวันที่เลือก</div>`;
-  else            alertEl.innerHTML=`<div class="alert success">✅ ไม่พบรายการชนคิวในช่วงวันที่เลือก</div>`;
+
+  let msg='';
+  if(notokItems.length) msg+=`<div class="alert warn">🔧 บันทึกอุปกรณ์รอซ่อม ${notokItems.length} รายการแล้ว — เจ้าหน้าที่ต้องกด "แก้ไขแล้ว" ที่ขั้นที่ 4 ก่อนจึงจะยืมได้</div>`;
+  if(busy>0)      msg+=`<div class="alert danger">⚠️ พบอุปกรณ์ชนคิว ${busy} รายการในช่วงวันที่เลือก</div>`;
+  else if(pend>0) msg+=`<div class="alert warn">🟡 มีอุปกรณ์ ${pend} รายการรออนุมัติในช่วงวันที่เลือก</div>`;
+  else if(!notokItems.length) msg+=`<div class="alert success">✅ ไม่พบรายการชนคิว สามารถส่งคำขอได้</div>`;
+  alertEl.innerHTML = msg;
 }
 
 // ════════════════════════════════════════════════
@@ -1249,12 +1305,174 @@ function showTab(name){
     if(el) el.classList.toggle('active',p===name);
     if(btn) btn.classList.toggle('active',p===name);
   });
-  if(name==='step4'){renderApproval();renderAdminStatus();}
+  if(name==='step4'){renderApproval();renderAdminStatus();renderIssueAdminPanel();}
   if(name==='step5') renderReturnList();
   if(name==='history') renderHistory();
+  if(name==='step1'||name==='step2') renderIssueBanners();
   window.scrollTo({top:0,behavior:'smooth'});
 }
-function renderAll(){renderApproval();renderReturnList();renderHistory();renderCalendar();updateHeaderStats();renderAdminStatus();}
+function renderAll(){renderApproval();renderReturnList();renderHistory();renderCalendar();updateHeaderStats();renderAdminStatus();renderIssueBanners();applyIssueBadgesOnEquipment();}
+
+// ════════════════════════════════════════════════
+// ISSUE TRACKER
+// ════════════════════════════════════════════════
+
+// รายงานปัญหาอุปกรณ์ไปยัง Sheets และบันทึก localStorage
+async function reportIssuesToSheets(notokItems){
+  if(!notokItems.length) return;
+  const issues = getIssues();
+  const now    = new Date().toLocaleString('th-TH');
+  const reporter = document.getElementById('userName')?.value.trim() || 'เจ้าหน้าที่';
+
+  notokItems.forEach(it=>{
+    issues[it.name] = {
+      note:       it.note || 'ไม่ระบุเหตุผล',
+      reportedAt: now,
+      reportedBy: reporter,
+      cat:        it.cat || ''
+    };
+  });
+  setIssues(issues);
+
+  // ส่งไป Sheets — อัปเดต status เป็น maintenance พร้อมเหตุผล
+  const url = localStorage.getItem('script_url');
+  if(url){
+    for(const it of notokItems){
+      await postToGoogle({
+        action:   'updateStatus',
+        itemName: it.name,
+        status:   'maintenance',
+        note:     it.note || 'ไม่พร้อมใช้งาน — ตรวจพบจากการตรวจสอบ'
+      });
+      // บันทึกลง Sheet แจ้งปัญหาอุปกรณ์
+      await postToGoogle({
+        action:     'reportIssue',
+        itemName:   it.name,
+        cat:        it.cat || '',
+        note:       it.note || 'ไม่ระบุเหตุผล',
+        reportedBy: reporter
+      });
+    }
+  }
+  applyIssueBadgesOnEquipment();
+  renderIssueBanners();
+  updateHeaderStats();
+}
+
+// เจ้าหน้าที่กด "แก้ไขแล้ว พร้อมใช้"
+async function resolveIssue(itemName){
+  if(!requireAdmin('ยืนยันการแก้ไขอุปกรณ์')) return;
+  const resolver = prompt('ชื่อผู้แก้ไข / ผู้รับผิดชอบ','เจ้าหน้าที่');
+  if(resolver===null) return;
+
+  const issues = getIssues();
+  delete issues[itemName];
+  setIssues(issues);
+
+  // อัปเดต Sheets
+  const url = localStorage.getItem('script_url');
+  if(url){
+    await postToGoogle({action:'updateStatus', itemName, status:'available', note:''});
+    await postToGoogle({action:'resolveIssue', itemName, resolvedBy: resolver||'เจ้าหน้าที่'});
+  }
+
+  // ลบ badge ออกจากรายการอุปกรณ์
+  applyIssueBadgesOnEquipment();
+  renderIssueBanners();
+  renderIssueAdminPanel();
+  updateHeaderStats();
+  showToast(`✅ "${itemName}" แก้ไขแล้ว — สถานะกลับเป็นพร้อมใช้`);
+}
+
+// แสดง badge 🔧 บน item-row ในขั้นที่ 1
+function applyIssueBadgesOnEquipment(){
+  const issues = getIssues();
+  EQUIPMENT.forEach(cat=>{
+    let catHasIssue = false;
+    cat.items.forEach(item=>{
+      const row = document.getElementById('row-'+item.id);
+      const tag = document.getElementById('issue-tag-'+item.id);
+      const chk = document.getElementById('chk-'+item.id);
+      if(!row||!tag) return;
+      if(issues[item.name]){
+        catHasIssue = true;
+        row.classList.add('has-issue');
+        tag.innerHTML = `<span class="badge maint" title="${escHtml(issues[item.name].note)}">🔧 รอซ่อม</span>`;
+        if(chk){ chk.checked=false; chk.disabled=true; state[item.id].checked=false; }
+      } else {
+        row.classList.remove('has-issue');
+        tag.innerHTML = '';
+        if(chk && sheetsStatuses[item.name]?.status !== 'borrowed') chk.disabled=false;
+      }
+    });
+    // dot บน category header
+    const dot = document.getElementById('issue-dot-'+cat.id);
+    if(dot) dot.style.display = catHasIssue ? 'inline-block' : 'none';
+  });
+  updateStats1();
+}
+
+// แสดงแบนเนอร์ปัญหาบน Step1 และ Step2
+function renderIssueBanners(){
+  const issues = getIssues();
+  const names  = Object.keys(issues);
+  ['step1','step2'].forEach(step=>{
+    const el = document.getElementById('issue-banner-'+step);
+    if(!el) return;
+    if(names.length===0){ el.innerHTML=''; return; }
+    const cards = names.map(name=>{
+      const info = issues[name];
+      return `<div class="issue-item-card">
+        <div class="issue-icon">🔧</div>
+        <div style="flex:1;min-width:0">
+          <div class="issue-item-name">${escHtml(name)}</div>
+          <div class="issue-item-note">❌ ${escHtml(info.note)}</div>
+          <div class="issue-item-meta">แจ้งโดย ${escHtml(info.reportedBy)} · ${escHtml(info.reportedAt)}</div>
+        </div>
+      </div>`;
+    }).join('');
+    el.innerHTML=`<div class="issue-banner">
+      <div class="issue-banner-title">⚠️ พบอุปกรณ์ที่รอซ่อมบำรุง / แก้ไข — ${names.length} รายการ</div>
+      ${cards}
+      <div style="font-size:12px;color:#9a3412;margin-top:8px">
+        อุปกรณ์เหล่านี้ถูกล็อกไม่ให้เลือก — เจ้าหน้าที่สามารถกด "แก้ไขแล้ว พร้อมใช้" ได้ที่ขั้นที่ 4
+      </div>
+    </div>`;
+  });
+}
+
+// แสดง issue panel ใน Step4 สำหรับ Admin
+function renderIssueAdminPanel(){
+  const panel = document.getElementById('issue-admin-panel');
+  const list  = document.getElementById('issue-list-admin');
+  if(!panel||!list) return;
+  const issues = getIssues();
+  const names  = Object.keys(issues);
+  panel.style.display = 'block';
+
+  if(names.length===0){
+    list.innerHTML='<div class="alert success">✅ ไม่มีอุปกรณ์ที่รอซ่อมบำรุงในขณะนี้</div>';
+    return;
+  }
+  list.innerHTML = names.map(name=>{
+    const info=issues[name];
+    const isAdmin=sessionStorage.getItem(ADMIN_KEY)==='1';
+    return `<div class="issue-item-card" style="background:#fff;border:1px solid #fed7aa;border-radius:12px;padding:14px;margin-bottom:10px;display:flex;gap:12px;align-items:flex-start;box-shadow:0 1px 4px rgba(0,0,0,.06)">
+      <div class="issue-icon" style="font-size:22px">🔧</div>
+      <div style="flex:1">
+        <div style="font-size:14px;font-weight:800;color:var(--text)">${escHtml(name)}</div>
+        <div style="font-size:12px;color:var(--red);margin-top:4px;line-height:1.6">❌ ${escHtml(info.note)}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px">
+          หมวดหมู่: ${escHtml(info.cat||'–')} · แจ้งโดย ${escHtml(info.reportedBy)} · ${escHtml(info.reportedAt)}
+        </div>
+      </div>
+      ${isAdmin
+        ? `<button class="btn success" style="flex-shrink:0;align-self:center" onclick="resolveIssue('${escHtml(name).replace(/'/g,"\\'")}')">✅ แก้ไขแล้ว<br>พร้อมใช้</button>`
+        : `<button class="btn" style="flex-shrink:0;align-self:center;opacity:.5" onclick="requireAdmin('ยืนยันการแก้ไข')">🔐 ยืนยัน</button>`
+      }
+    </div>`;
+  }).join('');
+}
 
 // ════════════════════════════════════════════════
 // SETTINGS
@@ -1298,9 +1516,13 @@ renderCalendar();
 updateHeaderStats();
 renderAdminStatus();
 
+// โหลด issue ที่ค้างอยู่จาก localStorage
+openIssues = getIssues();
+applyIssueBadgesOnEquipment();
+renderIssueBanners();
+
 // Set script URL
 const SCRIPT_URL='https://script.google.com/macros/s/AKfycbyKkOWhbGQ2xO-QqIbnFv_D6gjOisbEhiLwL9ZadSIyIqXAKo2asAPv_PXZoWtWrREGUw/exec';
-
 if(!localStorage.getItem('script_url')||localStorage.getItem('script_url').includes('AKfycbzjqab')){
   localStorage.setItem('script_url',SCRIPT_URL);
 }
