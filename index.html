@@ -150,7 +150,7 @@ body{font-family:'Sarabun','Segoe UI',sans-serif;background:linear-gradient(180d
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:0;border:1px solid var(--gray-2);border-radius:14px;overflow:hidden;background:var(--gray-2)}
 .cal-day-name{background:#fff;border-right:1px solid var(--gray-2);border-bottom:1px solid var(--gray-2);padding:9px 6px;font-size:11px;font-weight:800;text-align:center;color:var(--muted)}
 .cal-day-name:nth-child(7){border-right:none}
-.cal-day{min-height:110px;border-right:1px solid var(--gray-2);border-bottom:1px solid var(--gray-2);padding:6px 5px;background:#fff;cursor:pointer;position:relative;transition:.12s}
+.cal-day{min-height:68px;border-right:1px solid var(--gray-2);border-bottom:1px solid var(--gray-2);padding:6px 5px;background:#fff;cursor:pointer;position:relative;transition:.12s}
 .cal-day:nth-child(7n){border-right:none}
 .cal-day:hover{box-shadow:inset 0 0 0 2px rgba(0,107,63,.25)}
 .cal-day.muted{opacity:.4;background:#f8fafc}
@@ -170,7 +170,7 @@ body{font-family:'Sarabun','Segoe UI',sans-serif;background:linear-gradient(180d
 .cal-event.borrowed{background:#fdecea;color:#c0392b;border-left-color:#c0392b}
 .cal-more{font-size:10px;color:#475569;font-weight:800;cursor:pointer;padding:2px 5px}
 .cal-more:hover{text-decoration:underline}
-@media(max-width:700px){.cal-day{min-height:80px}.cal-event{font-size:9px}.cal-dcount{display:none}}
+@media(max-width:700px){.cal-day{min-height:52px}.cal-event{font-size:9px}.cal-dcount{display:none}}
 
 /* ── REQUEST CARD ── */
 .request-card{border:1px solid var(--gray-2);border-radius:14px;padding:14px;background:#fff;margin-bottom:10px;box-shadow:var(--shadow-soft)}
@@ -427,29 +427,20 @@ body{font-family:'Sarabun','Segoe UI',sans-serif;background:linear-gradient(180d
 <div class="container">
   <div class="step-divider">
     <div class="step-divider-num">4</div>
-    <div class="step-divider-title">อนุมัติคำขอ (เจ้าหน้าที่)</div>
+    <div class="step-divider-title">อนุมัติคำขอ</div>
     <div class="step-divider-line"></div>
   </div>
 
-  <div class="card">
-    <div class="card-header">
-      <span>🔐 สิทธิ์เจ้าหน้าที่</span>
-      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-        <a class="email-tag" href="mailto:nuttawuth.n@ku.th">📧 nuttawuth.n@ku.th</a>
-        <button class="btn warn" onclick="syncFromGoogle()">🔄 ซิงก์จาก Sheets</button>
-      </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+    <div style="font-size:13px;color:var(--muted)">
+      เมื่ออนุมัติแล้ว ระบบจะส่งอีเมลแจ้งไปยัง
+      <a class="email-tag" href="mailto:nuttawuth.n@ku.th">📧 nuttawuth.n@ku.th</a> อัตโนมัติ
     </div>
-    <div class="card-body">
-      <div id="admin-status"></div>
-      <div class="alert orange" style="margin-top:10px">
-        เมื่ออนุมัติแล้ว ระบบจะส่งอีเมลแจ้งผลไปยัง <strong>nuttawuth.n@ku.th</strong> อัตโนมัติ
-        พร้อมรายการอุปกรณ์และผลการตรวจสอบความพร้อมใช้
-      </div>
-    </div>
+    <button class="btn warn" onclick="syncFromGoogle()">🔄 ซิงก์จาก Sheets</button>
   </div>
   <div id="approval-list"></div>
 
-  <!-- ⚠️ รายการปัญหาอุปกรณ์รอแก้ไข (เฉพาะ admin) -->
+  <!-- รายการปัญหาอุปกรณ์รอแก้ไข -->
   <div id="issue-admin-panel" style="display:none">
     <div class="step-divider" style="margin-top:24px">
       <div class="step-divider-num" style="background:#f97316">🔧</div>
@@ -504,13 +495,13 @@ body{font-family:'Sarabun','Segoe UI',sans-serif;background:linear-gradient(180d
         </div>
         <div class="form-group span2">
           <label class="form-label">Admin key สำหรับเจ้าหน้าที่</label>
-          <input class="form-control" id="adminKeySetting" placeholder="เช่น 1234">
+          <input class="form-control" id="adminKeySetting" placeholder="เช่น KU-ADMIN-2569">
         </div>
       </div>
       <div class="btn-row">
         <button class="btn primary" onclick="saveAdminKey()">💾 บันทึก Admin key</button>
       </div>
-      <div class="alert warn" style="margin-top:12px">ค่าเริ่มต้น Admin key: <strong>1234</strong></div>
+      <div class="alert warn" style="margin-top:12px">ค่าเริ่มต้น Admin key: <strong>KU-ADMIN-2569</strong></div>
     </div>
   </div>
   <!-- ล้างข้อมูลในเครื่อง -->
@@ -634,7 +625,7 @@ let checkResults={};   // { itemName: { status:'ok'|'notok'|'', note:'' } }
 let calendarAvailability={};
 let openIssues={};     // { itemName: { note, reportedAt, reportedBy } } — ปัญหาที่ยังไม่ได้แก้
 let currentMonth=new Date(), selCalDate=null;
-const ADMIN_KEY='equipment_admin_verified', DEF_KEY='1234';
+const ADMIN_KEY='equipment_admin_verified', DEF_KEY='KU-ADMIN-2569';
 const ISSUES_KEY='equipment_open_issues';
 
 function initState(){
@@ -685,10 +676,10 @@ function requireAdmin(txt=''){
   if(sessionStorage.getItem(ADMIN_KEY)==='1') return true;
   const k=prompt('กรอกรหัสเจ้าหน้าที่'+(txt?` เพื่อ${txt}`:''));
   const key=localStorage.getItem('equipment_admin_key')||DEF_KEY;
-  if(k===key){sessionStorage.setItem(ADMIN_KEY,'1');renderAdminStatus();showToast('✅ ยืนยันสิทธิ์แล้ว');return true;}
+  if(k===key){sessionStorage.setItem(ADMIN_KEY,'1');showToast('✅ ยืนยันสิทธิ์แล้ว');return true;}
   showToast('❌ รหัสไม่ถูกต้อง');return false;
 }
-function logoutAdmin(){sessionStorage.removeItem(ADMIN_KEY);renderAdminStatus();showToast('ออกจากโหมดเจ้าหน้าที่');}
+function logoutAdmin(){sessionStorage.removeItem(ADMIN_KEY);showToast('ออกจากโหมดเจ้าหน้าที่');}
 function renderAdminStatus(){
   const el=document.getElementById('admin-status');if(!el)return;
   const ok=sessionStorage.getItem(ADMIN_KEY)==='1';
@@ -700,7 +691,7 @@ function saveAdminKey(){
   const v=document.getElementById('adminKeySetting')?.value.trim();
   if(!v){showToast('⚠️ กรุณากรอก key');return;}
   localStorage.setItem('equipment_admin_key',v);
-  sessionStorage.removeItem(ADMIN_KEY);renderAdminStatus();showToast('✅ บันทึก Admin key แล้ว');
+  sessionStorage.removeItem(ADMIN_KEY);showToast('✅ บันทึก Admin key แล้ว');
 }
 
 // ════════════════════════════════════════════════
@@ -1044,7 +1035,7 @@ function renderApproval(){
 }
 
 function approveRequest(id){
-  if(!requireAdmin('อนุมัติคำขอ')) return;
+  
   const records=getRecords();const r=records.find(x=>x.id===id);if(!r) return;
   r.status='approved';r.approvedAt=new Date().toISOString();
   setRecords(records);
@@ -1053,7 +1044,6 @@ function approveRequest(id){
   renderAll();showToast('✅ อนุมัติแล้ว — ส่งอีเมลแจ้งไปที่ '+NOTIFY_EMAIL);
 }
 function rejectRequest(id){
-  if(!requireAdmin('ไม่อนุมัติคำขอ')) return;
   const reason=prompt('ระบุเหตุผล (ถ้ามี)','อุปกรณ์ไม่พร้อม / ชนคิว');
   const records=getRecords();const r=records.find(x=>x.id===id);if(!r) return;
   r.status='rejected';r.rejectedAt=new Date().toISOString();r.rejectReason=reason||'';
@@ -1092,7 +1082,6 @@ function renderReturnList(){
   document.getElementById('return-list').innerHTML=records.length?records.map(r=>requestCard(r,'return')).join(''):'<div class="alert info">ไม่มีรายการที่รอคืนอุปกรณ์</div>';
 }
 function markReturned(id){
-  if(!requireAdmin('ยืนยันคืนอุปกรณ์')) return;
   const by=prompt('ชื่อผู้คืน / ผู้รับคืน','เจ้าหน้าที่');if(by===null) return;
   const records=getRecords();const r=records.find(x=>x.id===id);if(!r) return;
   r.status='returned';r.returnedAt=new Date().toISOString();r.returnedBy=by||'';
@@ -1305,13 +1294,13 @@ function showTab(name){
     if(el) el.classList.toggle('active',p===name);
     if(btn) btn.classList.toggle('active',p===name);
   });
-  if(name==='step4'){renderApproval();renderAdminStatus();renderIssueAdminPanel();}
+  if(name==='step4'){renderApproval();renderIssueAdminPanel();}
   if(name==='step5') renderReturnList();
   if(name==='history') renderHistory();
   if(name==='step1'||name==='step2') renderIssueBanners();
   window.scrollTo({top:0,behavior:'smooth'});
 }
-function renderAll(){renderApproval();renderReturnList();renderHistory();renderCalendar();updateHeaderStats();renderAdminStatus();renderIssueBanners();applyIssueBadgesOnEquipment();}
+function renderAll(){renderApproval();renderReturnList();renderHistory();renderCalendar();updateHeaderStats();renderIssueBanners();applyIssueBadgesOnEquipment();}
 
 // ════════════════════════════════════════════════
 // ISSUE TRACKER
@@ -1361,7 +1350,6 @@ async function reportIssuesToSheets(notokItems){
 
 // เจ้าหน้าที่กด "แก้ไขแล้ว พร้อมใช้"
 async function resolveIssue(itemName){
-  if(!requireAdmin('ยืนยันการแก้ไขอุปกรณ์')) return;
   const resolver = prompt('ชื่อผู้แก้ไข / ผู้รับผิดชอบ','เจ้าหน้าที่');
   if(resolver===null) return;
 
@@ -1456,7 +1444,6 @@ function renderIssueAdminPanel(){
   }
   list.innerHTML = names.map(name=>{
     const info=issues[name];
-    const isAdmin=sessionStorage.getItem(ADMIN_KEY)==='1';
     return `<div class="issue-item-card" style="background:#fff;border:1px solid #fed7aa;border-radius:12px;padding:14px;margin-bottom:10px;display:flex;gap:12px;align-items:flex-start;box-shadow:0 1px 4px rgba(0,0,0,.06)">
       <div class="issue-icon" style="font-size:22px">🔧</div>
       <div style="flex:1">
@@ -1467,8 +1454,7 @@ function renderIssueAdminPanel(){
         </div>
       </div>
       ${isAdmin
-        ? `<button class="btn success" style="flex-shrink:0;align-self:center" onclick="resolveIssue('${escHtml(name).replace(/'/g,"\\'")}')">✅ แก้ไขแล้ว<br>พร้อมใช้</button>`
-        : `<button class="btn" style="flex-shrink:0;align-self:center;opacity:.5" onclick="requireAdmin('ยืนยันการแก้ไข')">🔐 ยืนยัน</button>`
+`<button class="btn success" style="flex-shrink:0;align-self:center" onclick="resolveIssue('${escHtml(name).replace(/'/g,"\\'")}')">✅ แก้ไขแล้ว<br>พร้อมใช้</button>`
       }
     </div>`;
   }).join('');
@@ -1514,7 +1500,7 @@ buildSections();
 updateStats1();
 renderCalendar();
 updateHeaderStats();
-renderAdminStatus();
+
 
 // โหลด issue ที่ค้างอยู่จาก localStorage
 openIssues = getIssues();
