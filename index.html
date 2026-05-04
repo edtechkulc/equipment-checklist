@@ -266,6 +266,10 @@ body{font-family:'Sarabun','Segoe UI',sans-serif;background:linear-gradient(180d
       <div class="step-num" style="background:var(--gray-2);color:var(--muted)">⚙️</div>
       <span class="step-label">ตั้งค่า</span>
     </button>
+    <button class="step-btn" id="stab-eq" onclick="showTab('eq-admin')">
+      <div class="step-num" style="background:var(--gray-2);color:var(--muted)">📦</div>
+      <span class="step-label">จัดการอุปกรณ์</span>
+    </button>
   </div>
 </nav>
 
@@ -530,6 +534,72 @@ body{font-family:'Sarabun','Segoe UI',sans-serif;background:linear-gradient(180d
         <li><strong>ขั้นที่ 4 อนุมัติ</strong> — เจ้าหน้าที่กดอนุมัติ → ระบบส่งอีเมลแจ้ง <a href="mailto:nuttawuth.n@ku.th" class="email-tag">nuttawuth.n@ku.th</a> อัตโนมัติ</li>
         <li><strong>ขั้นที่ 5 ยืม/คืน</strong> — ยืนยันการยืมและบันทึกการคืนอุปกรณ์</li>
       </ol>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ════ TAB: จัดการอุปกรณ์ ════ -->
+<div class="tab-panel" id="panel-eq-admin">
+<div class="container">
+  <div id="eq-admin-lock">
+    <div style="max-width:420px;margin:40px auto;text-align:center">
+      <div style="font-size:48px;margin-bottom:16px">🔐</div>
+      <div style="font-size:18px;font-weight:800;color:var(--navy);margin-bottom:8px">จัดการรายการอุปกรณ์</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:20px">ต้องยืนยัน Admin key ก่อนจึงจะเพิ่ม/แก้ไข/ลบอุปกรณ์ได้</div>
+      <div style="display:flex;gap:8px;justify-content:center">
+        <input class="form-control" type="password" id="eq-admin-key-input" placeholder="กรอก Admin key" style="max-width:220px" onkeydown="if(event.key==='Enter')verifyEqAdmin()">
+        <button class="btn primary" onclick="verifyEqAdmin()">เข้าสู่ระบบ</button>
+      </div>
+    </div>
+  </div>
+  <div id="eq-admin-panel" style="display:none">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px">
+      <div>
+        <div style="font-size:16px;font-weight:800;color:var(--navy)">📦 จัดการรายการอุปกรณ์</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px">เพิ่ม / แก้ไข / ลบ / จัดลำดับ — การเปลี่ยนแปลงมีผลทันที</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn warn" onclick="exportEqJSON()">💾 Export JSON</button>
+        <button class="btn" onclick="importEqJSON()">📂 Import JSON</button>
+        <button class="btn danger" onclick="resetEqToDefault()">↩️ Reset</button>
+        <button class="btn" onclick="sessionStorage.removeItem('eq_admin_ok');document.getElementById('eq-admin-lock').style.display='block';document.getElementById('eq-admin-panel').style.display='none'">🔒 ออก</button>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:290px 1fr;gap:14px;align-items:start" id="eq-admin-grid">
+      <!-- หมวดหมู่ -->
+      <div>
+        <div class="card">
+          <div class="card-header">
+            📁 หมวดหมู่ <span id="eq-cat-count" class="badge" style="background:#e8f0f9;color:var(--blue);border:1px solid #bfdbfe;font-size:10px;padding:2px 7px;border-radius:999px">0</span>
+          </div>
+          <div class="card-body" style="padding:10px">
+            <div id="eq-cat-list" style="display:flex;flex-direction:column;gap:4px;max-height:380px;overflow-y:auto;margin-bottom:10px"></div>
+            <hr style="border:0;border-top:1px solid var(--gray-2);margin:10px 0">
+            <div style="font-size:11px;font-weight:800;color:var(--muted);margin-bottom:6px">เพิ่มหมวดหมู่ใหม่</div>
+            <input class="form-control" id="eq-new-cat" placeholder="ชื่อหมวดหมู่..." style="margin-bottom:6px;font-size:13px">
+            <label style="font-size:12px;display:flex;align-items:center;gap:6px;margin-bottom:6px;cursor:pointer">
+              <input type="checkbox" id="eq-new-cat-qty" style="accent-color:var(--ku)"> มีตัวเลือกจำนวน (qty)
+            </label>
+            <div id="eq-maxqty-wrap" style="display:none;margin-bottom:6px">
+              <input class="form-control" id="eq-new-cat-maxqty" type="number" min="1" max="20" value="5" placeholder="จำนวนสูงสุด" style="font-size:13px">
+            </div>
+            <button class="btn primary" style="width:100%;font-size:12px" onclick="eqAddCat()">➕ เพิ่มหมวดหมู่</button>
+          </div>
+        </div>
+      </div>
+      <!-- อุปกรณ์ -->
+      <div>
+        <div class="card">
+          <div class="card-header" id="eq-item-title">📦 เลือกหมวดหมู่ก่อน</div>
+          <div class="card-body" id="eq-item-body">
+            <div class="alert info">คลิกหมวดหมู่ทางซ้ายเพื่อดูและแก้ไขอุปกรณ์</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="alert warn" style="margin-top:14px">
+      ⚠️ หลังแก้ไขแล้ว ให้ <strong>ปิดและเปิดหน้าใหม่</strong> หรือกด Ctrl+R เพื่อให้การเปลี่ยนแปลงมีผลในขั้นตอนกรอกคำขอ
     </div>
   </div>
 </div>
@@ -1086,8 +1156,14 @@ function markReturned(id){
   const records=getRecords();const r=records.find(x=>x.id===id);if(!r) return;
   r.status='returned';r.returnedAt=new Date().toISOString();r.returnedBy=by||'';
   setRecords(records);
-  postToGoogle({...r,action:'return',returnedBy:r.returnedBy,items:r.items.map(i=>i.name)}); // fire-and-forget
-  renderAll();showToast('✅ บันทึกการคืนแล้ว');
+  postToGoogle({...r,action:'return',returnedBy:r.returnedBy,items:r.items.map(i=>i.name)});
+  renderAll();
+  // ✅ คืนครบแล้ว — ล้างฟอร์มและกลับ Step 1 อัตโนมัติ
+  setTimeout(()=>{
+    clearForm();
+    showTab('step1');
+    showToast('✅ คืนอุปกรณ์แล้ว — พร้อมรับคำขอใหม่');
+  }, 400);
 }
 
 // ════════════════════════════════════════════════
@@ -1286,18 +1362,27 @@ function printRequest(id){
 // TABS
 // ════════════════════════════════════════════════
 function showTab(name){
-  const panels=['step1','step2','step3','step4','step5','history','settings'];
-  const tabs=['stab-1','stab-2','stab-3','stab-4','stab-5','stab-hist','stab-set'];
+  const panels=['step1','step2','step3','step4','step5','history','settings','eq-admin'];
+  const tabs=['stab-1','stab-2','stab-3','stab-4','stab-5','stab-hist','stab-set','stab-eq'];
   panels.forEach((p,i)=>{
     const el=document.getElementById('panel-'+p);
     const btn=document.getElementById(tabs[i]);
     if(el) el.classList.toggle('active',p===name);
     if(btn) btn.classList.toggle('active',p===name);
   });
+  // ล้างฟอร์มอัตโนมัติเมื่อกลับ Step 1 ถ้ามีข้อมูลเดิมค้างอยู่
+  if(name==='step1'){
+    const hasData = document.getElementById('userName')?.value.trim() ||
+                    document.getElementById('eventName')?.value.trim() ||
+                    selectedItems().length > 0;
+    if(hasData) clearForm();
+    renderIssueBanners();
+  }
+  if(name==='step2') renderIssueBanners();
   if(name==='step4'){renderApproval();renderIssueAdminPanel();}
   if(name==='step5') renderReturnList();
   if(name==='history') renderHistory();
-  if(name==='step1'||name==='step2') renderIssueBanners();
+  if(name==='eq-admin') renderEqAdmin();
   window.scrollTo({top:0,behavior:'smooth'});
 }
 function renderAll(){renderApproval();renderReturnList();renderHistory();renderCalendar();updateHeaderStats();renderIssueBanners();applyIssueBadgesOnEquipment();}
@@ -1496,8 +1581,254 @@ function escHtml(s){return String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<'
 function formatDT(s){try{return new Date(s).toLocaleString('th-TH');}catch(e){return s||'–';}}
 
 // ════════════════════════════════════════════════
-// INIT
+// EQUIPMENT ADMIN (จัดการอุปกรณ์ในระบบ)
 // ════════════════════════════════════════════════
+const EQ_ADMIN_KEY = 'eq_admin_ok';
+const EQ_DATA_KEY  = 'admin_equipment_data';
+let eqData = [];           // working copy ของ EQUIPMENT
+let eqSelCat = -1;         // index หมวดที่เลือก
+let eqDragCat = null;
+let eqDragItem = null;
+
+function verifyEqAdmin(){
+  const val = document.getElementById('eq-admin-key-input')?.value.trim();
+  const key = localStorage.getItem('equipment_admin_key') || DEF_KEY;
+  if(val !== key){ showToast('❌ Admin key ไม่ถูกต้อง'); return; }
+  sessionStorage.setItem(EQ_ADMIN_KEY,'1');
+  document.getElementById('eq-admin-lock').style.display  = 'none';
+  document.getElementById('eq-admin-panel').style.display = 'block';
+  eqLoadData();
+  renderEqAdmin();
+  showToast('✅ เข้าสู่โหมดจัดการอุปกรณ์');
+}
+
+function renderEqAdmin(){
+  if(sessionStorage.getItem(EQ_ADMIN_KEY)!=='1'){
+    document.getElementById('eq-admin-lock').style.display  = 'block';
+    document.getElementById('eq-admin-panel').style.display = 'none';
+    return;
+  }
+  document.getElementById('eq-admin-lock').style.display  = 'none';
+  document.getElementById('eq-admin-panel').style.display = 'block';
+  eqLoadData();
+  eqRenderCats();
+  eqRenderItems();
+}
+
+// โหลดข้อมูลจาก localStorage (ถ้าไม่มีใช้ EQUIPMENT ปัจจุบัน)
+function eqLoadData(){
+  const saved = localStorage.getItem(EQ_DATA_KEY);
+  eqData = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(EQUIPMENT));
+}
+
+function eqSave(){
+  localStorage.setItem(EQ_DATA_KEY, JSON.stringify(eqData));
+  // อัปเดต EQUIPMENT จริงในหน่วยความจำด้วย
+  EQUIPMENT.length = 0;
+  eqData.forEach(c => EQUIPMENT.push(c));
+  // rebuild sections ใน step1
+  buildSections();
+  applyIssueBadgesOnEquipment();
+}
+
+function eqGenId(p){ return p+'-'+Date.now()+'-'+Math.random().toString(36).slice(2,5); }
+
+// ── Render category sidebar ────────────────────
+function eqRenderCats(){
+  const list  = document.getElementById('eq-cat-list');
+  const count = document.getElementById('eq-cat-count');
+  if(!list) return;
+  count.textContent = eqData.length + ' หมวด';
+  list.innerHTML = eqData.map((cat,i)=>`
+    <div style="display:flex;align-items:center;gap:7px;padding:9px 10px;border:1px solid ${i===eqSelCat?'var(--ku)':'var(--gray-2)'};border-radius:9px;background:${i===eqSelCat?'var(--ku-light)':'#fff'};cursor:pointer;user-select:none"
+      draggable="true"
+      ondragstart="eqDragCatStart(event,${i})"
+      ondragover="event.preventDefault()"
+      ondrop="eqDropCat(event,${i})"
+      onclick="eqSelectCat(${i})">
+      <span style="cursor:grab;color:var(--muted);font-size:13px">⠿</span>
+      <span style="flex:1;font-weight:700;font-size:12px;color:${i===eqSelCat?'var(--ku)':'var(--text)'}">${escHtml(cat.label)}</span>
+      <span style="font-size:10px;font-weight:800;background:${i===eqSelCat?'var(--ku)':'var(--gray-2)'};color:${i===eqSelCat?'#fff':'var(--muted)'};border-radius:999px;padding:1px 7px">${cat.items.length}</span>
+      <button class="btn danger" style="padding:3px 7px;font-size:10px" onclick="event.stopPropagation();eqDelCat(${i})">🗑</button>
+    </div>`).join('');
+}
+
+// ── Render item list for selected cat ─────────
+function eqRenderItems(){
+  const title = document.getElementById('eq-item-title');
+  const body  = document.getElementById('eq-item-body');
+  if(!title||!body) return;
+
+  if(eqSelCat < 0 || eqSelCat >= eqData.length){
+    title.textContent = '📦 เลือกหมวดหมู่ก่อน';
+    body.innerHTML    = '<div class="alert info">คลิกหมวดหมู่ทางซ้ายเพื่อดูและแก้ไขอุปกรณ์</div>';
+    return;
+  }
+  const cat = eqData[eqSelCat];
+  title.innerHTML = `📦 ${escHtml(cat.label)} <span style="font-size:11px;font-weight:700;color:var(--muted)">${cat.items.length} รายการ ${cat.qty?`· qty สูงสุด ${cat.maxQty||5}`:''}</span>
+    <div style="display:flex;gap:5px">
+      <button class="btn warn" style="padding:4px 9px;font-size:11px" onclick="eqEditCat(${eqSelCat})">✏️ แก้ไขหมวด</button>
+    </div>`;
+
+  const rows = cat.items.map((item,j)=>`
+    <div style="display:flex;align-items:center;gap:8px;padding:9px 12px;border:1px solid var(--gray-2);border-radius:9px;background:#fff"
+      draggable="true"
+      ondragstart="eqDragItemStart(event,${j})"
+      ondragover="event.preventDefault()"
+      ondrop="eqDropItem(event,${j})">
+      <span style="cursor:grab;color:var(--muted)">⠿</span>
+      <span style="flex:1;font-size:13px;font-weight:600">${escHtml(item.name)}</span>
+      <button class="btn" style="padding:4px 8px;font-size:11px" onclick="eqEditItem(${j})">✏️</button>
+      <button class="btn danger" style="padding:4px 8px;font-size:11px" onclick="eqDelItem(${j})">🗑</button>
+    </div>`).join('');
+
+  body.innerHTML = `
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <input class="form-control" id="eq-new-item" placeholder="ชื่ออุปกรณ์ใหม่..." style="flex:1;font-size:13px"
+        onkeydown="if(event.key==='Enter')eqAddItem()">
+      <button class="btn primary" style="font-size:12px" onclick="eqAddItem()">➕ เพิ่ม</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:5px;max-height:420px;overflow-y:auto">
+      ${rows || '<div class="alert warn" style="margin:0">ยังไม่มีอุปกรณ์</div>'}
+    </div>`;
+}
+
+function eqSelectCat(i){ eqSelCat=i; eqRenderCats(); eqRenderItems(); }
+
+// ── Category CRUD ──────────────────────────────
+function eqAddCat(){
+  const name   = document.getElementById('eq-new-cat')?.value.trim();
+  const hasQty = document.getElementById('eq-new-cat-qty')?.checked;
+  const maxQty = parseInt(document.getElementById('eq-new-cat-maxqty')?.value)||5;
+  if(!name){ showToast('⚠️ กรุณากรอกชื่อหมวดหมู่'); return; }
+  const cat = {id:eqGenId('cat'), label:name, items:[]};
+  if(hasQty){ cat.qty=true; cat.maxQty=maxQty; }
+  eqData.push(cat); eqSave();
+  eqSelCat = eqData.length-1;
+  if(document.getElementById('eq-new-cat')) document.getElementById('eq-new-cat').value='';
+  eqRenderCats(); eqRenderItems();
+  showToast(`✅ เพิ่มหมวด "${name}" แล้ว`);
+}
+
+function eqEditCat(i){
+  const cat    = eqData[i];
+  const name   = prompt('ชื่อหมวดหมู่:', cat.label);
+  if(name===null) return;
+  if(!name.trim()){ showToast('⚠️ ชื่อต้องไม่ว่าง'); return; }
+  cat.label = name.trim();
+  if(cat.qty){
+    const mq = parseInt(prompt('จำนวนสูงสุด:', cat.maxQty||5));
+    if(mq>0) cat.maxQty = mq;
+  }
+  eqSave(); eqRenderCats(); eqRenderItems();
+  showToast('✅ แก้ไขหมวดหมู่แล้ว');
+}
+
+function eqDelCat(i){
+  if(!confirm(`ลบหมวด "${eqData[i].label}" และอุปกรณ์ ${eqData[i].items.length} รายการ?`)) return;
+  eqData.splice(i,1);
+  eqSelCat = eqData.length>0 ? Math.min(eqSelCat, eqData.length-1) : -1;
+  eqSave(); eqRenderCats(); eqRenderItems();
+  showToast('🗑 ลบหมวดหมู่แล้ว');
+}
+
+// ── Item CRUD ──────────────────────────────────
+function eqAddItem(){
+  const name = document.getElementById('eq-new-item')?.value.trim();
+  if(!name){ showToast('⚠️ กรุณากรอกชื่ออุปกรณ์'); return; }
+  const cat = eqData[eqSelCat];
+  if(cat.items.some(i=>i.name===name)){ showToast('⚠️ มีชื่อนี้แล้วในหมวดนี้'); return; }
+  cat.items.push({id:eqGenId('item'), name});
+  eqSave(); eqRenderCats(); eqRenderItems();
+  showToast(`✅ เพิ่ม "${name}" แล้ว`);
+}
+
+function eqEditItem(j){
+  const item = eqData[eqSelCat].items[j];
+  const name = prompt('ชื่ออุปกรณ์:', item.name);
+  if(name===null) return;
+  if(!name.trim()){ showToast('⚠️ ชื่อต้องไม่ว่าง'); return; }
+  item.name = name.trim();
+  eqSave(); eqRenderItems();
+  showToast('✅ แก้ไขชื่อแล้ว');
+}
+
+function eqDelItem(j){
+  const item = eqData[eqSelCat].items[j];
+  if(!confirm(`ลบ "${item.name}"?`)) return;
+  eqData[eqSelCat].items.splice(j,1);
+  eqSave(); eqRenderCats(); eqRenderItems();
+  showToast('🗑 ลบอุปกรณ์แล้ว');
+}
+
+// ── Drag & Drop category ───────────────────────
+function eqDragCatStart(e,i){ eqDragCat=i; e.dataTransfer.effectAllowed='move'; }
+function eqDropCat(e,i){
+  e.preventDefault();
+  if(eqDragCat===null||eqDragCat===i) return;
+  const moved=eqData.splice(eqDragCat,1)[0];
+  eqData.splice(i,0,moved);
+  eqSelCat=i; eqDragCat=null;
+  eqSave(); eqRenderCats(); eqRenderItems();
+}
+
+// ── Drag & Drop item ───────────────────────────
+function eqDragItemStart(e,j){ eqDragItem=j; e.dataTransfer.effectAllowed='move'; }
+function eqDropItem(e,j){
+  e.preventDefault();
+  if(eqDragItem===null||eqDragItem===j) return;
+  const cat=eqData[eqSelCat];
+  const moved=cat.items.splice(eqDragItem,1)[0];
+  cat.items.splice(j,0,moved);
+  eqDragItem=null;
+  eqSave(); eqRenderItems();
+}
+
+// ── Export / Import / Reset ────────────────────
+function exportEqJSON(){
+  const blob=new Blob([JSON.stringify(eqData,null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='equipment_list.json'; a.click();
+  showToast('💾 Export JSON แล้ว');
+}
+function importEqJSON(){
+  const input=document.createElement('input'); input.type='file'; input.accept='.json';
+  input.onchange=e=>{
+    const file=e.target.files[0]; if(!file) return;
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      try{
+        const data=JSON.parse(ev.target.result);
+        if(!Array.isArray(data)) throw new Error('ไม่ใช่ array');
+        eqData=data; eqSave(); eqSelCat=-1;
+        eqRenderCats(); eqRenderItems();
+        showToast(`✅ Import สำเร็จ — ${data.length} หมวด`);
+      }catch(err){ showToast('❌ ไฟล์ไม่ถูกต้อง: '+err.message); }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+function resetEqToDefault(){
+  if(!confirm('Reset กลับค่าเริ่มต้น? (ข้อมูลที่แก้ไขจะหาย)')) return;
+  localStorage.removeItem(EQ_DATA_KEY);
+  eqLoadData(); eqSelCat=-1;
+  eqSave(); eqRenderCats(); eqRenderItems();
+  showToast('↩️ Reset เป็นค่าเริ่มต้นแล้ว');
+}
+
+// qty checkbox toggle
+document.getElementById('eq-new-cat-qty')?.addEventListener('change',function(){
+  const w=document.getElementById('eq-maxqty-wrap');
+  if(w) w.style.display=this.checked?'block':'none';
+});
+
+// ── โหลด equipment จาก localStorage ถ้าเคยแก้ไขไว้ ──
+(function(){
+  const saved=localStorage.getItem('admin_equipment_data');
+  if(saved){ try{ const d=JSON.parse(saved); if(Array.isArray(d)&&d.length>0){ EQUIPMENT.length=0; d.forEach(c=>EQUIPMENT.push(c)); } }catch(_){} }
+})();
+
 buildSections();
 updateStats1();
 renderCalendar();
