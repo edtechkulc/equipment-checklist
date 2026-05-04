@@ -832,51 +832,61 @@ function selectAllVisible(){
 // ════════════════════════════════════════════════
 // STEP 1 → STEP 2
 // ════════════════════════════════════════════════
-function goToStep2(){
-  try {
-    const user  = document.getElementById('userName').value.trim();
-    const event = document.getElementById('eventName').value.trim();
-    const date  = document.getElementById('useDate').value;
-    let   rdate = document.getElementById('returnDate').value;
+async function goToStep2(){
+  const user  = document.getElementById('userName').value.trim();
+  const event = document.getElementById('eventName').value.trim();
+  const date  = document.getElementById('useDate').value;
+  let   rdate = document.getElementById('returnDate').value;
 
-    // ── validation ──────────────────────────────
-    function fail(msg){
-      const el = document.getElementById('step1-alert');
-      el.className   = 'alert danger';
-      el.textContent = msg;
-      el.scrollIntoView({behavior:'smooth', block:'center'});
-      showToast(msg);
-    }
-
-    if(!user){    fail('⚠️ กรุณากรอกชื่อผู้ขอยืม'); return; }
-    if(!event){   fail('⚠️ กรุณากรอกชื่องาน / กิจกรรม'); return; }
-    if(!date){    fail('⚠️ กรุณาเลือกวันที่ใช้งาน'); return; }
-
-    // ถ้าไม่ได้กรอกวันคืน ให้ใช้วันเดียวกับวันใช้งาน
-    if(!rdate) {
-      rdate = date;
-      document.getElementById('returnDate').value = date;
-    }
-    if(rdate < date){ fail('⚠️ วันที่คืนต้องไม่ก่อนวันที่ใช้งาน'); return; }
-
-    const items = selectedItems();
-    if(items.length === 0){
-      fail('⚠️ กรุณาเลือกอุปกรณ์อย่างน้อย 1 รายการ (กดหัวข้อเพื่อเปิดแต่ละหมวดแล้วติ๊กถูก)');
-      return;
-    }
-
-    // ── ผ่านทุก validation ──────────────────────
-    const el = document.getElementById('step1-alert');
-    el.className   = 'alert success';
-    el.textContent = `✅ ข้อมูลครบ — ${items.length} รายการ กำลังไปขั้นที่ 2...`;
-
-    buildCheckTable(items);
-    showTab('step2');
-
-  } catch(err) {
-    showToast('❌ เกิดข้อผิดพลาด: ' + err.message);
-    console.error('goToStep2 error:', err);
+  function fail(msg){
+    const el=document.getElementById('step1-alert');
+    el.className='alert danger'; el.textContent=msg;
+    el.scrollIntoView({behavior:'smooth',block:'center'});
+    showToast(msg);
   }
+
+  if(!user)   { fail('⚠️ กรุณากรอกชื่อผู้ขอยืม'); return; }
+  if(!event)  { fail('⚠️ กรุณากรอกชื่องาน / กิจกรรม'); return; }
+  if(!date)   { fail('⚠️ กรุณาเลือกวันที่ใช้งาน'); return; }
+  if(!rdate)  { rdate=date; document.getElementById('returnDate').value=date; }
+  if(rdate<date){ fail('⚠️ วันที่คืนต้องไม่ก่อนวันที่ใช้งาน'); return; }
+
+  const items=selectedItems();
+  if(items.length===0){
+    fail('⚠️ กรุณาเลือกอุปกรณ์อย่างน้อย 1 รายการ'); return;
+  }
+
+  // ── แสดง loading state ─────────────────────────
+  const alertEl=document.getElementById('step1-alert');
+  alertEl.className='alert info';
+  alertEl.innerHTML='<span class="spinner" style="border-top-color:var(--blue);margin-right:6px"></span>กำลังตรวจสอบข้อมูลล่าสุดจาก Google Sheets...';
+  const btn=document.querySelector('[onclick="goToStep2()"]');
+  if(btn){ btn.disabled=true; btn.innerHTML='<span class="spinner"></span> กำลังโหลด...'; }
+
+  // ── ดึงข้อมูล real-time จาก Sheets พร้อมกัน 2 endpoints ──
+  const scriptUrl=localStorage.getItem('script_url');
+  if(scriptUrl){
+    try{
+      const [avRes, reqRes] = await Promise.all([
+        fetch(scriptUrl+'?action=availability',    {cache:'no-store'}).then(r=>r.json()).catch(()=>({})),
+        fetch(scriptUrl+'?action=active_requests', {cache:'no-store'}).then(r=>r.json()).catch(()=>({}))
+      ]);
+      if(avRes.success  && avRes.statuses)  sheetsStatuses            = avRes.statuses;
+      if(reqRes.success && reqRes.items)    window._sheetsActiveReqs  = reqRes.items;
+      updateHeaderStats();
+    }catch(_){ /* offline — ใช้ cache เดิม */ }
+  }
+
+  // คำนวณ conflict ด้วยข้อมูลล่าสุด
+  calendarAvailability = computeCalendarAvailability(date, rdate);
+
+  // ── restore button ─────────────────────────────
+  if(btn){ btn.disabled=false; btn.innerHTML='ไปขั้นที่ 2: ตรวจสอบความพร้อมใช้ →'; }
+  alertEl.className='alert success';
+  alertEl.textContent=`✅ ข้อมูลครบ — ${items.length} รายการ กำลังไปขั้นที่ 2...`;
+
+  buildCheckTable(items);
+  showTab('step2');
 }
 
 function selectedItems(){
@@ -1013,17 +1023,37 @@ async function loadSheetsAvailability(){
 
 function computeCalendarAvailability(start,end){
   const map={};
-  // จาก records ในเครื่อง
+
+  // 1. จาก localStorage ของเครื่องตัวเอง
   getRecords().filter(r=>['pending','approved','borrowed'].includes(r.status)).forEach(r=>{
     if(!rangesOverlap(start,end||start,r.date,r.returnDate||r.date)) return;
-    (r.items||[]).forEach(it=>{map[it.name]={type:r.status==='pending'?'pending':'busy',event:r.event};});
+    (r.items||[]).forEach(it=>{
+      const type=r.status==='pending'?'pending':'busy';
+      if(!map[it.name]||map[it.name].type!=='busy')
+        map[it.name]={type,event:r.event,user:r.user||''};
+    });
   });
-  // จาก Sheets
+
+  // 2. จาก Sheets statuses (borrowed/maintenance/lost)
   Object.entries(sheetsStatuses).forEach(([name,info])=>{
     if(['borrowed','maintenance','lost'].includes(info.status)){
-      if(!map[name]) map[name]={type:'busy',event:info.event||info.status};
+      if(!map[name]||map[name].type!=='busy')
+        map[name]={type:'busy',event:info.event||info.status,user:info.borrowedBy||''};
     }
   });
+
+  // 3. ── Real-time: คำขอ pending/approved จากเครื่องอื่นผ่าน Sheets ──
+  (window._sheetsActiveReqs||[])
+    .filter(r=>rangesOverlap(start,end||start,r.date,r.returnDate||r.date))
+    .forEach(r=>{
+      (r.items||[]).forEach(it=>{
+        const name=typeof it==='object'?it.name:it;
+        const type=r.status==='pending'?'pending':'busy';
+        if(!map[name]||map[name].type!=='busy')
+          map[name]={type,event:r.event||'–',user:r.user||'–'};
+      });
+    });
+
   return map;
 }
 
@@ -1841,7 +1871,7 @@ applyIssueBadgesOnEquipment();
 renderIssueBanners();
 
 // Set script URL
-const SCRIPT_URL='https://script.google.com/macros/s/AKfycbyKkOWhbGQ2xO-QqIbnFv_D6gjOisbEhiLwL9ZadSIyIqXAKo2asAPv_PXZoWtWrREGUw/exec';
+const SCRIPT_URL='https://script.google.com/macros/s/AKfycbzzk1PVJ-IlIzZLIaq8LzKg8rU6yR5VattVbX7Em4UV4WcofOPuK3zCRfYSAuqn98A-7A/exec';
 if(!localStorage.getItem('script_url')||localStorage.getItem('script_url').includes('AKfycbzjqab')){
   localStorage.setItem('script_url',SCRIPT_URL);
 }
