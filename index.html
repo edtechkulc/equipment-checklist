@@ -171,6 +171,7 @@ body{font-family:'Sarabun','Segoe UI',sans-serif;background:linear-gradient(180d
 .cal-more{font-size:10px;color:#475569;font-weight:800;cursor:pointer;padding:2px 5px}
 .cal-more:hover{text-decoration:underline}
 @media(max-width:700px){.cal-day{min-height:52px}.cal-event{font-size:9px}.cal-dcount{display:none}}
+@media(max-width:900px){#panel-step3 .container>div[style*="grid-template-columns"]{grid-template-columns:1fr!important}#panel-step3 div[style*="position:sticky"]{position:static!important}}
 
 /* ── REQUEST CARD ── */
 .request-card{border:1px solid var(--gray-2);border-radius:14px;padding:14px;background:#fff;margin-bottom:10px;box-shadow:var(--shadow-soft)}
@@ -392,35 +393,61 @@ body{font-family:'Sarabun','Segoe UI',sans-serif;background:linear-gradient(180d
     <div class="step-divider-title">เช็กปฏิทินกันชนงาน</div>
     <div class="step-divider-line"></div>
   </div>
-  <div class="card">
-    <div class="card-header">
-      <span class="month-title" id="month-title">—</span>
-      <div style="display:flex;gap:6px">
-        <button class="btn" onclick="moveMonth(-1)">← ก่อนหน้า</button>
-        <button class="btn" onclick="goToday()">วันนี้</button>
-        <button class="btn" onclick="moveMonth(1)">ถัดไป →</button>
-      </div>
-    </div>
-    <div class="card-body" style="padding:14px">
-      <div class="cal-head">
-        <div class="cal-legend">
-          <span><i class="legend-dot" style="background:#f59e0b"></i>รออนุมัติ</span>
-          <span><i class="legend-dot" style="background:#3b82f6"></i>อนุมัติแล้ว</span>
-          <span><i class="legend-dot" style="background:#c0392b"></i>ถูกยืม/ชนคิว</span>
+
+  <!-- two-column grid: calendar | sidebar -->
+  <div style="display:grid;grid-template-columns:1fr 310px;gap:14px;align-items:start">
+
+    <!-- คอลัมน์ซ้าย: ปฏิทิน -->
+    <div class="card">
+      <div class="card-header" style="flex-wrap:wrap;gap:6px">
+        <span class="month-title" id="month-title">—</span>
+        <div style="display:flex;gap:6px">
+          <button class="btn" onclick="moveMonth(-1)">← ก่อนหน้า</button>
+          <button class="btn" onclick="goToday()">วันนี้</button>
+          <button class="btn" onclick="moveMonth(1)">ถัดไป →</button>
         </div>
       </div>
-      <div class="cal-grid" id="cal-grid"></div>
+      <div class="card-body" style="padding:10px 12px">
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:8px;font-size:12px;color:var(--muted)">
+          <span><i class="legend-dot" style="background:#f59e0b"></i> รออนุมัติ</span>
+          <span><i class="legend-dot" style="background:#3b82f6"></i> อนุมัติแล้ว</span>
+          <span><i class="legend-dot" style="background:#c0392b"></i> ถูกยืม/ชนคิว</span>
+        </div>
+        <div class="cal-grid" id="cal-grid"></div>
+      </div>
+    </div>
+
+    <!-- คอลัมน์ขวา: sidebar -->
+    <div style="display:flex;flex-direction:column;gap:12px;position:sticky;top:140px">
+
+      <!-- แจ้งเตือนชนคิว -->
+      <div id="step3-conflict-alert"></div>
+
+      <!-- รายการวันที่เลือก -->
+      <div class="card">
+        <div class="card-header" style="font-size:13px;padding:10px 12px">
+          📅 วันที่เลือก
+          <span class="badge idle" id="sel-date-label" style="font-size:10px">ยังไม่เลือกวัน</span>
+        </div>
+        <div class="card-body" style="padding:12px;max-height:340px;overflow-y:auto" id="day-detail">
+          <div style="font-size:12px;color:var(--muted);text-align:center;padding:12px 0">
+            คลิกวันที่ในปฏิทิน<br>เพื่อดูรายการ
+          </div>
+        </div>
+      </div>
+
+      <!-- ปุ่ม -->
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <button class="btn primary lg full" onclick="goToStep4()" style="font-size:14px;padding:13px">
+          ส่งคำขอยืม →<br>
+          <span style="font-size:11px;font-weight:400;opacity:.85">ไปขั้นที่ 4 อนุมัติคำขอ</span>
+        </button>
+        <button class="btn full" onclick="showTab('step2')" style="font-size:13px">← กลับขั้นที่ 2</button>
+      </div>
+
     </div>
   </div>
-  <div class="card">
-    <div class="card-header">รายการในวันที่เลือก <span class="badge idle" id="sel-date-label">ยังไม่เลือกวัน</span></div>
-    <div class="card-body" id="day-detail"><div class="alert info">คลิกวันที่ในปฏิทินเพื่อดูรายการ</div></div>
-  </div>
-  <div id="step3-conflict-alert"></div>
-  <div class="btn-row">
-    <button class="btn" onclick="showTab('step2')">← กลับขั้นที่ 2</button>
-    <button class="btn primary lg" onclick="goToStep4()">ส่งคำขอยืมและไปขั้นที่ 4 →</button>
-  </div>
+
 </div>
 </div>
 
@@ -1871,7 +1898,7 @@ applyIssueBadgesOnEquipment();
 renderIssueBanners();
 
 // Set script URL
-const SCRIPT_URL='https://script.google.com/macros/s/AKfycbzzk1PVJ-IlIzZLIaq8LzKg8rU6yR5VattVbX7Em4UV4WcofOPuK3zCRfYSAuqn98A-7A/exec';
+const SCRIPT_URL='https://script.google.com/macros/s/AKfycbyKkOWhbGQ2xO-QqIbnFv_D6gjOisbEhiLwL9ZadSIyIqXAKo2asAPv_PXZoWtWrREGUw/exec';
 if(!localStorage.getItem('script_url')||localStorage.getItem('script_url').includes('AKfycbzjqab')){
   localStorage.setItem('script_url',SCRIPT_URL);
 }
