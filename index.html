@@ -736,7 +736,7 @@ function setIssues(obj){localStorage.setItem(ISSUES_KEY,JSON.stringify(obj));ope
 
 function seedDemo(){
   if(localStorage.getItem('university_equipment_seeded')) return;
-  const t=new Date(), iso=d=>d.toISOString().slice(0,10);
+  const t=new Date(), iso=d=>localISO(d);
   const d1=new Date(t);d1.setDate(t.getDate()+3);
   const d2=new Date(t);d2.setDate(t.getDate()+5);
   setRecords([
@@ -1278,10 +1278,10 @@ function renderCalendar(){
   const dn=['อา','จ','อ','พ','พฤ','ศ','ส'];
   let html=dn.map(n=>`<div class="cal-day-name">${n}</div>`).join('');
   const recs=getRecords().filter(r=>['pending','approved','borrowed'].includes(r.status));
-  const todayIso=new Date().toISOString().slice(0,10);
+  const todayIso = localISO(new Date());
   for(let i=0;i<42;i++){
     const d=new Date(start);d.setDate(start.getDate()+i);
-    const iso=d.toISOString().slice(0,10);
+    const iso = localISO(d);
     const dayRecs=recs.filter(r=>rangesOverlap(iso,iso,r.date,r.returnDate||r.date));
     const cls=['cal-day'];
     if(d.getMonth()!==m) cls.push('muted');
@@ -1318,15 +1318,30 @@ function renderCalEventBars(recs,startDate){
 }
 function selectCalDate(iso){
   selCalDate=iso;renderCalendar();
-  document.getElementById('sel-date-label').textContent=new Date(iso).toLocaleDateString('th-TH');
+  // แปลง iso string → Date แบบ local timezone (ไม่ใช่ UTC)
+  const [y,m,d] = iso.split('-').map(Number);
+  document.getElementById('sel-date-label').textContent = new Date(y,m-1,d).toLocaleDateString('th-TH');
   const recs=getRecords().filter(r=>['pending','approved','borrowed'].includes(r.status)&&rangesOverlap(iso,iso,r.date,r.returnDate||r.date));
   const box=document.getElementById('day-detail');
   box.innerHTML=recs.length?recs.map(requestCard).join(''):'<div class="alert info">ไม่มีรายการในวันนี้</div>';
 }
 function moveMonth(n){currentMonth.setMonth(currentMonth.getMonth()+n);renderCalendar();}
 function goToday(){currentMonth=new Date();renderCalendar();}
-function getDates(s,e){const d=[],cur=new Date(s),end=new Date(e||s);while(cur<=end){d.push(cur.toISOString().slice(0,10));cur.setDate(cur.getDate()+1);}return d;}
+function getDates(s,e){
+  const d=[],cur=new Date(s),end=new Date(e||s);
+  // reset time ให้เป็น local midnight เพื่อหลีกเลี่ยง DST/timezone drift
+  cur.setHours(0,0,0,0); end.setHours(23,59,59,999);
+  while(cur<=end){d.push(localISO(cur));cur.setDate(cur.getDate()+1);}
+  return d;
+}
 function daysBetween(s,e){return getDates(s,e).length;}
+// แปลง Date → "YYYY-MM-DD" ตาม timezone เครื่อง (ไม่ใช่ UTC)
+function localISO(d){
+  const y=d.getFullYear();
+  const m=String(d.getMonth()+1).padStart(2,'0');
+  const day=String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
 function rangesOverlap(aS,aE,bS,bE){aE=aE||aS;bE=bE||bS;return aS<=bE&&bS<=aE;}
 
 // ════════════════════════════════════════════════
