@@ -470,9 +470,6 @@ body{font-family:'Sarabun','Segoe UI',sans-serif;background:linear-gradient(180d
     <button class="btn warn" onclick="syncFromGoogle()">🔄 ซิงก์จาก Sheets</button>
   </div>
 
-  <!-- แถบสถานะ admin session -->
-  <div id="step4-admin-bar" style="margin-bottom:12px"></div>
-
   <div id="approval-list"></div>
 
   <!-- รายการปัญหาอุปกรณ์รอแก้ไข -->
@@ -497,7 +494,6 @@ body{font-family:'Sarabun','Segoe UI',sans-serif;background:linear-gradient(180d
     <div class="step-divider-title">ยืม / คืนอุปกรณ์</div>
     <div class="step-divider-line"></div>
   </div>
-  <div id="step5-admin-bar" style="margin-bottom:12px"></div>
   <div class="toolbar">
     <div style="font-size:13px;color:var(--muted)">แสดงเฉพาะคำขอที่อนุมัติแล้วหรือกำลังยืมอยู่</div>
     <button class="btn warn" onclick="renderReturnList()">🔄 รีเฟรช</button>
@@ -1199,7 +1195,6 @@ function renderApproval(){
 }
 
 function approveRequest(id){
-  if(!requireAdmin('อนุมัติคำขอ')) return;
   const records=getRecords();const r=records.find(x=>x.id===id);if(!r) return;
   r.status='approved';r.approvedAt=new Date().toISOString();
   setRecords(records);
@@ -1208,7 +1203,6 @@ function approveRequest(id){
   renderAll();showToast('✅ อนุมัติแล้ว — ส่งอีเมลแจ้งไปที่ '+NOTIFY_EMAIL);
 }
 function rejectRequest(id){
-  if(!requireAdmin('ไม่อนุมัติคำขอ')) return;
   const reason=prompt('ระบุเหตุผล (ถ้ามี)','อุปกรณ์ไม่พร้อม / ชนคิว');
   const records=getRecords();const r=records.find(x=>x.id===id);if(!r) return;
   r.status='rejected';r.rejectedAt=new Date().toISOString();r.rejectReason=reason||'';
@@ -1247,7 +1241,6 @@ function renderReturnList(){
   document.getElementById('return-list').innerHTML=records.length?records.map(r=>requestCard(r,'return')).join(''):'<div class="alert info">ไม่มีรายการที่รอคืนอุปกรณ์</div>';
 }
 function markReturned(id){
-  if(!requireAdmin('ยืนยันคืนอุปกรณ์')) return;
   const by=prompt('ชื่อผู้คืน / ผู้รับคืน','เจ้าหน้าที่');if(by===null) return;
   const records=getRecords();const r=records.find(x=>x.id===id);if(!r) return;
   r.status='returned';r.returnedAt=new Date().toISOString();r.returnedBy=by||'';
@@ -1490,8 +1483,8 @@ function showTab(name){
     renderIssueBanners();
   }
   if(name==='step2') renderIssueBanners();
-  if(name==='step4'){renderApproval();renderIssueAdminPanel();renderAdminBar();}
-  if(name==='step5') {renderReturnList();renderAdminBar();}
+  if(name==='step4'){renderApproval();renderIssueAdminPanel();}
+  if(name==='step5') renderReturnList();
   if(name==='history') renderHistory();
   if(name==='eq-admin') renderEqAdmin();
   window.scrollTo({top:0,behavior:'smooth'});
