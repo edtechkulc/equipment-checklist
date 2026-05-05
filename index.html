@@ -469,6 +469,10 @@ body{font-family:'Sarabun','Segoe UI',sans-serif;background:linear-gradient(180d
     </div>
     <button class="btn warn" onclick="syncFromGoogle()">🔄 ซิงก์จาก Sheets</button>
   </div>
+
+  <!-- แถบสถานะ admin session -->
+  <div id="step4-admin-bar" style="margin-bottom:12px"></div>
+
   <div id="approval-list"></div>
 
   <!-- รายการปัญหาอุปกรณ์รอแก้ไข -->
@@ -493,6 +497,7 @@ body{font-family:'Sarabun','Segoe UI',sans-serif;background:linear-gradient(180d
     <div class="step-divider-title">ยืม / คืนอุปกรณ์</div>
     <div class="step-divider-line"></div>
   </div>
+  <div id="step5-admin-bar" style="margin-bottom:12px"></div>
   <div class="toolbar">
     <div style="font-size:13px;color:var(--muted)">แสดงเฉพาะคำขอที่อนุมัติแล้วหรือกำลังยืมอยู่</div>
     <button class="btn warn" onclick="renderReturnList()">🔄 รีเฟรช</button>
@@ -771,6 +776,44 @@ function requireAdmin(txt=''){
   showToast('❌ รหัสไม่ถูกต้อง');return false;
 }
 function logoutAdmin(){sessionStorage.removeItem(ADMIN_KEY);showToast('ออกจากโหมดเจ้าหน้าที่');}
+// แถบแสดงสถานะ admin session (แสดงใน step4, step5, issue banner)
+function renderAdminBar(){
+  const isAuth = sessionStorage.getItem(ADMIN_KEY)==='1' || sessionStorage.getItem(EQ_ADMIN_KEY)==='1';
+  ['step4','step5'].forEach(step=>{
+    const el = document.getElementById('step'+step.slice(-1)+'-admin-bar') ||
+               document.getElementById(step+'-admin-bar');
+    if(!el) return;
+    if(isAuth){
+      el.innerHTML=`<div style="display:flex;align-items:center;gap:8px;background:var(--green-light);border:1px solid #c3e6cb;border-radius:10px;padding:9px 14px;font-size:12px;font-weight:700;color:var(--green)">
+        🔐 โหมดเจ้าหน้าที่ — สามารถอนุมัติ อนุมัติซ่อม และยืนยันคืนได้
+        <button class="btn danger" style="margin-left:auto;padding:4px 10px;font-size:11px" onclick="adminLogout()">🔒 ออก</button>
+      </div>`;
+    } else {
+      el.innerHTML=`<div style="display:flex;align-items:center;gap:8px;background:var(--yellow-light);border:1px solid #f7c948;border-radius:10px;padding:9px 14px;font-size:12px;font-weight:700;color:#92400e">
+        🔒 ต้องยืนยันรหัสเจ้าหน้าที่ก่อนอนุมัติ / ยืนยันคืน
+        <button class="btn primary" style="margin-left:auto;padding:4px 10px;font-size:11px" onclick="adminLogin()">เข้าสู่ระบบ</button>
+      </div>`;
+    }
+  });
+}
+
+function adminLogin(){
+  const k=prompt('กรอกรหัสเจ้าหน้าที่ (Admin key)');
+  const key=localStorage.getItem('equipment_admin_key')||DEF_KEY;
+  if(k===key){
+    sessionStorage.setItem(ADMIN_KEY,'1');
+    sessionStorage.setItem(EQ_ADMIN_KEY,'1');
+    renderAdminBar();
+    showToast('✅ ยืนยันสิทธิ์เจ้าหน้าที่แล้ว');
+  } else { showToast('❌ รหัสไม่ถูกต้อง'); }
+}
+
+function adminLogout(){
+  sessionStorage.removeItem(ADMIN_KEY);
+  sessionStorage.removeItem(EQ_ADMIN_KEY);
+  renderAdminBar();
+  showToast('ออกจากโหมดเจ้าหน้าที่แล้ว');
+}
 function renderAdminStatus(){
   const el=document.getElementById('admin-status');if(!el)return;
   const ok=sessionStorage.getItem(ADMIN_KEY)==='1';
@@ -1156,7 +1199,7 @@ function renderApproval(){
 }
 
 function approveRequest(id){
-  
+  if(!requireAdmin('อนุมัติคำขอ')) return;
   const records=getRecords();const r=records.find(x=>x.id===id);if(!r) return;
   r.status='approved';r.approvedAt=new Date().toISOString();
   setRecords(records);
@@ -1165,6 +1208,7 @@ function approveRequest(id){
   renderAll();showToast('✅ อนุมัติแล้ว — ส่งอีเมลแจ้งไปที่ '+NOTIFY_EMAIL);
 }
 function rejectRequest(id){
+  if(!requireAdmin('ไม่อนุมัติคำขอ')) return;
   const reason=prompt('ระบุเหตุผล (ถ้ามี)','อุปกรณ์ไม่พร้อม / ชนคิว');
   const records=getRecords();const r=records.find(x=>x.id===id);if(!r) return;
   r.status='rejected';r.rejectedAt=new Date().toISOString();r.rejectReason=reason||'';
@@ -1203,6 +1247,7 @@ function renderReturnList(){
   document.getElementById('return-list').innerHTML=records.length?records.map(r=>requestCard(r,'return')).join(''):'<div class="alert info">ไม่มีรายการที่รอคืนอุปกรณ์</div>';
 }
 function markReturned(id){
+  if(!requireAdmin('ยืนยันคืนอุปกรณ์')) return;
   const by=prompt('ชื่อผู้คืน / ผู้รับคืน','เจ้าหน้าที่');if(by===null) return;
   const records=getRecords();const r=records.find(x=>x.id===id);if(!r) return;
   r.status='returned';r.returnedAt=new Date().toISOString();r.returnedBy=by||'';
@@ -1445,8 +1490,8 @@ function showTab(name){
     renderIssueBanners();
   }
   if(name==='step2') renderIssueBanners();
-  if(name==='step4'){renderApproval();renderIssueAdminPanel();}
-  if(name==='step5') renderReturnList();
+  if(name==='step4'){renderApproval();renderIssueAdminPanel();renderAdminBar();}
+  if(name==='step5') {renderReturnList();renderAdminBar();}
   if(name==='history') renderHistory();
   if(name==='eq-admin') renderEqAdmin();
   window.scrollTo({top:0,behavior:'smooth'});
@@ -1497,6 +1542,7 @@ function resolveIssueByBtn(btn){
 }
 
 async function resolveIssue(itemName){
+  if(!requireAdmin('ยืนยันการแก้ไขอุปกรณ์')) return;
   const resolver = prompt('ชื่อผู้แก้ไข / ผู้รับผิดชอบ','เจ้าหน้าที่');
   if(resolver===null) return;
 
@@ -1660,6 +1706,8 @@ function verifyEqAdmin(){
   const val = document.getElementById('eq-admin-key-input')?.value.trim();
   const key = localStorage.getItem('equipment_admin_key') || DEF_KEY;
   if(val !== key){ showToast('❌ Admin key ไม่ถูกต้อง'); return; }
+  // ใช้ session key เดียวกันกับ requireAdmin เพื่อให้ share session ได้
+  sessionStorage.setItem(ADMIN_KEY,'1');
   sessionStorage.setItem(EQ_ADMIN_KEY,'1');
   document.getElementById('eq-admin-lock').style.display  = 'none';
   document.getElementById('eq-admin-panel').style.display = 'block';
@@ -1669,7 +1717,9 @@ function verifyEqAdmin(){
 }
 
 function renderEqAdmin(){
-  if(sessionStorage.getItem(EQ_ADMIN_KEY)!=='1'){
+  // ตรวจสอบทั้ง EQ_ADMIN_KEY และ ADMIN_KEY (ถ้า login จากหน้าอื่นแล้ว ไม่ต้อง login ซ้ำ)
+  const isAuth = sessionStorage.getItem(EQ_ADMIN_KEY)==='1' || sessionStorage.getItem(ADMIN_KEY)==='1';
+  if(!isAuth){
     document.getElementById('eq-admin-lock').style.display  = 'block';
     document.getElementById('eq-admin-panel').style.display = 'none';
     return;
