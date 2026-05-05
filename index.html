@@ -526,13 +526,13 @@ body{font-family:'Sarabun','Segoe UI',sans-serif;background:linear-gradient(180d
         </div>
         <div class="form-group span2">
           <label class="form-label">Admin key สำหรับเจ้าหน้าที่</label>
-          <input class="form-control" id="adminKeySetting" placeholder="เช่น KU-ADMIN-2569">
+          <input class="form-control" id="adminKeySetting" placeholder="กรอก Admin key ใหม่">
         </div>
       </div>
       <div class="btn-row">
         <button class="btn primary" onclick="saveAdminKey()">💾 บันทึก Admin key</button>
       </div>
-      <div class="alert warn" style="margin-top:12px">ค่าเริ่มต้น Admin key: <strong>KU-ADMIN-2569</strong></div>
+      <div class="alert info" style="margin-top:12px">หลังเปลี่ยน Admin key แล้ว session ปัจจุบันจะถูก logout อัตโนมัติ</div>
     </div>
   </div>
   <!-- ล้างข้อมูลในเครื่อง -->
@@ -734,17 +734,11 @@ function setRecords(r){localStorage.setItem('university_equipment_requests',JSON
 function getIssues(){return JSON.parse(localStorage.getItem(ISSUES_KEY)||'{}');}
 function setIssues(obj){localStorage.setItem(ISSUES_KEY,JSON.stringify(obj));openIssues=obj;updateHeaderStats();}
 
+// FIX 4: ปิด seedDemo สำหรับ production — ไม่สร้างข้อมูลตัวอย่าง
 function seedDemo(){
-  if(localStorage.getItem('university_equipment_seeded')) return;
-  const t=new Date(), iso=d=>localISO(d);
-  const d1=new Date(t);d1.setDate(t.getDate()+3);
-  const d2=new Date(t);d2.setDate(t.getDate()+5);
-  setRecords([
-    {id:'rq-demo-1',user:'เจ้าหน้าที่โสตฯ',event:'ถ่ายทำวิดีโอประชาสัมพันธ์',date:iso(d1),returnDate:iso(d2),note:'ข้อมูลตัวอย่าง',status:'approved',savedAt:new Date().toISOString(),
-     items:[{cat:'กล้องถ่ายทำ',name:'Canon XF705',qty:1},{cat:'ไวเลสไมโครโฟน',name:'Saramonic Blink500',qty:1}],
-     checkResults:{}}
-  ]);
-  localStorage.setItem('university_equipment_seeded','1');
+  // ปิดการใช้งาน seed demo ในระบบ production
+  // หากต้องการทดสอบ ให้ uncomment โค้ดด้านล่าง
+  return;
 }
 seedDemo();
 
@@ -1687,10 +1681,21 @@ function renderEqAdmin(){
   eqRenderItems();
 }
 
-// โหลดข้อมูลจาก localStorage (ถ้าไม่มีใช้ EQUIPMENT ปัจจุบัน)
+// โหลดข้อมูลจาก localStorage — ถ้าไม่มีหรือว่างเปล่า ให้ใช้ EQUIPMENT และบันทึกทันที
 function eqLoadData(){
   const saved = localStorage.getItem(EQ_DATA_KEY);
-  eqData = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(EQUIPMENT));
+  if(saved){
+    try{
+      const parsed = JSON.parse(saved);
+      eqData = (Array.isArray(parsed) && parsed.length > 0) ? parsed : JSON.parse(JSON.stringify(EQUIPMENT));
+    } catch(_){
+      eqData = JSON.parse(JSON.stringify(EQUIPMENT));
+    }
+  } else {
+    eqData = JSON.parse(JSON.stringify(EQUIPMENT));
+    // บันทึกทันทีเพื่อให้ครั้งถัดไปโหลดได้
+    localStorage.setItem(EQ_DATA_KEY, JSON.stringify(eqData));
+  }
 }
 
 function eqSave(){
@@ -1912,12 +1917,10 @@ openIssues = getIssues();
 applyIssueBadgesOnEquipment();
 renderIssueBanners();
 
-// Set script URL
+// ── FIX 1: Hardcode Script URL ทุกเครื่อง ไม่ใช้ conditional ──
 const SCRIPT_URL='https://script.google.com/macros/s/AKfycbyKkOWhbGQ2xO-QqIbnFv_D6gjOisbEhiLwL9ZadSIyIqXAKo2asAPv_PXZoWtWrREGUw/exec';
-if(!localStorage.getItem('script_url')||localStorage.getItem('script_url').includes('AKfycbzjqab')){
-  localStorage.setItem('script_url',SCRIPT_URL);
-}
-document.getElementById('scriptUrl').value=localStorage.getItem('script_url');
+localStorage.setItem('script_url', SCRIPT_URL); // set ทุกครั้ง ไม่มีเงื่อนไข
+document.getElementById('scriptUrl').value = SCRIPT_URL;
 saveScriptUrl();
 const adminInput=document.getElementById('adminKeySetting');
 if(adminInput) adminInput.value=localStorage.getItem('equipment_admin_key')||DEF_KEY;
