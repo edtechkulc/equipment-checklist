@@ -1268,9 +1268,29 @@ async function goToStep4(){
   const date=document.getElementById('useDate').value;
   const returnDate=document.getElementById('returnDate').value||date;
   const note=document.getElementById('note').value.trim();
-  const items=selectedItems();
+  const allItems=selectedItems();
 
-  if(!user||!event||!date||items.length===0){showToast('⚠️ ข้อมูลไม่ครบ กรุณากลับไปขั้นที่ 1');return;}
+  if(!user||!event||!date||allItems.length===0){showToast('⚠️ ข้อมูลไม่ครบ กรุณากลับไปขั้นที่ 1');return;}
+
+  // ✅ อนุมัติให้ยืมได้เฉพาะอุปกรณ์ที่ตรวจแล้วสถานะ "ปกติ" เท่านั้น
+  const okItems  = allItems.filter(it=>checkResults[it.name]?.status==='ok');
+  const excluded = allItems.filter(it=>checkResults[it.name]?.status!=='ok');
+
+  if(okItems.length===0){
+    const el=document.getElementById('step3-conflict-alert');
+    if(el) el.innerHTML='<div class="alert danger">⚠️ ไม่มีอุปกรณ์ที่ผ่านการตรวจ "ปกติ" — อนุมัติให้ยืมไม่ได้ กรุณากลับไปตรวจที่ขั้นที่ 2</div>';
+    showToast('⚠️ ไม่มีอุปกรณ์ที่ตรวจแล้วปกติ');
+    return;
+  }
+  if(excluded.length){
+    const names=excluded.map(x=>{
+      const s=checkResults[x.name]?.status;
+      return `• ${x.name} (${s==='notok'?'ไม่พร้อม/รอซ่อม':'ยังไม่ได้ตรวจ'})`;
+    }).join('\n');
+    if(!confirm(`อุปกรณ์ ${excluded.length} รายการต่อไปนี้จะ "ไม่ถูกอนุมัติให้ยืม" เพราะไม่ได้ผ่านการตรวจว่าปกติ:\n\n${names}\n\nระบบจะอนุมัติเฉพาะอุปกรณ์ที่ปกติ ${okItems.length} รายการ ดำเนินการต่อหรือไม่?`)) return;
+  }
+
+  const items=okItems; // คำขอที่ส่งอนุมัติ มีเฉพาะอุปกรณ์ที่ปกติ
 
   const record={
     id:'rq-'+Date.now(),user,userEmail,event,date,returnDate,note,items,
@@ -1282,7 +1302,7 @@ async function goToStep4(){
 
   showTab('step4');
   renderApproval();
-  showToast('✅ ส่งคำขอแล้ว — รอเจ้าหน้าที่อนุมัติ (Step 4)');
+  showToast(`✅ ส่งคำขอแล้ว — อนุมัติเฉพาะอุปกรณ์ปกติ ${okItems.length} รายการ`);
 
   // FIX: บันทึกขึ้น Sheets แบบตรวจผลจริง ถ้าไม่สำเร็จให้เตือน (ข้อมูลยังอยู่ในเครื่อง กดซิงก์ภายหลังได้)
   if(localStorage.getItem('script_url')){
