@@ -1322,31 +1322,52 @@ function renderApproval(){
   el.innerHTML=records.length?records.map(r=>requestCard(r,'approval')).join(''):'<div class="alert info">ไม่มีคำขอที่รออนุมัติ</div>';
 }
 
-function approveRequest(id){
+async function approveRequest(id){
   const records=getRecords();const r=records.find(x=>x.id===id);if(!r) return;
+  const url=localStorage.getItem('script_url');
+  if(url){
+    const res=await postToGoogle({...r,action:'approve'});
+    if(!res||res.success!==true){
+      const err=res&&res.error?res.error:'ไม่ทราบสาเหตุ';
+      if(err==='unauthorized') showToast('❌ อนุมัติไม่สำเร็จ: รหัสเจ้าหน้าที่ไม่ตรงกับ SHARED_SECRET บนเซิร์ฟเวอร์');
+      else showToast('❌ อนุมัติไม่สำเร็จ: '+err);
+      return; // ไม่เปลี่ยนสถานะ เพื่อไม่ให้ลวงตา
+    }
+  }
   r.status='approved';r.approvedAt=new Date().toISOString();
   setRecords(records);
-  postToGoogle({...r,action:'approve'}); // fire-and-forget
-  sendEmailNotification(r,'approved');
-  renderAll();showToast('✅ อนุมัติแล้ว — ส่งอีเมลแจ้งไปที่ '+NOTIFY_EMAIL);
+  const mail=await sendEmailNotification(r,'approved');
+  renderAll();
+  if(url && mail && mail.success===false) showToast('✅ อนุมัติแล้ว — แต่ส่งอีเมลไม่สำเร็จ: '+(mail.error||''));
+  else showToast('✅ อนุมัติแล้ว'+(url?' — ส่งอีเมลแจ้งไปที่ '+NOTIFY_EMAIL:''));
 }
-function rejectRequest(id){
+async function rejectRequest(id){
   const reason=prompt('ระบุเหตุผล (ถ้ามี)','อุปกรณ์ไม่พร้อม / ชนคิว');
   const records=getRecords();const r=records.find(x=>x.id===id);if(!r) return;
-  r.status='rejected';r.rejectedAt=new Date().toISOString();r.rejectReason=reason||'';
+  const url=localStorage.getItem('script_url');
+  const payload={...r,status:'rejected',rejectedAt:new Date().toISOString(),rejectReason:reason||''};
+  if(url){
+    const res=await postToGoogle({...payload,action:'reject'});
+    if(!res||res.success!==true){
+      const err=res&&res.error?res.error:'ไม่ทราบสาเหตุ';
+      if(err==='unauthorized') showToast('❌ ไม่อนุมัติไม่สำเร็จ: รหัสเจ้าหน้าที่ไม่ตรงกับ SHARED_SECRET บนเซิร์ฟเวอร์');
+      else showToast('❌ ทำรายการไม่สำเร็จ: '+err);
+      return;
+    }
+  }
+  r.status='rejected';r.rejectedAt=payload.rejectedAt;r.rejectReason=payload.rejectReason;
   setRecords(records);
-  postToGoogle({...r,action:'reject'}); // fire-and-forget
-  sendEmailNotification(r,'rejected');
-  renderAll();showToast('❌ ไม่อนุมัติ — ส่งอีเมลแจ้งแล้ว');
+  await sendEmailNotification(r,'rejected');
+  renderAll();showToast('❌ ไม่อนุมัติแล้ว'+(url?' — ส่งอีเมลแจ้งแล้ว':''));
 }
 
 // ส่งอีเมลผ่าน Apps Script
 async function sendEmailNotification(r,action){
-  const url=localStorage.getItem('script_url');if(!url) return;
+  const url=localStorage.getItem('script_url');if(!url) return {success:false,error:'no url'};
   const checkSummary=Object.entries(r.checkResults||{}).map(([name,v])=>
     `${name}: ${v.status==='ok'?'✅ ปกติ':'❌ ไม่พร้อม'}${v.note?' ('+v.note+')':''}`
   ).join('\n');
-  await postToGoogle({
+  return await postToGoogle({
     action:'sendEmail',
     toEmail: NOTIFY_EMAIL,
     requesterEmail: r.userEmail||'',   // FIX F: อีเมลผู้ขอ (backend ใช้ CC/แจ้งผู้ยืมได้)
@@ -1386,21 +1407,37 @@ function overdueDays(r){
 }
 
 // FIX D: เจ้าหน้าที่จ่ายอุปกรณ์ออก (approved → borrowed)
-function markBorrowed(id){
+async function markBorrowed(id){
   if(!requireAdmin('จ่ายอุปกรณ์')) return;
   const records=getRecords();const r=records.find(x=>x.id===id);if(!r) return;
+  const url=localStorage.getItem('script_url');
+  if(url){
+    const res=await postToGoogle({...r,action:'borrow'});
+    if(!res||res.success!==true){
+      const err=res&&res.error?res.error:'ไม่ทราบสาเหตุ';
+      showToast(err==='unauthorized'?'❌ จ่ายอุปกรณ์ไม่สำเร็จ: รหัสไม่ตรงกับเซิร์ฟเวอร์':'❌ จ่ายอุปกรณ์ไม่สำเร็จ: '+err);
+      return;
+    }
+  }
   r.status='borrowed';r.borrowedAt=new Date().toISOString();
   setRecords(records);
-  postToGoogle({...r,action:'borrow'}); // fire-and-forget (backend ไม่รู้จักก็ไม่กระทบ)
   renderAll();
   showToast('📤 จ่ายอุปกรณ์แล้ว — สถานะเปลี่ยนเป็น "ถูกยืมอยู่"');
 }
-function markReturned(id){
+async function markReturned(id){
   const by=prompt('ชื่อผู้คืน / ผู้รับคืน','เจ้าหน้าที่');if(by===null) return;
   const records=getRecords();const r=records.find(x=>x.id===id);if(!r) return;
+  const url=localStorage.getItem('script_url');
+  if(url){
+    const res=await postToGoogle({...r,action:'return',returnedBy:by||'',items:r.items.map(i=>i.name)});
+    if(!res||res.success!==true){
+      const err=res&&res.error?res.error:'ไม่ทราบสาเหตุ';
+      showToast(err==='unauthorized'?'❌ ยืนยันคืนไม่สำเร็จ: รหัสไม่ตรงกับเซิร์ฟเวอร์':'❌ ยืนยันคืนไม่สำเร็จ: '+err);
+      return;
+    }
+  }
   r.status='returned';r.returnedAt=new Date().toISOString();r.returnedBy=by||'';
   setRecords(records);
-  postToGoogle({...r,action:'return',returnedBy:r.returnedBy,items:r.items.map(i=>i.name)});
   renderAll();
   // ✅ คืนครบแล้ว — ล้างฟอร์มและกลับ Step 1 อัตโนมัติ
   setTimeout(()=>{
