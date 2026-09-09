@@ -296,6 +296,10 @@ body{font-family:'Sarabun','Segoe UI',sans-serif;background:linear-gradient(180d
               <label class="form-label">ชื่องาน / กิจกรรม *</label>
               <input class="form-control" id="eventName" placeholder="เช่น ถ่ายทอดสด / ถ่ายภาพกิจกรรม">
             </div>
+            <div class="form-group span2">
+              <label class="form-label">อีเมลผู้ขอยืม (สำหรับแจ้งผลอนุมัติ)</label>
+              <input class="form-control" type="email" id="userEmail" placeholder="name@ku.th (ถ้ามี)">
+            </div>
             <div class="form-group">
               <label class="form-label">วันที่ใช้งาน *</label>
               <input class="form-control" type="date" id="useDate">
@@ -727,7 +731,12 @@ const ADMIN_KEY='equipment_admin_verified', DEF_KEY='KU-ADMIN-2569';
 const ISSUES_KEY='equipment_open_issues';
 
 function initState(){
-  EQUIPMENT.forEach(cat=>cat.items.forEach(item=>{state[item.id]={checked:false,qty:1};}));
+  // merge: เติม state ให้เฉพาะ item ที่ยังไม่มี (ไม่ทับรายการที่ผู้ใช้กำลังเลือกอยู่)
+  // สำคัญมาก: ต้องเรียกซ้ำหลังโหลด/แก้ไข EQUIPMENT จาก localStorage
+  // ไม่งั้นอุปกรณ์ที่เพิ่มใหม่จะไม่มี state และคลิกแล้ว error
+  EQUIPMENT.forEach(cat=>cat.items.forEach(item=>{
+    if(!state[item.id]) state[item.id]={checked:false,qty:1};
+  }));
 }
 initState();
 function getRecords(){return JSON.parse(localStorage.getItem('university_equipment_requests')||'[]');}
@@ -833,14 +842,14 @@ function buildSections(){
     const sec=document.createElement('div');sec.className='eq-section';
     sec.innerHTML=`
       <div class="eq-header" id="hdr-${cat.id}" onclick="toggleSec('${cat.id}')">
-        <div class="eq-title">${cat.label} <span class="eq-badge" id="bdg-${cat.id}">0/${cat.items.length}</span><span id="issue-dot-${cat.id}" style="display:none" class="eq-issue-dot"></span></div>
+        <div class="eq-title">${escHtml(cat.label)} <span class="eq-badge" id="bdg-${cat.id}">0/${cat.items.length}</span><span id="issue-dot-${cat.id}" style="display:none" class="eq-issue-dot"></span></div>
         <span style="color:var(--muted)">⌄</span>
       </div>
       <div class="eq-body" id="bdy-${cat.id}">
         ${cat.items.map(item=>`
           <div class="item-row" id="row-${item.id}">
             <input type="checkbox" class="item-check" id="chk-${item.id}" onchange="toggleItem('${item.id}','${cat.id}')">
-            <label class="item-name" for="chk-${item.id}">${item.name}</label>
+            <label class="item-name" for="chk-${item.id}">${escHtml(item.name)}</label>
             ${cat.qty?`<select class="qty-select" id="qty-${item.id}" onchange="changeQty('${item.id}')" disabled>
               ${Array.from({length:cat.maxQty||5},(_,i)=>`<option value="${i+1}">${i+1}</option>`).join('')}
             </select>`:`<span></span>`}
@@ -977,8 +986,16 @@ function buildCheckTable(items){
   // ใช้ data-idx แทนการส่งชื่อโดยตรงใน onclick (หลีกเลี่ยง escaping issues)
   const rows = items.map((it, i) => {
     const catColor   = getCatColor(it.cat);
-    const conflictTag = calendarAvailability[it.name]
-      ? '<span class="check-calendar-conflict">⚠️ ชนคิว</span>' : '';
+    const av = calendarAvailability[it.name];
+    let conflictTag = '';
+    if(av){
+      if(av.type==='busy')
+        conflictTag = '<span class="check-calendar-conflict">⚠️ ชนคิว (เต็ม)</span>';
+      else if(av.type==='pending')
+        conflictTag = '<span class="check-calendar-conflict" style="background:#fff7df;color:#92400e;border-color:#f7c948">🟡 คิวเต็ม (รออนุมัติ)</span>';
+      else if(av.type==='partial')
+        conflictTag = `<span class="check-calendar-conflict" style="background:#e8f0f9;color:#1a6fb5;border-color:#bfdbfe">ℹ️ เหลือ ${av.remaining}/${av.stock}</span>`;
+    }
     return `<tr id="chkrow-${i}">
       <td>${i+1}</td>
       <td>
@@ -988,8 +1005,8 @@ function buildCheckTable(items){
       </td>
       <td>
         <div class="check-radio-group">
-          <div class="radio-btn" id="rbOk-${i}"   data-idx="${i}" data-status="ok"    onclick="handleCheck(this)">✅ ปกติ</div>
-          <div class="radio-btn" id="rbNotok-${i}" data-idx="${i}" data-status="notok" onclick="handleCheck(this)">❌ ไม่พร้อม</div>
+          <div class="radio-btn" id="rbOk-${i}"   data-idx="${i}" data-status="ok"    role="button" tabindex="0" aria-label="อุปกรณ์ปกติ" onclick="handleCheck(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();handleCheck(this);}">✅ ปกติ</div>
+          <div class="radio-btn" id="rbNotok-${i}" data-idx="${i}" data-status="notok" role="button" tabindex="0" aria-label="อุปกรณ์ไม่พร้อม" onclick="handleCheck(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();handleCheck(this);}">❌ ไม่พร้อม</div>
         </div>
       </td>
       <td><input class="check-note-input" id="cknote-${i}" data-idx="${i}"
@@ -1081,24 +1098,48 @@ async function loadSheetsAvailability(){
   btn.disabled=false;btn.innerHTML='🔄 ดึงข้อมูลจาก Sheets';
 }
 
+// FIX B: จำนวนสต็อกรวมต่อชื่ออุปกรณ์
+// - หมวดที่มี qty:true → ใช้ maxQty เป็นจำนวนคงคลังรวม
+// - หมวดปกติ → นับเป็น 1 ชิ้น (unique unit)
+function getStockByName(){
+  const m={};
+  EQUIPMENT.forEach(cat=>cat.items.forEach(it=>{
+    const stock = cat.qty ? (cat.maxQty||5) : 1;
+    m[it.name] = Math.max(m[it.name]||0, stock);
+  }));
+  return m;
+}
+
+// FIX B: คำนวณความพร้อมแบบคิดจำนวนจริง แทนการบล็อกทั้งชิ้นเมื่อมีการจองทับ
+// คืน map: { [name]: { type, remaining, stock, booked, event, user } }
+//   type = 'busy'    → ถูกจองเต็ม และมีอย่างน้อย 1 รายการที่ยืนยันแล้ว (อนุมัติ/ยืม)
+//   type = 'pending' → ถูกจองเต็ม แต่ทั้งหมดยัง "รออนุมัติ"
+//   type = 'partial' → ยังเหลือของ (remaining > 0) แต่มีคนจองไปบางส่วน
 function computeCalendarAvailability(start,end){
-  const map={};
+  const stock = getStockByName();
+  const agg   = {};  // name -> { busy, pending, event, user }
+
+  function add(name, qty, confirmed, event, user){
+    if(!agg[name]) agg[name]={busy:0,pending:0,event:'',user:''};
+    if(confirmed) agg[name].busy += qty; else agg[name].pending += qty;
+    if(!agg[name].event && event) agg[name].event=event;
+    if(!agg[name].user  && user)  agg[name].user=user;
+  }
 
   // 1. จาก localStorage ของเครื่องตัวเอง
   getRecords().filter(r=>['pending','approved','borrowed'].includes(r.status)).forEach(r=>{
     if(!rangesOverlap(start,end||start,r.date,r.returnDate||r.date)) return;
     (r.items||[]).forEach(it=>{
-      const type=r.status==='pending'?'pending':'busy';
-      if(!map[it.name]||map[it.name].type!=='busy')
-        map[it.name]={type,event:r.event,user:r.user||''};
+      const name = typeof it==='object'?it.name:it;
+      const qty  = (typeof it==='object' && it.qty)?it.qty:1;
+      add(name, qty, r.status!=='pending', r.event, r.user||'');
     });
   });
 
-  // 2. จาก Sheets statuses (borrowed/maintenance/lost)
+  // 2. จาก Sheets statuses (borrowed/maintenance/lost) → ถือว่าใช้ไม่ได้ทั้งหมด
   Object.entries(sheetsStatuses).forEach(([name,info])=>{
     if(['borrowed','maintenance','lost'].includes(info.status)){
-      if(!map[name]||map[name].type!=='busy')
-        map[name]={type:'busy',event:info.event||info.status,user:info.borrowedBy||''};
+      add(name, (stock[name]||1), true, info.event||info.status, info.borrowedBy||'');
     }
   });
 
@@ -1107,13 +1148,24 @@ function computeCalendarAvailability(start,end){
     .filter(r=>rangesOverlap(start,end||start,r.date,r.returnDate||r.date))
     .forEach(r=>{
       (r.items||[]).forEach(it=>{
-        const name=typeof it==='object'?it.name:it;
-        const type=r.status==='pending'?'pending':'busy';
-        if(!map[name]||map[name].type!=='busy')
-          map[name]={type,event:r.event||'–',user:r.user||'–'};
+        const name = typeof it==='object'?it.name:it;
+        const qty  = (typeof it==='object' && it.qty)?it.qty:1;
+        add(name, qty, r.status!=='pending', r.event||'–', r.user||'–');
       });
     });
 
+  // สรุปเป็น type ตามจำนวนคงเหลือ
+  const map={};
+  Object.entries(agg).forEach(([name,a])=>{
+    const s = stock[name]||1;
+    const booked = a.busy + a.pending;
+    if(booked<=0) return;
+    const remaining = Math.max(0, s - booked);
+    let type;
+    if(booked >= s) type = a.busy>0 ? 'busy' : 'pending';  // เต็ม
+    else            type = 'partial';                        // ยังเหลือ
+    map[name] = { type, remaining, stock:s, booked, event:a.event, user:a.user };
+  });
   return map;
 }
 
@@ -1146,15 +1198,20 @@ function goToStep3(){
   const start=document.getElementById('useDate').value;
   const end=document.getElementById('returnDate').value||start;
   const av=computeCalendarAvailability(start,end);
-  const busy=Object.values(av).filter(x=>x.type==='busy').length;
-  const pend=Object.values(av).filter(x=>x.type==='pending').length;
+  // นับเฉพาะอุปกรณ์ที่อยู่ในคำขอนี้เท่านั้น
+  const myNames=new Set(selectedItems().map(it=>it.name));
+  const mine=Object.entries(av).filter(([name])=>myNames.has(name)).map(([,v])=>v);
+  const busy   =mine.filter(x=>x.type==='busy').length;
+  const pend   =mine.filter(x=>x.type==='pending').length;
+  const partial=mine.filter(x=>x.type==='partial').length;
   const alertEl=document.getElementById('step3-conflict-alert');
 
   let msg='';
   if(notokItems.length) msg+=`<div class="alert warn">🔧 บันทึกอุปกรณ์รอซ่อม ${notokItems.length} รายการแล้ว — เจ้าหน้าที่ต้องกด "แก้ไขแล้ว" ที่ขั้นที่ 4 ก่อนจึงจะยืมได้</div>`;
-  if(busy>0)      msg+=`<div class="alert danger">⚠️ พบอุปกรณ์ชนคิว ${busy} รายการในช่วงวันที่เลือก</div>`;
-  else if(pend>0) msg+=`<div class="alert warn">🟡 มีอุปกรณ์ ${pend} รายการรออนุมัติในช่วงวันที่เลือก</div>`;
-  else if(!notokItems.length) msg+=`<div class="alert success">✅ ไม่พบรายการชนคิว สามารถส่งคำขอได้</div>`;
+  if(busy>0)      msg+=`<div class="alert danger">⚠️ พบอุปกรณ์ถูกจองเต็ม ${busy} รายการในช่วงวันที่เลือก</div>`;
+  else if(pend>0) msg+=`<div class="alert warn">🟡 มีอุปกรณ์ ${pend} รายการที่คิวเต็มแต่ยังรออนุมัติ (อาจได้ถ้ารายการก่อนหน้าไม่ผ่าน)</div>`;
+  if(partial>0)   msg+=`<div class="alert info">ℹ️ มีอุปกรณ์ ${partial} รายการที่ถูกจองบางส่วน แต่ยังมีจำนวนคงเหลือให้ยืมได้</div>`;
+  if(!busy && !pend && !notokItems.length) msg+=`<div class="alert success">✅ ไม่พบรายการชนคิว สามารถส่งคำขอได้</div>`;
   alertEl.innerHTML = msg;
 }
 
@@ -1164,6 +1221,7 @@ function goToStep3(){
 async function goToStep4(){
   const user=document.getElementById('userName').value.trim();
   const event=document.getElementById('eventName').value.trim();
+  const userEmail=document.getElementById('userEmail')?.value.trim()||'';
   const date=document.getElementById('useDate').value;
   const returnDate=document.getElementById('returnDate').value||date;
   const note=document.getElementById('note').value.trim();
@@ -1172,7 +1230,7 @@ async function goToStep4(){
   if(!user||!event||!date||items.length===0){showToast('⚠️ ข้อมูลไม่ครบ กรุณากลับไปขั้นที่ 1');return;}
 
   const record={
-    id:'rq-'+Date.now(),user,event,date,returnDate,note,items,
+    id:'rq-'+Date.now(),user,userEmail,event,date,returnDate,note,items,
     checkResults:{...checkResults},
     status:'pending',
     savedAt:new Date().toISOString()
@@ -1221,6 +1279,7 @@ async function sendEmailNotification(r,action){
   await postToGoogle({
     action:'sendEmail',
     toEmail: NOTIFY_EMAIL,
+    requesterEmail: r.userEmail||'',   // FIX F: อีเมลผู้ขอ (backend ใช้ CC/แจ้งผู้ยืมได้)
     requestId: r.id,
     requestUser: r.user,
     requestEvent: r.event,
@@ -1237,8 +1296,34 @@ async function sendEmailNotification(r,action){
 // RETURN (Step 5)
 // ════════════════════════════════════════════════
 function renderReturnList(){
-  const records=getRecords().filter(r=>['approved','borrowed'].includes(r.status));
+  const records=getRecords().filter(r=>['approved','borrowed'].includes(r.status))
+    // FIX E: เรียงรายการที่เกินกำหนดคืนขึ้นก่อน
+    .sort((a,b)=>(isOverdue(b)-isOverdue(a)) || ((a.returnDate||a.date)<(b.returnDate||b.date)?-1:1));
   document.getElementById('return-list').innerHTML=records.length?records.map(r=>requestCard(r,'return')).join(''):'<div class="alert info">ไม่มีรายการที่รอคืนอุปกรณ์</div>';
+}
+
+// FIX E: อุปกรณ์เกินกำหนดคืนหรือยัง (เฉพาะที่ยังไม่คืน)
+function isOverdue(r){
+  if(!['approved','borrowed'].includes(r.status)) return 0;
+  const due=r.returnDate||r.date; if(!due) return 0;
+  return due < localISO(new Date()) ? 1 : 0;
+}
+function overdueDays(r){
+  const due=r.returnDate||r.date; if(!due) return 0;
+  const [y,m,d]=due.split('-').map(Number);
+  const diff=Math.floor((new Date().setHours(0,0,0,0)-new Date(y,m-1,d).setHours(0,0,0,0))/86400000);
+  return diff>0?diff:0;
+}
+
+// FIX D: เจ้าหน้าที่จ่ายอุปกรณ์ออก (approved → borrowed)
+function markBorrowed(id){
+  if(!requireAdmin('จ่ายอุปกรณ์')) return;
+  const records=getRecords();const r=records.find(x=>x.id===id);if(!r) return;
+  r.status='borrowed';r.borrowedAt=new Date().toISOString();
+  setRecords(records);
+  postToGoogle({...r,action:'borrow'}); // fire-and-forget (backend ไม่รู้จักก็ไม่กระทบ)
+  renderAll();
+  showToast('📤 จ่ายอุปกรณ์แล้ว — สถานะเปลี่ยนเป็น "ถูกยืมอยู่"');
 }
 function markReturned(id){
   const by=prompt('ชื่อผู้คืน / ผู้รับคืน','เจ้าหน้าที่');if(by===null) return;
@@ -1274,6 +1359,15 @@ function requestCard(r,mode=''){
       ${details}
     </div>`;
   }
+  let returnActions;
+  if(r.status==='approved'){
+    returnActions=`<button class="btn blue" onclick="markBorrowed('${r.id}')">📤 จ่ายอุปกรณ์ (รับของ)</button>
+        <button class="btn success" onclick="markReturned('${r.id}')">↩️ คืนเลย</button>
+        <button class="btn" onclick="printRequest('${r.id}')">🖨️ พิมพ์</button>`;
+  } else { // borrowed
+    returnActions=`<button class="btn success" onclick="markReturned('${r.id}')">↩️ ยืนยันคืนอุปกรณ์</button>
+        <button class="btn" onclick="printRequest('${r.id}')">🖨️ พิมพ์</button>`;
+  }
   const actions=mode==='approval'
     ?`<div class="btn-row">
         <button class="btn success" onclick="approveRequest('${r.id}')">✅ อนุมัติ (ส่งอีเมล)</button>
@@ -1281,15 +1375,17 @@ function requestCard(r,mode=''){
         <button class="btn"         onclick="printRequest('${r.id}')">🖨️ พิมพ์</button>
       </div>`
     :mode==='return'
-    ?`<div class="btn-row"><button class="btn success" onclick="markReturned('${r.id}')">↩️ ยืนยันคืนอุปกรณ์</button><button class="btn" onclick="printRequest('${r.id}')">🖨️ พิมพ์</button></div>`
+    ?`<div class="btn-row">${returnActions}</div>`
     :`<div class="btn-row"><button class="btn" onclick="printRequest('${r.id}')">🖨️ พิมพ์</button></div>`;
-  return `<div class="request-card" id="req-${r.id}">
+  // FIX E: ป้ายเตือนเกินกำหนดคืน
+  const overdueBadge = isOverdue(r) ? `<span class="badge busy" style="margin-left:6px">⏰ เกินกำหนด ${overdueDays(r)} วัน</span>` : '';
+  return `<div class="request-card" id="req-${r.id}"${isOverdue(r)?' style="border-left:4px solid var(--red)"':''}>
     <div class="req-top">
       <div style="flex:1;min-width:0">
         <div class="req-title">${escHtml(r.event)}</div>
         <div class="req-meta">👤 ${escHtml(r.user)} · 📅 ${r.date} → ${r.returnDate||r.date}<br>🕒 ${formatDT(r.savedAt)}${r.note?` · 📝 ${escHtml(r.note)}`:''}</div>
       </div>
-      <span class="badge ${sl[1]}">${sl[0]}</span>
+      <div style="text-align:right"><span class="badge ${sl[1]}">${sl[0]}</span>${overdueBadge}</div>
     </div>
     <div class="req-items">${(r.items||[]).map((it,i)=>`${i+1}. [${escHtml(it.cat)}] ${escHtml(it.name)} <strong>${it.qty}</strong> ชิ้น`).join('<br>')}</div>
     ${checkHtml}
@@ -1574,7 +1670,7 @@ function applyIssueBadgesOnEquipment(){
         catHasIssue = true;
         row.classList.add('has-issue');
         tag.innerHTML = `<span class="badge maint" title="${escHtml(issues[item.name].note)}">🔧 รอซ่อม</span>`;
-        if(chk){ chk.checked=false; chk.disabled=true; state[item.id].checked=false; }
+        if(chk){ chk.checked=false; chk.disabled=true; if(state[item.id]) state[item.id].checked=false; }
       } else {
         row.classList.remove('has-issue');
         tag.innerHTML = '';
@@ -1629,6 +1725,7 @@ function renderIssueAdminPanel(){
   const issues = getIssues();
   const names  = Object.keys(issues);
   panel.style.display = 'block';
+  const isAdmin = sessionStorage.getItem(ADMIN_KEY)==='1' || sessionStorage.getItem(EQ_ADMIN_KEY)==='1';
 
   if(names.length===0){
     list.innerHTML='<div class="alert success">✅ ไม่มีอุปกรณ์ที่รอซ่อมบำรุงในขณะนี้</div>';
@@ -1646,8 +1743,8 @@ function renderIssueAdminPanel(){
         </div>
       </div>
       ${isAdmin
-`<button class="btn success" style="flex-shrink:0;align-self:center" onclick="resolveIssue('${escHtml(name).replace(/'/g,"\\'")}')">✅ แก้ไขแล้ว<br>พร้อมใช้</button>`
-      }
+        ? `<button class="btn success" style="flex-shrink:0;align-self:center" data-itemname="${escHtml(name)}" onclick="resolveIssueByBtn(this)">✅ แก้ไขแล้ว<br>พร้อมใช้</button>`
+        : ''}
     </div>`;
   }).join('');
 }
@@ -1664,7 +1761,7 @@ function saveScriptUrl(){
   else{st.textContent='ยังไม่ได้ตั้งค่า';st.style.color='var(--muted)';}
 }
 function clearForm(){
-  ['userName','eventName','useDate','returnDate','note'].forEach(id=>document.getElementById(id).value='');
+  ['userName','userEmail','eventName','useDate','returnDate','note'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   EQUIPMENT.forEach(cat=>cat.items.forEach(item=>{
     state[item.id]={checked:false,qty:1};
     const chk=document.getElementById('chk-'+item.id);if(chk){chk.checked=false;chk.disabled=false;}
@@ -1746,6 +1843,7 @@ function eqSave(){
   // อัปเดต EQUIPMENT จริงในหน่วยความจำด้วย
   EQUIPMENT.length = 0;
   eqData.forEach(c => EQUIPMENT.push(c));
+  initState();   // FIX A: เติม state ให้อุปกรณ์ที่เพิ่งเพิ่ม เพื่อไม่ให้คลิกแล้ว error
   // rebuild sections ใน step1
   buildSections();
   applyIssueBadgesOnEquipment();
@@ -1949,6 +2047,7 @@ document.getElementById('eq-new-cat-qty')?.addEventListener('change',function(){
   if(saved){ try{ const d=JSON.parse(saved); if(Array.isArray(d)&&d.length>0){ EQUIPMENT.length=0; d.forEach(c=>EQUIPMENT.push(c)); } }catch(_){} }
 })();
 
+initState();   // FIX A: สร้าง state ให้อุปกรณ์ที่โหลดมาจาก localStorage ครบทุกชิ้น
 buildSections();
 updateStats1();
 renderCalendar();
