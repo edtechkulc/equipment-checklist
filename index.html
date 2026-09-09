@@ -1200,9 +1200,14 @@ function computeCalendarAvailability(start,end){
     });
   });
 
-  // 2. จาก Sheets statuses (borrowed/maintenance/lost) → ถือว่าใช้ไม่ได้ทั้งหมด
+  // 2. จาก Sheets statuses (borrowed/maintenance/lost) → ถือว่าใช้ไม่ได้
+  const isQtyName={};
+  EQUIPMENT.forEach(c=>c.items.forEach(it=>{ if(c.qty) isQtyName[it.name]=true; }));
   Object.entries(sheetsStatuses).forEach(([name,info])=>{
-    if(['borrowed','maintenance','lost'].includes(info.status)){
+    if(info.status==='maintenance' || info.status==='lost'){
+      add(name, (stock[name]||1), true, info.event||info.status, info.borrowedBy||'');
+    } else if(info.status==='borrowed' && !isQtyName[name]){
+      // ชิ้นเดียวที่ถูกยืม → บล็อกเต็ม; แบบมีจำนวน ให้การนับจากคำขอจัดการเอง
       add(name, (stock[name]||1), true, info.event||info.status, info.borrowedBy||'');
     }
   });
@@ -1739,8 +1744,9 @@ function showTab(name){
                     selectedItems().length > 0;
     if(hasData) clearForm();
     renderIssueBanners();
+    syncAvailabilityLocks();   // ดึงสถานะ borrowed มาล็อกอุปกรณ์
   }
-  if(name==='step2') renderIssueBanners();
+  if(name==='step2'){ renderIssueBanners(); syncAvailabilityLocks(); }
   if(name==='step4'){renderApproval();renderIssueAdminPanel();}
   if(name==='step5') renderReturnList();
   if(name==='dashboard') renderDashboard();
@@ -1965,22 +1971,48 @@ function applyIssueBadgesOnEquipment(){
       const tag = document.getElementById('issue-tag-'+item.id);
       const chk = document.getElementById('chk-'+item.id);
       if(!row||!tag) return;
+      const st = sheetsStatuses[item.name]?.status;
+      const isUnique = !cat.qty;                                   // อุปกรณ์ชิ้นเดียว (ไม่ใช่แบบมีจำนวน)
+      const borrowedLock = isUnique && (st==='borrowed' || st==='lost');
+
       if(issues[item.name]){
+        // รอซ่อม (มาก่อนสุด)
         catHasIssue = true;
         row.classList.add('has-issue');
         tag.innerHTML = `<span class="badge maint" title="${escHtml(issues[item.name].note)}">🔧 รอซ่อม</span>`;
         if(chk){ chk.checked=false; chk.disabled=true; if(state[item.id]) state[item.id].checked=false; }
+      } else if(borrowedLock){
+        // ถูกยืมอยู่ / สูญหาย → ล็อกไม่ให้ขอยืมซ้ำ
+        row.classList.add('has-issue');
+        const who = sheetsStatuses[item.name]?.borrowedBy;
+        const label = st==='lost' ? '🔴 สูญหาย' : '🔴 ถูกยืมอยู่';
+        tag.innerHTML = `<span class="badge busy"${who?` title="ผู้ยืม: ${escHtml(who)}"`:''}>${label}</span>`;
+        if(chk){ chk.checked=false; chk.disabled=true; if(state[item.id]) state[item.id].checked=false; }
       } else {
         row.classList.remove('has-issue');
         tag.innerHTML = '';
-        if(chk && sheetsStatuses[item.name]?.status !== 'borrowed') chk.disabled=false;
+        if(chk) chk.disabled=false;
       }
     });
-    // dot บน category header
+    // dot บน category header (เฉพาะกรณีรอซ่อม)
     const dot = document.getElementById('issue-dot-'+cat.id);
     if(dot) dot.style.display = catHasIssue ? 'inline-block' : 'none';
   });
   updateStats1();
+}
+
+// ดึงสถานะอุปกรณ์จาก Sheets แล้วล็อกชิ้นที่ถูกยืม (ใช้ตอนอยู่ขั้นที่ 1)
+async function syncAvailabilityLocks(){
+  const url=localStorage.getItem('script_url'); if(!url) return;
+  try{
+    const res=await fetch(url+'?action=availability',{cache:'no-store'});
+    const json=await res.json();
+    if(json.success && json.statuses){
+      sheetsStatuses=json.statuses;
+      updateHeaderStats();
+      applyIssueBadgesOnEquipment();
+    }
+  }catch(e){}
 }
 
 // แสดงแบนเนอร์ปัญหาบน Step1 และ Step2
@@ -2365,6 +2397,9 @@ document.getElementById('scriptUrl').value = SCRIPT_URL;
 saveScriptUrl();
 const adminInput=document.getElementById('adminKeySetting');
 if(adminInput) adminInput.value=localStorage.getItem('equipment_admin_key')||DEF_KEY;
+
+// ดึงสถานะอุปกรณ์จาก Sheets มาล็อกชิ้นที่ถูกยืม ตั้งแต่เปิดหน้าแรก
+syncAvailabilityLocks();
 </script>
 </body>
 </html>
