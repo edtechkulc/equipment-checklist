@@ -1962,8 +1962,31 @@ async function resolveIssue(itemName){
 }
 
 // แสดง badge 🔧 บน item-row ในขั้นที่ 1
+// จัดรูปแบบวันที่ไทยแบบสั้น เช่น "10 ก.ย."
+const THAI_MON=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+function thaiShortDate(iso){
+  const m=String(iso||'').match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if(!m) return '';
+  return parseInt(m[3],10)+' '+THAI_MON[parseInt(m[2],10)-1];
+}
+// หาวันกำหนดคืนของอุปกรณ์ที่กำลังถูกยืม (จากคำขอสถานะ borrowed) → { ชื่ออุปกรณ์: 'YYYY-MM-DD' }
+function borrowedReturnDateMap(){
+  const m={};
+  getRecords().forEach(r=>{
+    if(r.status!=='borrowed') return;
+    const due=r.returnDate||r.date;
+    (r.items||[]).forEach(it=>{
+      const name=typeof it==='object'?it.name:it;
+      if(!name) return;
+      if(!m[name] || String(due) > String(m[name])) m[name]=due; // เก็บวันคืนที่ช้าสุด
+    });
+  });
+  return m;
+}
+
 function applyIssueBadgesOnEquipment(){
   const issues = getIssues();
+  const retMap = borrowedReturnDateMap();
   EQUIPMENT.forEach(cat=>{
     let catHasIssue = false;
     cat.items.forEach(item=>{
@@ -1985,7 +2008,9 @@ function applyIssueBadgesOnEquipment(){
         // ถูกยืมอยู่ / สูญหาย → ล็อกไม่ให้ขอยืมซ้ำ
         row.classList.add('has-issue');
         const who = sheetsStatuses[item.name]?.borrowedBy;
-        const label = st==='lost' ? '🔴 สูญหาย' : '🔴 ถูกยืมอยู่';
+        const due = retMap[item.name];
+        const dateTxt = (st!=='lost' && due) ? ' · คืน '+thaiShortDate(due) : '';
+        const label = st==='lost' ? '🔴 สูญหาย' : ('🔴 ถูกยืมอยู่'+dateTxt);
         tag.innerHTML = `<span class="badge busy"${who?` title="ผู้ยืม: ${escHtml(who)}"`:''}>${label}</span>`;
         if(chk){ chk.checked=false; chk.disabled=true; if(state[item.id]) state[item.id].checked=false; }
       } else {
@@ -2001,17 +2026,19 @@ function applyIssueBadgesOnEquipment(){
   updateStats1();
 }
 
-// ดึงสถานะอุปกรณ์จาก Sheets แล้วล็อกชิ้นที่ถูกยืม (ใช้ตอนอยู่ขั้นที่ 1)
+// ดึงสถานะอุปกรณ์ + คำขอจาก Sheets แล้วล็อกชิ้นที่ถูกยืม (ใช้ตอนอยู่ขั้นที่ 1)
 async function syncAvailabilityLocks(){
   const url=localStorage.getItem('script_url'); if(!url) return;
   try{
-    const res=await fetch(url+'?action=availability',{cache:'no-store'});
-    const json=await res.json();
-    if(json.success && json.statuses){
-      sheetsStatuses=json.statuses;
-      updateHeaderStats();
-      applyIssueBadgesOnEquipment();
-    }
+    const [avRes, reqRes] = await Promise.all([
+      fetch(url+'?action=availability',{cache:'no-store'}).then(r=>r.json()).catch(()=>null),
+      fetch(url+'?action=requests',   {cache:'no-store'}).then(r=>r.json()).catch(()=>null)
+    ]);
+    // อัปเดตคำขอ (เพื่อให้รู้วันกำหนดคืนของอุปกรณ์ที่ถูกยืม)
+    if(reqRes && reqRes.success && Array.isArray(reqRes.items)) setRecords(mergeRecords(reqRes.items));
+    if(avRes && avRes.success && avRes.statuses) sheetsStatuses=avRes.statuses;
+    updateHeaderStats();
+    applyIssueBadgesOnEquipment();
   }catch(e){}
 }
 
