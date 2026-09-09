@@ -259,6 +259,10 @@ body{font-family:'Sarabun','Segoe UI',sans-serif;background:linear-gradient(180d
       <div class="step-num">5</div>
       <span class="step-label">↩️ ยืม/คืน</span>
     </button>
+    <button class="step-btn" id="stab-dash" onclick="showTab('dashboard')">
+      <div class="step-num" style="background:var(--gray-2);color:var(--muted)">📊</div>
+      <span class="step-label">สรุป</span>
+    </button>
     <button class="step-btn" id="stab-hist" onclick="showTab('history')">
       <div class="step-num" style="background:var(--gray-2);color:var(--muted)">📂</div>
       <span class="step-label">ประวัติ</span>
@@ -506,6 +510,45 @@ body{font-family:'Sarabun','Segoe UI',sans-serif;background:linear-gradient(180d
 </div>
 </div>
 
+<!-- DASHBOARD (สรุปของค้าง / เกินกำหนดคืน) -->
+<div class="tab-panel" id="panel-dashboard">
+<div class="container">
+  <div class="toolbar">
+    <div style="font-size:14px;font-weight:800;color:var(--navy)">📊 สรุปภาพรวม (ของค้าง / เกินกำหนดคืน)</div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <span id="dash-refresh-status" style="font-size:11px;color:var(--muted)"></span>
+      <button class="btn warn" onclick="refreshFromSheets(false)">🔄 รีเฟรชเดี๋ยวนี้</button>
+    </div>
+  </div>
+  <div class="stats" style="grid-template-columns:repeat(4,1fr)">
+    <div class="stat"><div class="n" id="dash-pending" style="color:var(--yellow)">0</div><div class="l">รออนุมัติ</div></div>
+    <div class="stat"><div class="n" id="dash-outstanding" style="color:var(--blue)">0</div><div class="l">กำลังยืม / ยังไม่คืน</div></div>
+    <div class="stat"><div class="n" id="dash-overdue" style="color:var(--red)">0</div><div class="l">เกินกำหนดคืน</div></div>
+    <div class="stat"><div class="n" id="dash-maint" style="color:var(--orange)">0</div><div class="l">อุปกรณ์รอซ่อม</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header" style="color:var(--red)">⏰ เกินกำหนดคืน — ต้องติดตามด่วน</div>
+    <div class="card-body" id="dash-overdue-list" style="padding:12px"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">📦 กำลังยืมอยู่ (ยังไม่เกินกำหนด)</div>
+    <div class="card-body" id="dash-outstanding-list" style="padding:12px"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">🟡 รออนุมัติ</div>
+    <div class="card-body" id="dash-pending-list" style="padding:12px"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header" style="color:var(--orange)">🔧 อุปกรณ์รอซ่อม</div>
+    <div class="card-body" id="dash-maint-list" style="padding:12px"></div>
+  </div>
+</div>
+</div>
+
 <!-- HISTORY -->
 <div class="tab-panel" id="panel-history">
 <div class="container">
@@ -727,7 +770,7 @@ let checkResults={};   // { itemName: { status:'ok'|'notok'|'', note:'' } }
 let calendarAvailability={};
 let openIssues={};     // { itemName: { note, reportedAt, reportedBy } } — ปัญหาที่ยังไม่ได้แก้
 let currentMonth=new Date(), selCalDate=null;
-const ADMIN_KEY='equipment_admin_verified', DEF_KEY='KU-ADMIN-2569';
+const ADMIN_KEY='equipment_admin_verified', DEF_KEY='KU-AV-9x7Q2m';
 const ISSUES_KEY='equipment_open_issues';
 
 function initState(){
@@ -1236,11 +1279,18 @@ async function goToStep4(){
     savedAt:new Date().toISOString()
   };
   const records=getRecords();records.unshift(record);setRecords(records);
-  postToGoogle({...record,action:'request'}); // fire-and-forget ไม่รอ
 
   showTab('step4');
   renderApproval();
   showToast('✅ ส่งคำขอแล้ว — รอเจ้าหน้าที่อนุมัติ (Step 4)');
+
+  // FIX: บันทึกขึ้น Sheets แบบตรวจผลจริง ถ้าไม่สำเร็จให้เตือน (ข้อมูลยังอยู่ในเครื่อง กดซิงก์ภายหลังได้)
+  if(localStorage.getItem('script_url')){
+    const res=await postToGoogle({...record,action:'request'});
+    if(!res||res.success!==true){
+      showToast('⚠️ บันทึกขึ้นส่วนกลางไม่สำเร็จ — ข้อมูลถูกเก็บในเครื่องแล้ว ลองกด "ซิงก์" อีกครั้ง');
+    }
+  }
 }
 
 // ════════════════════════════════════════════════
@@ -1518,9 +1568,20 @@ async function syncFromGoogle(){
     }else{showToast('⚠️ '+(json.error||'ไม่พบข้อมูล'));}
   }catch(e){showToast('⚠️ ซิงก์ไม่สำเร็จ: '+e.message);}
 }
+// FIX: เลิกใช้ no-cors เพื่อให้ "อ่านผลการเขียนได้จริง"
+// ใช้ Content-Type text/plain (simple request) เพื่อไม่ให้เกิด CORS preflight ที่ Apps Script ตอบไม่ได้
+// แนบ secret (= Admin key) ไปให้ backend ตรวจสิทธิ์ฝั่ง server
 async function postToGoogle(payload){
-  const url=localStorage.getItem('script_url');if(!url) return;
-  try{await fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});}catch(_){}
+  const url=localStorage.getItem('script_url');if(!url) return {success:false,error:'no url'};
+  const secret=localStorage.getItem('equipment_admin_key')||DEF_KEY;
+  try{
+    const res=await fetch(url,{
+      method:'POST',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify({...payload,secret})
+    });
+    return await res.json();
+  }catch(e){ return {success:false,error:e.message}; }
 }
 
 // ════════════════════════════════════════════════
@@ -1562,8 +1623,8 @@ function printRequest(id){
 // TABS
 // ════════════════════════════════════════════════
 function showTab(name){
-  const panels=['step1','step2','step3','step4','step5','history','settings','eq-admin'];
-  const tabs=['stab-1','stab-2','stab-3','stab-4','stab-5','stab-hist','stab-set','stab-eq'];
+  const panels=['step1','step2','step3','step4','step5','dashboard','history','settings','eq-admin'];
+  const tabs=['stab-1','stab-2','stab-3','stab-4','stab-5','stab-dash','stab-hist','stab-set','stab-eq'];
   panels.forEach((p,i)=>{
     const el=document.getElementById('panel-'+p);
     const btn=document.getElementById(tabs[i]);
@@ -1581,11 +1642,135 @@ function showTab(name){
   if(name==='step2') renderIssueBanners();
   if(name==='step4'){renderApproval();renderIssueAdminPanel();}
   if(name==='step5') renderReturnList();
+  if(name==='dashboard') renderDashboard();
   if(name==='history') renderHistory();
   if(name==='eq-admin') renderEqAdmin();
+  // แท็บที่ต้องข้อมูลสด → ดึงจาก Sheets ทันที (เงียบ ๆ) แล้วเปิด auto-refresh
+  if(['step3','step4','step5','dashboard'].includes(name)){
+    refreshFromSheets(true);
+    startAutoRefresh();
+  } else {
+    stopAutoRefresh();
+  }
   window.scrollTo({top:0,behavior:'smooth'});
 }
-function renderAll(){renderApproval();renderReturnList();renderHistory();renderCalendar();updateHeaderStats();renderIssueBanners();applyIssueBadgesOnEquipment();}
+function renderAll(){renderApproval();renderReturnList();renderHistory();renderCalendar();updateHeaderStats();renderIssueBanners();applyIssueBadgesOnEquipment();if(document.getElementById('panel-dashboard')?.classList.contains('active'))renderDashboard();}
+
+// ════════════════════════════════════════════════
+// AUTO-REFRESH — ดึงจาก Sheets เองเป็นระยะ (ไม่ต้องกดซิงก์มือ)
+// ════════════════════════════════════════════════
+let _autoTimer=null, _refreshing=false;
+const AUTO_REFRESH_MS=30000; // 30 วินาที
+
+function currentTab(){
+  const map={'panel-step3':'step3','panel-step4':'step4','panel-step5':'step5','panel-dashboard':'dashboard'};
+  for(const id in map){ if(document.getElementById(id)?.classList.contains('active')) return map[id]; }
+  return '';
+}
+
+function startAutoRefresh(){
+  if(_autoTimer) return;
+  if(!localStorage.getItem('script_url')) return;
+  _autoTimer=setInterval(()=>{
+    if(document.hidden) return;           // แท็บเบราว์เซอร์ถูกซ่อน → ข้าม (ประหยัดโควตา)
+    if(!currentTab()) return;             // ไม่ได้อยู่แท็บที่ต้องข้อมูลสด → ข้าม
+    refreshFromSheets(true);
+  }, AUTO_REFRESH_MS);
+}
+function stopAutoRefresh(){ if(_autoTimer){ clearInterval(_autoTimer); _autoTimer=null; } }
+
+// รวมข้อมูลจาก Sheets (แหล่งกลาง) กับ record ในเครื่องที่ยังไม่ถูกซิงก์ (กันข้อมูลหาย)
+function mergeRecords(serverItems){
+  const local=getRecords();
+  const byId={};
+  serverItems.forEach(r=>{ if(r&&r.id) byId[r.id]=r; });
+  // record ในเครื่องที่ server ยังไม่มี → เก็บไว้ (เช่นเพิ่งส่งตอนออฟไลน์)
+  local.forEach(r=>{ if(r&&r.id&&!byId[r.id]) byId[r.id]=r; });
+  return Object.values(byId).sort((a,b)=>String(b.savedAt||'').localeCompare(String(a.savedAt||'')));
+}
+
+async function refreshFromSheets(silent){
+  const url=localStorage.getItem('script_url');
+  if(!url){ if(!silent) showToast('⚠️ ยังไม่ได้ตั้งค่า Script URL'); return; }
+  if(_refreshing) return;
+  _refreshing=true;
+  const st=document.getElementById('dash-refresh-status');
+  if(st) st.textContent='⏳ กำลังดึงข้อมูล...';
+  try{
+    const [reqRes, avRes] = await Promise.all([
+      fetch(url+'?action=requests',    {cache:'no-store'}).then(r=>r.json()).catch(()=>null),
+      fetch(url+'?action=availability',{cache:'no-store'}).then(r=>r.json()).catch(()=>null)
+    ]);
+    if(reqRes && reqRes.success && Array.isArray(reqRes.items)){
+      setRecords(mergeRecords(reqRes.items));
+    }
+    if(avRes && avRes.success && avRes.statuses){
+      sheetsStatuses=avRes.statuses;
+    }
+    updateHeaderStats();
+    // re-render เฉพาะแท็บที่กำลังดูอยู่
+    const tab=currentTab();
+    if(tab==='step3') renderCalendar();
+    else if(tab==='step4'){ renderApproval(); renderIssueAdminPanel(); }
+    else if(tab==='step5') renderReturnList();
+    else if(tab==='dashboard') renderDashboard();
+    applyIssueBadgesOnEquipment();
+    if(st) st.textContent='✅ อัปเดตล่าสุด '+new Date().toLocaleTimeString('th-TH');
+    if(!silent) showToast('✅ ซิงก์จาก Sheets แล้ว');
+  }catch(e){
+    if(st) st.textContent='⚠️ ดึงข้อมูลไม่สำเร็จ';
+    if(!silent) showToast('⚠️ ซิงก์ไม่สำเร็จ: '+e.message);
+  }finally{ _refreshing=false; }
+}
+
+// หยุด/เริ่ม auto-refresh ตามการซ่อน/แสดงแท็บเบราว์เซอร์
+document.addEventListener('visibilitychange',()=>{
+  if(document.hidden) return;
+  if(currentTab()){ refreshFromSheets(true); startAutoRefresh(); }
+});
+
+// ════════════════════════════════════════════════
+// DASHBOARD — สรุปของค้าง / เกินกำหนดคืน
+// ════════════════════════════════════════════════
+function renderDashboard(){
+  const recs=getRecords();
+  const outstanding=recs.filter(r=>['approved','borrowed'].includes(r.status));
+  const overdue=outstanding.filter(isOverdue)
+    .sort((a,b)=>overdueDays(b)-overdueDays(a));
+  const active=outstanding.filter(r=>!isOverdue(r))
+    .sort((a,b)=>String(a.returnDate||a.date).localeCompare(String(b.returnDate||b.date)));
+  const pending=recs.filter(r=>r.status==='pending');
+  const issues=getIssues();
+  const issueNames=Object.keys(issues);
+
+  document.getElementById('dash-pending').textContent=pending.length;
+  document.getElementById('dash-outstanding').textContent=outstanding.length;
+  document.getElementById('dash-overdue').textContent=overdue.length;
+  document.getElementById('dash-maint').textContent=issueNames.length;
+
+  const line=(r,showOverdue)=>{
+    const items=(r.items||[]).map(it=>escHtml(typeof it==='object'?it.name:it)).join(', ');
+    const od=showOverdue?`<span class="badge busy" style="margin-left:6px">⏰ เกิน ${overdueDays(r)} วัน</span>`:'';
+    return `<div style="padding:9px 0;border-bottom:1px solid var(--gray-2)">
+      <div style="font-weight:700;font-size:13px">${escHtml(r.event||'-')}${od}</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:2px">
+        👤 ${escHtml(r.user||'-')} · 📅 คืน ${r.returnDate||r.date||'-'} · 📦 ${items||'-'}
+      </div>
+    </div>`;
+  };
+
+  document.getElementById('dash-overdue-list').innerHTML =
+    overdue.length ? overdue.map(r=>line(r,true)).join('') : '<div class="alert success" style="margin:0">✅ ไม่มีรายการเกินกำหนดคืน</div>';
+  document.getElementById('dash-outstanding-list').innerHTML =
+    active.length ? active.map(r=>line(r,false)).join('') : '<div class="alert info" style="margin:0">ไม่มีรายการที่กำลังยืมอยู่</div>';
+  document.getElementById('dash-pending-list').innerHTML =
+    pending.length ? pending.map(r=>line(r,false)).join('') : '<div class="alert info" style="margin:0">ไม่มีคำขอรออนุมัติ</div>';
+  document.getElementById('dash-maint-list').innerHTML =
+    issueNames.length ? issueNames.map(n=>`<div style="padding:8px 0;border-bottom:1px solid var(--gray-2);font-size:13px">
+      🔧 <strong>${escHtml(n)}</strong> — <span style="color:var(--red)">${escHtml(issues[n].note||'')}</span>
+      <span style="color:var(--muted);font-size:11px">(แจ้งโดย ${escHtml(issues[n].reportedBy||'-')} · ${escHtml(issues[n].reportedAt||'-')})</span>
+    </div>`).join('') : '<div class="alert success" style="margin:0">✅ ไม่มีอุปกรณ์รอซ่อม</div>';
+}
 
 // ════════════════════════════════════════════════
 // ISSUE TRACKER
@@ -2060,7 +2245,7 @@ applyIssueBadgesOnEquipment();
 renderIssueBanners();
 
 // ── FIX 1: Hardcode Script URL ทุกเครื่อง ไม่ใช้ conditional ──
-const SCRIPT_URL='https://script.google.com/macros/s/AKfycbyKkOWhbGQ2xO-QqIbnFv_D6gjOisbEhiLwL9ZadSIyIqXAKo2asAPv_PXZoWtWrREGUw/exec';
+const SCRIPT_URL='https://script.google.com/macros/s/AKfycbyGac5MT_C1lZLHpjcVe5-rY812j8RJJhhid81hk6OffPCpppzn5Kwd2bPKGh_A4bZ83Q/exec';
 localStorage.setItem('script_url', SCRIPT_URL); // set ทุกครั้ง ไม่มีเงื่อนไข
 document.getElementById('scriptUrl').value = SCRIPT_URL;
 saveScriptUrl();
