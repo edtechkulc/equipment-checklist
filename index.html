@@ -1740,10 +1740,23 @@ function startAutoRefresh(){
 function stopAutoRefresh(){ if(_autoTimer){ clearInterval(_autoTimer); _autoTimer=null; } }
 
 // รวมข้อมูลจาก Sheets (แหล่งกลาง) กับ record ในเครื่องที่ยังไม่ถูกซิงก์ (กันข้อมูลหาย)
+// ลำดับความก้าวหน้าของสถานะ (ยิ่งมากยิ่งใหม่)
+const STATUS_RANK={pending:1, approved:2, borrowed:3, returned:4, rejected:4};
+
 function mergeRecords(serverItems){
   const local=getRecords();
+  const localById={};
+  local.forEach(r=>{ if(r&&r.id) localById[r.id]=r; });
+
   const byId={};
-  serverItems.forEach(r=>{ if(r&&r.id) byId[r.id]=r; });
+  serverItems.forEach(r=>{
+    if(!r||!r.id) return;
+    const loc=localById[r.id];
+    // ถ้าสถานะในเครื่อง "ก้าวหน้ากว่า" server (server ยังตอบค่าเก่าอยู่จังหวะนั้น)
+    // ให้ยึดของในเครื่องไว้ก่อน กัน auto-refresh ดึงค่าเก่ามาทับสถานะที่เพิ่งเปลี่ยน
+    if(loc && (STATUS_RANK[loc.status]||0) > (STATUS_RANK[r.status]||0)) byId[r.id]=loc;
+    else byId[r.id]=r;
+  });
   // record ในเครื่องที่ server ยังไม่มี → เก็บไว้ (เช่นเพิ่งส่งตอนออฟไลน์)
   local.forEach(r=>{ if(r&&r.id&&!byId[r.id]) byId[r.id]=r; });
   return Object.values(byId).sort((a,b)=>String(b.savedAt||'').localeCompare(String(a.savedAt||'')));
