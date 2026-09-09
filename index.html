@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="th">
 <head>
 <meta charset="UTF-8">
@@ -581,6 +581,24 @@ body{font-family:'Sarabun','Segoe UI',sans-serif;background:linear-gradient(180d
         <button class="btn primary" onclick="saveAdminKey()">💾 บันทึก Admin key</button>
       </div>
       <div class="alert info" style="margin-top:12px">หลังเปลี่ยน Admin key แล้ว session ปัจจุบันจะถูก logout อัตโนมัติ</div>
+    </div>
+  </div>
+  <!-- ล้างข้อมูลส่วนกลาง (Google Sheets) -->
+  <div class="card" style="border:2px solid #ef4444">
+    <div class="card-header" style="background:#fef2f2;color:#b91c1c">🗑 ล้างข้อมูลส่วนกลาง (Google Sheets)</div>
+    <div class="card-body">
+      <div class="alert danger">
+        ลบคำขอ / สถานะอุปกรณ์ / รายการรอซ่อมทั้งหมดบน Google Sheets<br>
+        <strong>มีผลกับทุกเครื่อง และย้อนกลับไม่ได้</strong> — ต้องยืนยันรหัสเจ้าหน้าที่
+      </div>
+      <div class="btn-row" style="margin-top:8px">
+        <button class="btn danger lg full" onclick="clearCentralData()" style="font-size:15px;padding:14px">
+          🗑 ล้างข้อมูลส่วนกลางทั้งหมด (Sheets)
+        </button>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.6">
+        หมายเหตุ: ปุ่มนี้ล้างส่วนกลาง + ในเครื่องนี้ให้ด้วย ส่วนเครื่องอื่นที่เปิดค้างไว้ ให้กด "ล้างข้อมูลในเครื่อง" ด้านล่างอีกครั้ง เพื่อไม่ให้ข้อมูลเก่าเด้งกลับ
+      </div>
     </div>
   </div>
   <!-- ล้างข้อมูลในเครื่อง -->
@@ -1589,6 +1607,29 @@ function renderHistory(){
   const r=getRecords();
   document.getElementById('history-list').innerHTML=r.length?r.map(x=>requestCard(x,'history')).join(''):'<div class="alert info">ยังไม่มีรายการ</div>';
 }
+// ล้างข้อมูลส่วนกลาง (Google Sheets) ผ่าน backend + ล้างในเครื่องนี้
+async function clearCentralData(){
+  if(!requireAdmin('ล้างข้อมูลส่วนกลาง')) return;
+  if(!localStorage.getItem('script_url')){ showToast('⚠️ ยังไม่ได้ตั้งค่า Script URL'); return; }
+  if(!confirm('⚠️ ล้างข้อมูล "ส่วนกลาง" ทั้งหมดบน Google Sheets?\n\nคำขอ / สถานะอุปกรณ์ / รายการรอซ่อม ทั้งหมดจะถูกลบถาวร\nและมีผลกับทุกเครื่อง — การกระทำนี้ย้อนกลับไม่ได้')) return;
+  if(!confirm('ยืนยันอีกครั้ง: ต้องการลบข้อมูลส่วนกลางทั้งหมดใช่หรือไม่?')) return;
+  showToast('⏳ กำลังล้างข้อมูลส่วนกลาง...');
+  const res=await postToGoogle({action:'clearAll'});
+  if(res && res.success){
+    // ล้างในเครื่องนี้ด้วย เพื่อไม่ให้ข้อมูลเก่าเด้งกลับจาก localStorage
+    localStorage.removeItem('university_equipment_requests');
+    localStorage.removeItem(ISSUES_KEY);
+    openIssues={};
+    sheetsStatuses={};
+    window._sheetsActiveReqs=[];
+    renderAll();
+    showToast('✅ ล้างข้อมูลส่วนกลาง + ในเครื่องนี้เรียบร้อยแล้ว');
+  } else {
+    const err=res&&res.error?res.error:'ไม่ทราบสาเหตุ';
+    showToast(err==='unauthorized'?'❌ ล้างไม่สำเร็จ: รหัสเจ้าหน้าที่ไม่ตรงกับเซิร์ฟเวอร์':'❌ ล้างไม่สำเร็จ: '+err);
+  }
+}
+
 function hardClearAll(){
   // แสดง dialog ยืนยัน
   const ok = confirm('⚠️ ยืนยันการล้างข้อมูลทั้งหมดในเบราว์เซอร์นี้?\n\nรายการคำขอยืมทั้งหมดในเครื่องจะถูกลบ\n(ข้อมูลใน Google Sheets จะไม่ถูกกระทบ)');
