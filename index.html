@@ -771,6 +771,9 @@ let calendarAvailability={};
 let openIssues={};     // { itemName: { note, reportedAt, reportedBy } } — ปัญหาที่ยังไม่ได้แก้
 let currentMonth=new Date(), selCalDate=null;
 const ADMIN_KEY='equipment_admin_verified', DEF_KEY='KU-AV-9x7Q2m';
+// รหัสสำหรับส่งให้เซิร์ฟเวอร์ตรวจสิทธิ์ (ต้องตรงกับ SHARED_SECRET ใน Script Properties เป๊ะ)
+// แยกจาก Admin key ที่ผู้ใช้แก้ได้ในหน้า Settings เพื่อไม่ให้ค่าในเครื่องมาทับจนส่งรหัสผิด
+const SCRIPT_SECRET='KU-AV-9x7Q2m';
 const ISSUES_KEY='equipment_open_issues';
 
 function initState(){
@@ -820,7 +823,7 @@ function requireAdmin(txt=''){
   if(sessionStorage.getItem(ADMIN_KEY)==='1') return true;
   const k=prompt('กรอกรหัสเจ้าหน้าที่'+(txt?` เพื่อ${txt}`:''));
   const key=localStorage.getItem('equipment_admin_key')||DEF_KEY;
-  if(k===key){sessionStorage.setItem(ADMIN_KEY,'1');showToast('✅ ยืนยันสิทธิ์แล้ว');return true;}
+  if(k===key||k===SCRIPT_SECRET){sessionStorage.setItem(ADMIN_KEY,'1');showToast('✅ ยืนยันสิทธิ์แล้ว');return true;}
   showToast('❌ รหัสไม่ถูกต้อง');return false;
 }
 function logoutAdmin(){sessionStorage.removeItem(ADMIN_KEY);showToast('ออกจากโหมดเจ้าหน้าที่');}
@@ -848,7 +851,7 @@ function renderAdminBar(){
 function adminLogin(){
   const k=prompt('กรอกรหัสเจ้าหน้าที่ (Admin key)');
   const key=localStorage.getItem('equipment_admin_key')||DEF_KEY;
-  if(k===key){
+  if(k===key||k===SCRIPT_SECRET){
     sessionStorage.setItem(ADMIN_KEY,'1');
     sessionStorage.setItem(EQ_ADMIN_KEY,'1');
     renderAdminBar();
@@ -1630,7 +1633,7 @@ async function syncFromGoogle(){
 // แนบ secret (= Admin key) ไปให้ backend ตรวจสิทธิ์ฝั่ง server
 async function postToGoogle(payload){
   const url=localStorage.getItem('script_url');if(!url) return {success:false,error:'no url'};
-  const secret=localStorage.getItem('equipment_admin_key')||DEF_KEY;
+  const secret=SCRIPT_SECRET; // ใช้ค่าตายตัวที่ตรงกับ SHARED_SECRET เสมอ ไม่ให้ค่าในเครื่องมาทับ
   try{
     const res=await fetch(url,{
       method:'POST',
@@ -2037,7 +2040,7 @@ let eqDragItem = null;
 function verifyEqAdmin(){
   const val = document.getElementById('eq-admin-key-input')?.value.trim();
   const key = localStorage.getItem('equipment_admin_key') || DEF_KEY;
-  if(val !== key){ showToast('❌ Admin key ไม่ถูกต้อง'); return; }
+  if(val !== key && val !== SCRIPT_SECRET){ showToast('❌ Admin key ไม่ถูกต้อง'); return; }
   // ใช้ session key เดียวกันกับ requireAdmin เพื่อให้ share session ได้
   sessionStorage.setItem(ADMIN_KEY,'1');
   sessionStorage.setItem(EQ_ADMIN_KEY,'1');
