@@ -215,6 +215,12 @@ body{font-family:'Sarabun','Segoe UI',sans-serif;background:linear-gradient(180d
 .step-divider-num{width:32px;height:32px;border-radius:50%;background:var(--ku-green);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;flex-shrink:0}
 .step-divider-line{flex:1;height:2px;background:var(--gray-2)}
 .step-divider-title{font-size:16px;font-weight:800;color:var(--navy)}
+.substep{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:var(--ku-green);color:#fff;font-size:13px;font-weight:800;flex-shrink:0}
+.checklist{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
+.checklist li{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:700;color:var(--muted)}
+.checklist li.done{color:var(--green)}
+.checklist .ck{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0;border:2px solid var(--gray-2);background:#fff;color:var(--muted)}
+.checklist li.done .ck{background:var(--green);border-color:var(--green);color:#fff}
 </style>
 </head>
 <body>
@@ -287,11 +293,21 @@ body{font-family:'Sarabun','Segoe UI',sans-serif;background:linear-gradient(180d
 <div class="container">
   <!-- ⚠️ แบนเนอร์ปัญหาอุปกรณ์ค้าง -->
   <div id="issue-banner-step1"></div>
+  <div class="step-divider">
+    <div class="step-divider-num">1</div>
+    <div class="step-divider-title">กรอกคำขอ & เลือกอุปกรณ์</div>
+    <div class="step-divider-line"></div>
+  </div>
+  <div class="alert info" style="margin-bottom:14px">
+    ทำให้ครบ 2 ส่วน แล้วปุ่ม <strong>"ไปขั้นที่ 2"</strong> จะกดได้ &nbsp;•&nbsp;
+    <span style="white-space:nowrap"><span class="substep" style="width:20px;height:20px;font-size:12px;vertical-align:middle">1</span> กรอกข้อมูลคำขอ</span> &nbsp;
+    <span style="white-space:nowrap"><span class="substep" style="width:20px;height:20px;font-size:12px;vertical-align:middle">2</span> เลือกอุปกรณ์ที่ต้องการ</span>
+  </div>
   <div class="grid-main">
     <!-- ซ้าย: ฟอร์ม -->
     <div>
       <div class="card">
-        <div class="card-header">📝 ข้อมูลคำขอยืมอุปกรณ์</div>
+        <div class="card-header"><span style="display:flex;align-items:center;gap:9px"><span class="substep">1</span>กรอกข้อมูลคำขอ</span></div>
         <div class="card-body">
           <div class="form-grid">
             <div class="form-group span2">
@@ -322,7 +338,7 @@ body{font-family:'Sarabun','Segoe UI',sans-serif;background:linear-gradient(180d
         </div>
       </div>
       <div class="card">
-        <div class="card-header">📊 สรุปรายการที่เลือก</div>
+        <div class="card-header">✅ ความคืบหน้า & ไปขั้นต่อไป</div>
         <div class="card-body">
           <div class="stats">
             <div class="stat"><div class="n" id="s-checked">0</div><div class="l">รายการที่เลือก</div></div>
@@ -344,7 +360,7 @@ body{font-family:'Sarabun','Segoe UI',sans-serif;background:linear-gradient(180d
     <!-- ขวา: เลือกอุปกรณ์ -->
     <div>
       <div class="toolbar">
-        <div style="font-size:14px;font-weight:800;color:var(--navy)">📦 เลือกอุปกรณ์</div>
+        <div style="font-size:14px;font-weight:800;color:var(--navy);display:flex;align-items:center;gap:9px"><span class="substep">2</span>เลือกอุปกรณ์ที่ต้องยืม</div>
         <button class="btn" onclick="collapseAll()">ย่อทั้งหมด</button>
       </div>
       <div id="equipment-sections"></div>
@@ -984,19 +1000,30 @@ function updateStep1Gate(){
   if(date && rdate && rdate<date) missing.push('วันที่คืนต้องไม่ก่อนวันที่ใช้งาน');
   if(nItems===0) missing.push('เลือกอุปกรณ์อย่างน้อย 1 รายการ');
 
-  const ready = missing.length===0;
+  const dateBad = !!(date && rdate && rdate<date);
+  const checks=[
+    {ok:!!user,  label:'กรอกชื่อผู้ขอยืม'},
+    {ok:!!event, label:'กรอกชื่องาน / กิจกรรม'},
+    {ok:!!date,  label:'เลือกวันที่ใช้งาน'},
+    {ok:nItems>0,label:nItems>0?`เลือกอุปกรณ์แล้ว ${nItems} รายการ`:'เลือกอุปกรณ์อย่างน้อย 1 รายการ'}
+  ];
+  const ready = checks.every(c=>c.ok) && !dateBad;
+
   const btn = document.getElementById('btn-step2');
   const el  = document.getElementById('step1-alert');
   if(btn && !btn.classList.contains('is-loading')) btn.disabled=!ready;
-  if(el){
-    if(ready){
-      el.className='alert success';
-      el.innerHTML=`✅ ข้อมูลครบ (${nItems} รายการ) — กด "ไปขั้นที่ 2" ได้เลย`;
-    }else{
-      el.className='alert info';
-      el.innerHTML='<strong>ยังไปขั้นที่ 2 ไม่ได้</strong> กรุณาทำให้ครบตามนี้ก่อน:<br>'
-        + missing.map((m,i)=>`${i+1}. ${m}`).join('<br>');
-    }
+  if(!el) return;
+
+  if(ready){
+    el.className='alert success';
+    el.innerHTML=`✅ ครบแล้ว! กด <strong>"ไปขั้นที่ 2"</strong> เพื่อตรวจสอบความพร้อมใช้ได้เลย`;
+  }else{
+    let html='<strong>ทำให้ครบก่อนไปขั้นที่ 2:</strong><ul class="checklist">'
+      + checks.map(c=>`<li class="${c.ok?'done':''}"><span class="ck">${c.ok?'✓':'○'}</span>${c.label}</li>`).join('');
+    if(dateBad) html+='<li><span class="ck" style="border-color:var(--red);color:var(--red)">!</span><span style="color:var(--red)">วันที่คืนต้องไม่ก่อนวันที่ใช้งาน</span></li>';
+    html+='</ul>';
+    el.className='alert info';
+    el.innerHTML=html;
   }
 }
 function collapseAll(){EQUIPMENT.forEach(cat=>{openSecs[cat.id]=false;document.getElementById('bdy-'+cat.id).classList.remove('open');document.getElementById('hdr-'+cat.id).classList.remove('open');});}
