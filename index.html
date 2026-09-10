@@ -1642,10 +1642,12 @@ function hardClearAll(){
   // เก็บ settings ไว้ก่อนล้าง
   const savedUrl      = localStorage.getItem('script_url');
   const savedAdminKey = localStorage.getItem('equipment_admin_key');
+  const savedEquip    = localStorage.getItem(EQ_DATA_KEY);   // เก็บรายชื่ออุปกรณ์ไว้ด้วย
   localStorage.clear();
   // คืน settings
   if(savedUrl)      localStorage.setItem('script_url', savedUrl);
   if(savedAdminKey) localStorage.setItem('equipment_admin_key', savedAdminKey);
+  if(savedEquip)    localStorage.setItem(EQ_DATA_KEY, savedEquip);
   // ✅ สำคัญ: set ค่านี้ไว้เพื่อไม่ให้ seedDemo() สร้างข้อมูลตัวอย่างกลับมาอีก
   localStorage.setItem('university_equipment_seeded', '1');
   sessionStorage.clear();
@@ -2196,7 +2198,7 @@ function eqLoadData(){
   }
 }
 
-function eqSave(){
+async function eqSave(){
   localStorage.setItem(EQ_DATA_KEY, JSON.stringify(eqData));
   // อัปเดต EQUIPMENT จริงในหน่วยความจำด้วย
   EQUIPMENT.length = 0;
@@ -2205,6 +2207,12 @@ function eqSave(){
   // rebuild sections ใน step1
   buildSections();
   applyIssueBadgesOnEquipment();
+  // บันทึกขึ้นส่วนกลาง (Sheets) เพื่อให้ทุกเครื่องใช้ร่วมกัน และไม่หายเมื่อล้างข้อมูลในเครื่อง
+  if(localStorage.getItem('script_url')){
+    const res=await postToGoogle({action:'saveEquipment', equipment:eqData});
+    if(res && res.success) showToast('✅ บันทึกรายชื่ออุปกรณ์ขึ้นส่วนกลางแล้ว');
+    else showToast('⚠️ บันทึกในเครื่องแล้ว แต่ขึ้นส่วนกลางไม่สำเร็จ: '+((res&&res.error)||''));
+  }
 }
 
 function eqGenId(p){ return p+'-'+Date.now()+'-'+Math.random().toString(36).slice(2,5); }
@@ -2425,8 +2433,25 @@ saveScriptUrl();
 const adminInput=document.getElementById('adminKeySetting');
 if(adminInput) adminInput.value=localStorage.getItem('equipment_admin_key')||DEF_KEY;
 
-// ดึงสถานะอุปกรณ์จาก Sheets มาล็อกชิ้นที่ถูกยืม ตั้งแต่เปิดหน้าแรก
-syncAvailabilityLocks();
+// ดึงรายชื่ออุปกรณ์จาก Sheets (ศูนย์กลาง) มาแทน localStorage ถ้ามี
+async function loadEquipmentFromServer(){
+  const url=localStorage.getItem('script_url'); if(!url) return;
+  try{
+    const res=await fetch(url+'?action=equipment',{cache:'no-store'});
+    const json=await res.json();
+    if(json.success && Array.isArray(json.equipment) && json.equipment.length){
+      EQUIPMENT.length=0; json.equipment.forEach(c=>EQUIPMENT.push(c));
+      localStorage.setItem(EQ_DATA_KEY, JSON.stringify(json.equipment)); // cache ไว้ใช้ตอนออฟไลน์
+      initState(); buildSections(); applyIssueBadgesOnEquipment(); updateStats1();
+    }
+  }catch(e){}
+}
+
+// ดึงรายชื่ออุปกรณ์จากส่วนกลางก่อน แล้วค่อยล็อกชิ้นที่ถูกยืม
+(async function(){
+  await loadEquipmentFromServer();
+  syncAvailabilityLocks();
+})();
 </script>
 </body>
 </html>
