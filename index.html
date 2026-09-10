@@ -554,9 +554,15 @@ body{font-family:'Sarabun','Segoe UI',sans-serif;background:linear-gradient(180d
 <!-- HISTORY -->
 <div class="tab-panel" id="panel-history">
 <div class="container">
-  <div class="toolbar">
+  <div class="toolbar" style="flex-wrap:wrap;gap:8px">
     <div style="font-size:14px;font-weight:800;color:var(--navy)">🗂 ประวัติรายการทั้งหมด</div>
-    <button class="btn danger" onclick="clearAllLocal()">🗑 ล้างข้อมูลทั้งหมด</button>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;user-select:none">
+        <input type="checkbox" id="hist-select-all" onchange="histToggleAll(this.checked)" style="width:16px;height:16px"> เลือกทั้งหมด
+      </label>
+      <button class="btn danger" id="hist-del-selected" onclick="deleteSelectedHistory()" disabled>🗑 ลบรายการที่เลือก (0)</button>
+      <button class="btn danger" onclick="clearAllLocal()">🗑 ล้างข้อมูลทั้งหมด</button>
+    </div>
   </div>
   <div id="history-list"></div>
 </div>
@@ -1690,7 +1696,44 @@ function rangesOverlap(aS,aE,bS,bE){aE=aE||aS;bE=bE||bS;return aS<=bE&&bS<=aE;}
 // ════════════════════════════════════════════════
 function renderHistory(){
   const r=getRecords();
-  document.getElementById('history-list').innerHTML=r.length?r.map(x=>requestCard(x,'history')).join(''):'<div class="alert info">ยังไม่มีรายการ</div>';
+  const listEl=document.getElementById('history-list');
+  if(!r.length){
+    listEl.innerHTML='<div class="alert info">ยังไม่มีรายการ</div>';
+    updateHistSelBar(); return;
+  }
+  listEl.innerHTML = r.map(x=>`
+    <div style="display:flex;gap:10px;align-items:flex-start">
+      <input type="checkbox" class="hist-check" value="${x.id}" onchange="updateHistSelBar()"
+             style="margin-top:20px;width:18px;height:18px;flex-shrink:0;cursor:pointer">
+      <div style="flex:1;min-width:0">${requestCard(x,'history')}</div>
+    </div>`).join('');
+  updateHistSelBar();
+}
+function histSelectedIds(){ return [...document.querySelectorAll('.hist-check:checked')].map(c=>c.value); }
+function histToggleAll(chk){ document.querySelectorAll('.hist-check').forEach(c=>c.checked=chk); updateHistSelBar(); }
+function updateHistSelBar(){
+  const n=histSelectedIds().length;
+  const all=document.querySelectorAll('.hist-check').length;
+  const btn=document.getElementById('hist-del-selected');
+  if(btn){ btn.disabled=n===0; btn.textContent=`🗑 ลบรายการที่เลือก (${n})`; }
+  const master=document.getElementById('hist-select-all');
+  if(master){ master.checked = all>0 && n===all; master.indeterminate = n>0 && n<all; }
+}
+async function deleteSelectedHistory(){
+  const ids=histSelectedIds();
+  if(!ids.length) return;
+  if(!requireAdmin('ลบรายการประวัติ')) return;
+  if(!confirm(`ลบ ${ids.length} รายการที่เลือกออกจากระบบ (รวมบน Google Sheets)?\nการกระทำนี้ย้อนกลับไม่ได้`)) return;
+  // ลบในเครื่อง
+  setRecords(getRecords().filter(r=>!ids.includes(r.id)));
+  renderAll();
+  showToast(`🗑 ลบ ${ids.length} รายการแล้ว`);
+  // ลบบนเซิร์ฟเวอร์
+  if(localStorage.getItem('script_url')){
+    const res=await postToGoogle({action:'deleteRequests', ids});
+    if(!res || res.success!==true)
+      showToast('⚠️ ลบในเครื่องแล้ว แต่ลบบนส่วนกลางไม่สำเร็จ: '+((res&&res.error)||''));
+  }
 }
 // ล้างข้อมูลส่วนกลาง (Google Sheets) ผ่าน backend + ล้างในเครื่องนี้
 async function clearCentralData(){
