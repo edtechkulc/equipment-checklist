@@ -999,6 +999,13 @@ function selectAllVisible(){
 // ════════════════════════════════════════════════
 // STEP 1 → STEP 2
 // ════════════════════════════════════════════════
+// ดึง JSON แบบมี timeout กันค้าง (คืน {} ถ้าช้าเกินหรือพลาด)
+function fetchJSONTimeout(url, ms){
+  return Promise.race([
+    fetch(url,{cache:'no-store'}).then(r=>r.json()),
+    new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')), ms))
+  ]).catch(()=>({}));
+}
 async function goToStep2(){
   const user  = document.getElementById('userName').value.trim();
   const event = document.getElementById('eventName').value.trim();
@@ -1023,37 +1030,35 @@ async function goToStep2(){
     fail('⚠️ กรุณาเลือกอุปกรณ์อย่างน้อย 1 รายการ'); return;
   }
 
-  // ── แสดง loading state ─────────────────────────
+  // ── เปิดหน้าขั้นที่ 2 ทันทีด้วยข้อมูลที่มีอยู่ (ไม่รอเน็ต) ──
+  calendarAvailability = computeCalendarAvailability(date, rdate);
+  buildCheckTable(items);
   const alertEl=document.getElementById('step1-alert');
-  alertEl.className='alert info';
-  alertEl.innerHTML='<span class="spinner" style="border-top-color:var(--blue);margin-right:6px"></span>กำลังตรวจสอบข้อมูลล่าสุดจาก Google Sheets...';
-  const btn=document.querySelector('[onclick="goToStep2()"]');
-  if(btn){ btn.disabled=true; btn.classList.add('is-loading'); btn.innerHTML='<span class="spinner"></span> กำลังโหลด...'; }
+  alertEl.className='alert success';
+  alertEl.textContent=`✅ ข้อมูลครบ — ${items.length} รายการ`;
+  showTab('step2');
 
-  // ── ดึงข้อมูล real-time จาก Sheets พร้อมกัน 2 endpoints ──
+  // ── อัปเดตคิวล่าสุดจาก Sheets เบื้องหลัง (มี timeout กันค้าง) ──
   const scriptUrl=localStorage.getItem('script_url');
   if(scriptUrl){
-    try{
-      const [avRes, reqRes] = await Promise.all([
-        fetch(scriptUrl+'?action=availability',    {cache:'no-store'}).then(r=>r.json()).catch(()=>({})),
-        fetch(scriptUrl+'?action=active_requests', {cache:'no-store'}).then(r=>r.json()).catch(()=>({}))
-      ]);
-      if(avRes.success  && avRes.statuses)  sheetsStatuses            = avRes.statuses;
-      if(reqRes.success && reqRes.items)    window._sheetsActiveReqs  = reqRes.items;
-      updateHeaderStats();
-    }catch(_){ /* offline — ใช้ cache เดิม */ }
+    showToast('⏳ กำลังอัปเดตคิวล่าสุด...');
+    const [avRes, reqRes] = await Promise.all([
+      fetchJSONTimeout(scriptUrl+'?action=availability',    12000),
+      fetchJSONTimeout(scriptUrl+'?action=active_requests', 12000)
+    ]);
+    let changed=false;
+    if(avRes.success  && avRes.statuses){ sheetsStatuses           = avRes.statuses; changed=true; }
+    if(reqRes.success && reqRes.items){   window._sheetsActiveReqs = reqRes.items;   changed=true; }
+    updateHeaderStats();
+    if(changed && document.getElementById('panel-step2')?.classList.contains('active')){
+      calendarAvailability = computeCalendarAvailability(date, rdate);
+      const noneChecked = Object.values(checkResults).every(v=>!v.status);
+      if(noneChecked) buildCheckTable(items);   // ยังไม่ได้กดตรวจ → รีเฟรชตารางให้คิวถูกต้อง
+      showToast('✅ อัปเดตคิวล่าสุดแล้ว');
+    } else if(!changed){
+      showToast('⚠️ อัปเดตคิวไม่สำเร็จ — ใช้ข้อมูลที่มีอยู่');
+    }
   }
-
-  // คำนวณ conflict ด้วยข้อมูลล่าสุด
-  calendarAvailability = computeCalendarAvailability(date, rdate);
-
-  // ── restore button ─────────────────────────────
-  if(btn){ btn.disabled=false; btn.classList.remove('is-loading'); btn.innerHTML='ไปขั้นที่ 2: ตรวจสอบความพร้อมใช้ →'; }
-  alertEl.className='alert success';
-  alertEl.textContent=`✅ ข้อมูลครบ — ${items.length} รายการ กำลังไปขั้นที่ 2...`;
-
-  buildCheckTable(items);
-  showTab('step2');
 }
 
 function selectedItems(){
