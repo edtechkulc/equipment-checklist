@@ -1350,13 +1350,19 @@ function renderApproval(){
 
 // ส่งคำสั่งเปลี่ยนสถานะไปเซิร์ฟเวอร์ ถ้าคำขอยังไม่มีบนเซิร์ฟเวอร์ (request not found)
 // ให้ดันคำขอขึ้นก่อนแล้วสั่งซ้ำ (กันกรณีคำขออยู่แค่ในเครื่อง เช่นหลังล้างข้อมูลส่วนกลาง)
+let _mutating=false;
 async function serverMutate(r, action, extra){
-  let res=await postToGoogle({...r,...(extra||{}),action});
-  if(res && res.error && String(res.error).indexOf('request not found')===0){
-    await postToGoogle({...r,action:'request'});        // ดันคำขอขึ้นส่วนกลางก่อน
-    res=await postToGoogle({...r,...(extra||{}),action}); // แล้วสั่งซ้ำ
-  }
-  return res;
+  if(_mutating) return {success:false,error:'กำลังดำเนินการรายการก่อนหน้า กรุณารอสักครู่'};
+  _mutating=true;
+  showToast('⏳ กำลังดำเนินการ...');
+  try{
+    let res=await postToGoogle({...r,...(extra||{}),action});
+    if(res && res.error && String(res.error).indexOf('request not found')===0){
+      await postToGoogle({...r,action:'request'});        // ดันคำขอขึ้นส่วนกลางก่อน
+      res=await postToGoogle({...r,...(extra||{}),action}); // แล้วสั่งซ้ำ
+    }
+    return res;
+  }finally{ _mutating=false; }
 }
 
 async function approveRequest(id){
@@ -1693,14 +1699,19 @@ async function syncFromGoogle(){
 async function postToGoogle(payload){
   const url=localStorage.getItem('script_url');if(!url) return {success:false,error:'no url'};
   const secret=SCRIPT_SECRET; // ใช้ค่าตายตัวที่ตรงกับ SHARED_SECRET เสมอ ไม่ให้ค่าในเครื่องมาทับ
+  const ctrl=new AbortController();
+  const timer=setTimeout(()=>ctrl.abort(), 30000); // ตัดจบถ้าเกิน 30 วิ กันค้างถาวร
   try{
     const res=await fetch(url,{
       method:'POST',
       headers:{'Content-Type':'text/plain;charset=utf-8'},
-      body:JSON.stringify({...payload,secret})
+      body:JSON.stringify({...payload,secret}),
+      signal:ctrl.signal
     });
     return await res.json();
-  }catch(e){ return {success:false,error:e.message}; }
+  }catch(e){
+    return {success:false,error: e.name==='AbortError' ? 'เซิร์ฟเวอร์ไม่ตอบใน 30 วินาที (ลองใหม่อีกครั้ง)' : e.message};
+  }finally{ clearTimeout(timer); }
 }
 
 // ════════════════════════════════════════════════
