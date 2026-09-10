@@ -330,7 +330,7 @@ body{font-family:'Sarabun','Segoe UI',sans-serif;background:linear-gradient(180d
           </div>
           <div id="step1-alert" class="alert info">เลือกอุปกรณ์ที่ต้องการทางขวามือ จากนั้นกด "ไปขั้นที่ 2" เพื่อตรวจสอบความพร้อมใช้งาน</div>
           <div class="btn-row">
-            <button class="btn primary lg full" onclick="goToStep2()">ไปขั้นที่ 2: ตรวจสอบความพร้อมใช้ →</button>
+            <button class="btn primary lg full" id="btn-step2" onclick="goToStep2()">ไปขั้นที่ 2: ตรวจสอบความพร้อมใช้ →</button>
           </div>
           <div class="btn-row">
             <button class="btn" onclick="clearForm()">🔄 ล้างข้อมูล</button>
@@ -953,6 +953,38 @@ function updateStats1(){
   document.getElementById('s-total').textContent=total;
   document.getElementById('s-cats').textContent=cats.size;
   document.getElementById('s-qty-max').textContent=maxq||0;
+  updateStep1Gate();
+}
+
+// ควบคุมปุ่ม "ไปขั้นที่ 2": กดได้ต่อเมื่อกรอกข้อมูลจำเป็นและเลือกอุปกรณ์ครบ
+function updateStep1Gate(){
+  const user  = document.getElementById('userName')?.value.trim();
+  const event = document.getElementById('eventName')?.value.trim();
+  const date  = document.getElementById('useDate')?.value;
+  const rdate = document.getElementById('returnDate')?.value;
+  const nItems= selectedItems().length;
+
+  const missing=[];
+  if(!user)  missing.push('กรอกชื่อผู้ขอยืม');
+  if(!event) missing.push('กรอกชื่องาน / กิจกรรม');
+  if(!date)  missing.push('เลือกวันที่ใช้งาน');
+  if(date && rdate && rdate<date) missing.push('วันที่คืนต้องไม่ก่อนวันที่ใช้งาน');
+  if(nItems===0) missing.push('เลือกอุปกรณ์อย่างน้อย 1 รายการ');
+
+  const ready = missing.length===0;
+  const btn = document.getElementById('btn-step2');
+  const el  = document.getElementById('step1-alert');
+  if(btn && !btn.classList.contains('is-loading')) btn.disabled=!ready;
+  if(el){
+    if(ready){
+      el.className='alert success';
+      el.innerHTML=`✅ ข้อมูลครบ (${nItems} รายการ) — กด "ไปขั้นที่ 2" ได้เลย`;
+    }else{
+      el.className='alert info';
+      el.innerHTML='<strong>ยังไปขั้นที่ 2 ไม่ได้</strong> กรุณาทำให้ครบตามนี้ก่อน:<br>'
+        + missing.map((m,i)=>`${i+1}. ${m}`).join('<br>');
+    }
+  }
 }
 function collapseAll(){EQUIPMENT.forEach(cat=>{openSecs[cat.id]=false;document.getElementById('bdy-'+cat.id).classList.remove('open');document.getElementById('hdr-'+cat.id).classList.remove('open');});}
 function selectAllVisible(){
@@ -994,7 +1026,7 @@ async function goToStep2(){
   alertEl.className='alert info';
   alertEl.innerHTML='<span class="spinner" style="border-top-color:var(--blue);margin-right:6px"></span>กำลังตรวจสอบข้อมูลล่าสุดจาก Google Sheets...';
   const btn=document.querySelector('[onclick="goToStep2()"]');
-  if(btn){ btn.disabled=true; btn.innerHTML='<span class="spinner"></span> กำลังโหลด...'; }
+  if(btn){ btn.disabled=true; btn.classList.add('is-loading'); btn.innerHTML='<span class="spinner"></span> กำลังโหลด...'; }
 
   // ── ดึงข้อมูล real-time จาก Sheets พร้อมกัน 2 endpoints ──
   const scriptUrl=localStorage.getItem('script_url');
@@ -1014,7 +1046,7 @@ async function goToStep2(){
   calendarAvailability = computeCalendarAvailability(date, rdate);
 
   // ── restore button ─────────────────────────────
-  if(btn){ btn.disabled=false; btn.innerHTML='ไปขั้นที่ 2: ตรวจสอบความพร้อมใช้ →'; }
+  if(btn){ btn.disabled=false; btn.classList.remove('is-loading'); btn.innerHTML='ไปขั้นที่ 2: ตรวจสอบความพร้อมใช้ →'; }
   alertEl.className='alert success';
   alertEl.textContent=`✅ ข้อมูลครบ — ${items.length} รายการ กำลังไปขั้นที่ 2...`;
 
@@ -2414,6 +2446,12 @@ document.getElementById('eq-new-cat-qty')?.addEventListener('change',function(){
   if(w) w.style.display=this.checked?'block':'none';
 });
 
+// ผูกช่องกรอกข้อมูลคำขอเข้ากับปุ่ม "ไปขั้นที่ 2" (กดได้เมื่อครบ)
+['userName','eventName','useDate','returnDate'].forEach(id=>{
+  const el=document.getElementById(id);
+  if(el){ el.addEventListener('input',updateStep1Gate); el.addEventListener('change',updateStep1Gate); }
+});
+
 // ── โหลด equipment จาก localStorage ถ้าเคยแก้ไขไว้ ──
 (function(){
   const saved=localStorage.getItem('admin_equipment_data');
@@ -2423,6 +2461,7 @@ document.getElementById('eq-new-cat-qty')?.addEventListener('change',function(){
 initState();   // FIX A: สร้าง state ให้อุปกรณ์ที่โหลดมาจาก localStorage ครบทุกชิ้น
 buildSections();
 updateStats1();
+updateStep1Gate();   // ตั้งสถานะปุ่ม "ไปขั้นที่ 2" ตั้งแต่เริ่ม (ยังไม่ครบ = กดไม่ได้)
 renderCalendar();
 updateHeaderStats();
 
