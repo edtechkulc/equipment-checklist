@@ -1444,8 +1444,30 @@ async function rejectRequest(id){
     if(rr) await sendEmailNotification(rr,'rejected');
   }
 }
+// ดึงสถานะอุปกรณ์ล่าสุด (เฉพาะ availability) มาอัปเดต sheetsStatuses
+async function fetchAvailability(){
+  const url=localStorage.getItem('script_url'); if(!url) return;
+  try{
+    const j=await fetch(url+'?action=availability',{cache:'no-store'}).then(r=>r.json());
+    if(j && j.success && j.statuses){ sheetsStatuses=j.statuses; updateHeaderStats(); }
+  }catch(e){}
+}
+
 async function markBorrowed(id){
   if(!requireAdmin('จ่ายอุปกรณ์')) return;
+  const r=getRecords().find(x=>x.id===id); if(!r) return;
+  // ตรวจสถานะล่าสุดก่อนจ่าย: อุปกรณ์ชิ้นเดียวในคำขอนี้ถูกยืม/สูญหายอยู่แล้วหรือไม่ (กันจ่ายซ้ำ)
+  if(localStorage.getItem('script_url')){
+    await fetchAvailability();
+    const qtyName={}; EQUIPMENT.forEach(c=>c.items.forEach(it=>{ if(c.qty) qtyName[it.name]=true; }));
+    const conflict=(r.items||[])
+      .map(it=>typeof it==='object'?it.name:it)
+      .filter(name=>!qtyName[name] && ['borrowed','lost'].includes(sheetsStatuses[name]?.status));
+    if(conflict.length){
+      showToast('❌ จ่ายอุปกรณ์ไม่ได้: ถูกยืม/ไม่พร้อมอยู่แล้ว — '+conflict.join(', '));
+      return;
+    }
+  }
   await optimisticStatus(id,'borrow','borrowed',
     {borrowedAt:new Date().toISOString()}, {},
     '📤 จ่ายอุปกรณ์แล้ว — สถานะเปลี่ยนเป็น "ถูกยืมอยู่"', 'จ่ายอุปกรณ์ไม่สำเร็จ');
