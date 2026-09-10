@@ -2394,8 +2394,15 @@ async function eqSave(){
   // บันทึกขึ้นส่วนกลาง (Sheets) เพื่อให้ทุกเครื่องใช้ร่วมกัน และไม่หายเมื่อล้างข้อมูลในเครื่อง
   if(localStorage.getItem('script_url')){
     const res=await postToGoogle({action:'saveEquipment', equipment:eqData});
-    if(res && res.success) showToast('✅ บันทึกรายชื่ออุปกรณ์ขึ้นส่วนกลางแล้ว');
-    else showToast('⚠️ บันทึกในเครื่องแล้ว แต่ขึ้นส่วนกลางไม่สำเร็จ: '+((res&&res.error)||''));
+    if(res && res.success){
+      localStorage.removeItem('equipment_dirty');
+      showToast('✅ บันทึกรายชื่ออุปกรณ์ขึ้นส่วนกลางแล้ว');
+    }else{
+      localStorage.setItem('equipment_dirty','1'); // ยังไม่ซิงก์ → กันไม่ให้ถูกดึงทับตอนรีเฟรช
+      showToast('⚠️ บันทึกในเครื่องแล้ว (ยังไม่ขึ้นส่วนกลาง จะลองซิงก์อีกครั้งอัตโนมัติ)');
+    }
+  }else{
+    localStorage.setItem('equipment_dirty','1');
   }
 }
 
@@ -2504,9 +2511,11 @@ function eqDelCat(i){
 function eqAddItem(){
   const name = document.getElementById('eq-new-item')?.value.trim();
   if(!name){ showToast('⚠️ กรุณากรอกชื่ออุปกรณ์'); return; }
+  if(eqSelCat<0 || !eqData[eqSelCat]){ showToast('⚠️ กรุณาเลือกหมวดหมู่ก่อน แล้วจึงเพิ่มอุปกรณ์'); return; }
   const cat = eqData[eqSelCat];
   if(cat.items.some(i=>i.name===name)){ showToast('⚠️ มีชื่อนี้แล้วในหมวดนี้'); return; }
   cat.items.push({id:eqGenId('item'), name});
+  const inp=document.getElementById('eq-new-item'); if(inp) inp.value='';
   eqSave(); eqRenderCats(); eqRenderItems();
   showToast(`✅ เพิ่ม "${name}" แล้ว`);
 }
@@ -2627,6 +2636,14 @@ if(adminInput) adminInput.value=localStorage.getItem('equipment_admin_key')||DEF
 // ดึงรายชื่ออุปกรณ์จาก Sheets (ศูนย์กลาง) มาแทน localStorage ถ้ามี
 async function loadEquipmentFromServer(){
   const url=localStorage.getItem('script_url'); if(!url) return;
+  // มีการแก้ในเครื่องที่ยังไม่ได้ซิงก์ → ดันขึ้นเซิร์ฟเวอร์ก่อน อย่าดึงทับ (ของในเครื่องใหม่กว่า)
+  if(localStorage.getItem('equipment_dirty')==='1'){
+    try{
+      const res=await postToGoogle({action:'saveEquipment', equipment:EQUIPMENT});
+      if(res && res.success) localStorage.removeItem('equipment_dirty');
+    }catch(e){}
+    return;
+  }
   try{
     const res=await fetch(url+'?action=equipment',{cache:'no-store'});
     const json=await res.json();
