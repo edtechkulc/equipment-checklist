@@ -564,6 +564,11 @@ body{font-family:'Sarabun','Segoe UI',sans-serif;background:linear-gradient(180d
       <button class="btn danger" onclick="clearAllLocal()">🗑 ล้างข้อมูลทั้งหมด</button>
     </div>
   </div>
+  <div id="hist-filter" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px">
+    <div id="hist-chips" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+    <input id="hist-search" type="text" placeholder="🔍 ค้นหา ชื่องาน / ผู้ขอ" oninput="renderHistory()"
+           style="flex:1;min-width:180px;padding:8px 12px;border:1px solid var(--gray-2);border-radius:10px;font:inherit;font-size:13px">
+  </div>
   <div id="history-list"></div>
 </div>
 </div>
@@ -1694,14 +1699,37 @@ function rangesOverlap(aS,aE,bS,bE){aE=aE||aS;bE=bE||bS;return aS<=bE&&bS<=aE;}
 // ════════════════════════════════════════════════
 // HISTORY
 // ════════════════════════════════════════════════
+let histFilter='all';
+function setHistFilter(s){ histFilter=s; renderHistory(); }
 function renderHistory(){
-  const r=getRecords();
+  const all=getRecords();
+  const q=(document.getElementById('hist-search')?.value||'').trim().toLowerCase();
+
+  // วาดชิปตัวกรองสถานะ พร้อมจำนวนในแต่ละสถานะ
+  const chipsEl=document.getElementById('hist-chips');
+  if(chipsEl){
+    const defs=[['all','📋 ทั้งหมด'],['pending','🟡 รออนุมัติ'],['approved','🔵 อนุมัติแล้ว'],
+                ['borrowed','🔴 ถูกยืมอยู่'],['returned','🟢 คืนแล้ว'],['rejected','⚫ ไม่อนุมัติ']];
+    chipsEl.innerHTML=defs.map(([key,label])=>{
+      const cnt = key==='all' ? all.length : all.filter(r=>r.status===key).length;
+      const active = histFilter===key;
+      return `<button class="btn${active?' primary':''}" onclick="setHistFilter('${key}')"
+        style="padding:6px 12px;font-size:12px">${label} (${cnt})</button>`;
+    }).join('');
+  }
+
+  // กรองรายการ
+  let list=all;
+  if(histFilter!=='all') list=list.filter(r=>r.status===histFilter);
+  if(q) list=list.filter(r=>
+    (r.event||'').toLowerCase().includes(q) || (r.user||'').toLowerCase().includes(q));
+
   const listEl=document.getElementById('history-list');
-  if(!r.length){
-    listEl.innerHTML='<div class="alert info">ยังไม่มีรายการ</div>';
+  if(!list.length){
+    listEl.innerHTML='<div class="alert info">ไม่มีรายการที่ตรงกับตัวกรอง</div>';
     updateHistSelBar(); return;
   }
-  listEl.innerHTML = r.map(x=>`
+  listEl.innerHTML = list.map(x=>`
     <div style="display:flex;gap:10px;align-items:flex-start">
       <input type="checkbox" class="hist-check" value="${x.id}" onchange="updateHistSelBar()"
              style="margin-top:20px;width:18px;height:18px;flex-shrink:0;cursor:pointer">
